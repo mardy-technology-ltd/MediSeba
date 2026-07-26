@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'health_consultation_success_view.dart';
 
 class HealthConsultationView extends StatefulWidget {
   const HealthConsultationView({super.key});
@@ -10,6 +11,37 @@ class HealthConsultationView extends StatefulWidget {
 class _HealthConsultationViewState extends State<HealthConsultationView> {
   String? selectedGender;
   String? selectedAge;
+  final TextEditingController _questionController = TextEditingController();
+
+  @override
+  void dispose() {
+    _questionController.dispose();
+    super.dispose();
+  }
+
+  void _submitForm() {
+    if (_questionController.text.trim().isEmpty || 
+        selectedGender == null || 
+        selectedAge == null) {
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please fill all mandatory fields to proceed.'),
+          backgroundColor: Colors.redAccent,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    // All fields are valid, navigate to success view
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const HealthConsultationSuccessView(),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +114,7 @@ class _HealthConsultationViewState extends State<HealthConsultationView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildLabel('Ask Your Question'),
+                    _buildLabel('Ask Your Question *'),
                     const SizedBox(height: 8),
                     Container(
                       height: 120,
@@ -91,17 +123,20 @@ class _HealthConsultationViewState extends State<HealthConsultationView> {
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: const Color(0xFFF1F5F9)),
                       ),
-                      child: const TextField(
+                      child: TextField(
+                        controller: _questionController,
                         maxLines: null,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.all(16),
+                          hintText: 'Type your question here...',
+                          hintStyle: TextStyle(color: Color(0xFF94A3B8), fontSize: 14),
                         ),
                       ),
                     ),
                     const SizedBox(height: 20),
                     
-                    _buildLabel('Select Gender'),
+                    _buildLabel('Select Gender *'),
                     const SizedBox(height: 8),
                     Container(
                       decoration: BoxDecoration(
@@ -114,6 +149,7 @@ class _HealthConsultationViewState extends State<HealthConsultationView> {
                         child: DropdownButton<String>(
                           isExpanded: true,
                           value: selectedGender,
+                          hint: const Text('Select your gender', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 14)),
                           icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF94A3B8)),
                           items: ['Male', 'Female', 'Other']
                               .map((e) => DropdownMenuItem(value: e, child: Text(e)))
@@ -124,7 +160,7 @@ class _HealthConsultationViewState extends State<HealthConsultationView> {
                     ),
                     const SizedBox(height: 20),
                     
-                    _buildLabel('Your Age'),
+                    _buildLabel('Your Age *'),
                     const SizedBox(height: 8),
                     Container(
                       decoration: BoxDecoration(
@@ -137,6 +173,7 @@ class _HealthConsultationViewState extends State<HealthConsultationView> {
                         child: DropdownButton<String>(
                           isExpanded: true,
                           value: selectedAge,
+                          hint: const Text('Select your age', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 14)),
                           icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF94A3B8)),
                           items: ['Under 18', '18-25', '26-35', '36-45', '46-60', '60+']
                               .map((e) => DropdownMenuItem(value: e, child: Text(e)))
@@ -157,7 +194,7 @@ class _HealthConsultationViewState extends State<HealthConsultationView> {
                 width: double.infinity,
                 height: 52,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: _submitForm,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF0F9D58),
                     shape: RoundedRectangleBorder(

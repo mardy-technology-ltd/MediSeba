@@ -79,7 +79,7 @@ class _HomeViewState extends State<HomeView> {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Text(
-                  'ডাক্তার বাড়ি',
+                  'ডাক্তার ঘর',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
