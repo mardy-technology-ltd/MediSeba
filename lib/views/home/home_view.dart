@@ -4,6 +4,9 @@ import '../../controllers/home_controller.dart';
 import '../../controllers/auth_controller.dart';
 import '../doctors/doctor_list_view.dart';
 import '../doctor_bari/doctor_bari_view.dart';
+import '../about/about_us_view.dart';
+import '../social/social_media_view.dart';
+import '../health_consultation/health_consultation_view.dart';
 
 class HomeView extends StatefulWidget {
   final HomeController homeController;
@@ -356,12 +359,21 @@ class _HomeViewState extends State<HomeView> {
 
   // Health Query Banner (100% pixel-matched with Figma screenshot)
   Widget _buildQueryBanner() {
-    return GestureDetector(
-      onTap: () {},
-      child: Image.asset(
-        'assets/images/perfect_query_banner.png',
-        fit: BoxFit.contain,
-        width: double.infinity,
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const HealthConsultationView()),
+        );
+      },
+      borderRadius: BorderRadius.circular(16),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Image.asset(
+          'assets/images/perfect_query_banner.png',
+          width: double.infinity,
+          fit: BoxFit.fitWidth,
+        ),
       ),
     );
   }
@@ -604,7 +616,13 @@ class _HomeViewState extends State<HomeView> {
                   fit: BoxFit.contain,
                 ),
                 title: 'About us',
-                onTap: () => Navigator.pop(context),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const AboutUsView()),
+                  );
+                },
               ),
               const SizedBox(height: 14),
 
@@ -617,7 +635,13 @@ class _HomeViewState extends State<HomeView> {
                   fit: BoxFit.contain,
                 ),
                 title: 'Social Media',
-                onTap: () => Navigator.pop(context),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const SocialMediaView()),
+                  );
+                },
               ),
               const SizedBox(height: 14),
 
