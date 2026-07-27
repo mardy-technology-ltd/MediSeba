@@ -1,6 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
 import '../repositories/firebase_auth_repository.dart';
+import '../repositories/cloudinary_repository.dart';
 import '../models/user_model.dart';
 
 class AuthController extends ChangeNotifier {
@@ -105,5 +108,55 @@ class AuthController extends ChangeNotifier {
     _currentUser = null;
     _currentUserData = null;
     notifyListeners();
+  }
+
+  Future<bool> updateProfilePicture(BuildContext context) async {
+    if (_currentUser == null) return false;
+
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 70, // Compress image
+        maxWidth: 800,
+        maxHeight: 800,
+      );
+
+      if (image == null) return false; // User canceled
+
+      _setLoading(true);
+      _setError(null);
+
+      // Upload to Cloudinary
+      final cloudinaryRepo = CloudinaryRepository();
+      final String secureUrl = await cloudinaryRepo.uploadImage(File(image.path));
+
+      // Save URL to Firestore
+      await _authRepository.updateUserProfileImage(_currentUser!.uid, secureUrl);
+      
+      // Update local state
+      await _fetchUserData(_currentUser!.uid);
+
+      _setLoading(false);
+      return true;
+    } catch (e) {
+      _setError(e.toString().replaceAll('Exception: ', ''));
+      _setLoading(false);
+      
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to upload image: $_errorMessage'),
+            backgroundColor: Colors.red,
+            action: SnackBarAction(
+              label: 'Retry',
+              textColor: Colors.white,
+              onPressed: () => updateProfilePicture(context),
+            ),
+          ),
+        );
+      }
+      return false;
+    }
   }
 }

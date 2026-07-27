@@ -63,66 +63,54 @@ class _HomeViewState extends State<HomeView> {
               height: 38,
               fit: BoxFit.contain,
             ),
-            const Spacer(),
-
-            // Doctor Bari Button (Commented out as requested)
-            /*
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const DoctorBariView()),
-                );
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                decoration: BoxDecoration(
-                  color: brandGreen,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Text(
-                  'ডাক্তার ঘর',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-            */
-
-            // User Profile Button
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ProfileView(
-                      authController: widget.authController,
-                      homeController: widget.homeController,
-                    ),
-                  ),
-                );
-              },
-              child: Container(
-                height: 36,
-                width: 36,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: const Color(0xFFF1F5F9),
-                  border: Border.all(color: brandGreen, width: 1.5),
-                ),
-                child: const Icon(
-                  Icons.person_rounded,
-                  color: brandGreen,
-                  size: 20,
-                ),
-              ),
-            ),
           ],
         ),
         actions: [
+          // User Profile Button
+          ListenableBuilder(
+            listenable: widget.authController,
+            builder: (context, _) {
+              final uData = widget.authController.currentUserData;
+              final hasImage = uData?.profileImageUrl != null && uData!.profileImageUrl!.isNotEmpty;
+
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProfileView(
+                        authController: widget.authController,
+                        homeController: widget.homeController,
+                      ),
+                    ),
+                  );
+                },
+                child: Container(
+                  height: 30,
+                  width: 30,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: const Color(0xFFF1F5F9),
+                    border: Border.all(color: brandGreen, width: 1.5),
+                    image: hasImage
+                        ? DecorationImage(
+                            image: NetworkImage(uData!.profileImageUrl!),
+                            fit: BoxFit.cover,
+                          )
+                        : null,
+                  ),
+                  child: !hasImage
+                      ? const Icon(
+                          Icons.person_rounded,
+                          color: brandGreen,
+                          size: 18,
+                        )
+                      : null,
+                ),
+              );
+            },
+          ),
+          const SizedBox(width: 4),
           Builder(
             builder: (context) => IconButton(
               icon: const Icon(Icons.menu_rounded, color: brandGreen, size: 28),
@@ -160,7 +148,9 @@ class _HomeViewState extends State<HomeView> {
               onSeeAllTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const DoctorListView()),
+                  MaterialPageRoute(
+                    builder: (context) => const DoctorListView(),
+                  ),
                 );
               },
             ),
@@ -172,37 +162,38 @@ class _HomeViewState extends State<HomeView> {
               specialty: 'GP-general practitioner',
               time: '07:00 am - 09:30 pm',
               isSponsor: true,
-              imageUrl: 'https://img.freepik.com/free-photo/doctor-offering-medical-teleconsultation_23-2149329007.jpg',
+              imageUrl:
+                  'https://img.freepik.com/free-photo/doctor-offering-medical-teleconsultation_23-2149329007.jpg',
             ),
             _buildDoctorItem(
               name: 'Dr. Billy',
               specialty: 'GP-general practitioner',
               time: '07:00 am - 09:30 pm',
               isSponsor: true,
-              imageUrl: 'https://img.freepik.com/free-photo/female-doctor-hospital-with-stethoscope_23-2148827766.jpg',
+              imageUrl:
+                  'https://img.freepik.com/free-photo/female-doctor-hospital-with-stethoscope_23-2148827766.jpg',
             ),
             _buildDoctorItem(
               name: 'Dr. Harry',
               specialty: 'GP-general practitioner',
               time: '09:30 am - 12:00 pm',
               isSponsor: true,
-              imageUrl: 'https://img.freepik.com/free-photo/young-handsome-physician-medical-robe-with-stethoscope_1303-17818.jpg',
+              imageUrl:
+                  'https://img.freepik.com/free-photo/young-handsome-physician-medical-robe-with-stethoscope_1303-17818.jpg',
             ),
             _buildDoctorItem(
               name: 'Dr. Angel',
               specialty: 'GP-general practitioner',
               time: '07:00 am - 15:30 pm',
               isSponsor: false,
-              imageUrl: 'https://img.freepik.com/free-photo/pleased-young-female-doctor-wearing-medical-robe-stethoscope-around-neck-standing-with-crossed-arms_409827-254.jpg',
+              imageUrl:
+                  'https://img.freepik.com/free-photo/pleased-young-female-doctor-wearing-medical-robe-stethoscope-around-neck-standing-with-crossed-arms_409827-254.jpg',
             ),
 
             const SizedBox(height: 24),
 
             // 5. Nearby Hospitals Section Header
-            _buildSectionHeader(
-              title: 'Nearby Hospitals',
-              onSeeAllTap: () {},
-            ),
+            _buildSectionHeader(title: 'Nearby Hospitals', onSeeAllTap: () {}),
             const SizedBox(height: 12),
 
             // Hospitals Grid (Responsive Grid)
@@ -210,7 +201,9 @@ class _HomeViewState extends State<HomeView> {
               builder: (context, constraints) {
                 final screenWidth = constraints.maxWidth;
                 final crossAxisCount = screenWidth > 600 ? 3 : 2;
-                final aspectRatio = screenWidth > 600 ? 0.95 : (screenWidth < 360 ? 0.82 : 0.92);
+                final aspectRatio = screenWidth > 600
+                    ? 0.95
+                    : (screenWidth < 360 ? 0.82 : 0.92);
 
                 return GridView.count(
                   shrinkWrap: true,
@@ -224,25 +217,29 @@ class _HomeViewState extends State<HomeView> {
                       name: 'Popular Diagonistic',
                       address: 'Street Address',
                       time: '07:00 am - 15:30 pm',
-                      imageUrl: 'https://img.freepik.com/free-photo/empty-emergency-room-with-medical-equipment_23-2149138092.jpg',
+                      imageUrl:
+                          'https://img.freepik.com/free-photo/empty-emergency-room-with-medical-equipment_23-2149138092.jpg',
                     ),
                     _buildHospitalCard(
                       name: 'Popular Diagonistic',
                       address: 'Street Address',
                       time: '07:00 am - 15:30 pm',
-                      imageUrl: 'https://img.freepik.com/free-photo/modern-operating-room-hospital_23-2148942918.jpg',
+                      imageUrl:
+                          'https://img.freepik.com/free-photo/modern-operating-room-hospital_23-2148942918.jpg',
                     ),
                     _buildHospitalCard(
                       name: 'Popular Diagonistic',
                       address: 'Street Address',
                       time: '07:00 am - 15:30 pm',
-                      imageUrl: 'https://img.freepik.com/free-photo/interior-view-operating-room_1170-2254.jpg',
+                      imageUrl:
+                          'https://img.freepik.com/free-photo/interior-view-operating-room_1170-2254.jpg',
                     ),
                     _buildHospitalCard(
                       name: 'Popular Diagonistic',
                       address: 'Street Address',
                       time: '07:00 am - 15:30 pm',
-                      imageUrl: 'https://img.freepik.com/free-photo/medical-clinic-reception-counter-registration_482257-26804.jpg',
+                      imageUrl:
+                          'https://img.freepik.com/free-photo/medical-clinic-reception-counter-registration_482257-26804.jpg',
                     ),
                   ],
                 );
@@ -309,7 +306,9 @@ class _HomeViewState extends State<HomeView> {
       builder: (context, constraints) {
         final screenWidth = constraints.maxWidth;
         final crossAxisCount = screenWidth > 600 ? 3 : 2;
-        final aspectRatio = screenWidth > 600 ? 1.85 : (screenWidth < 360 ? 1.85 : 2.05);
+        final aspectRatio = screenWidth > 600
+            ? 1.85
+            : (screenWidth < 360 ? 1.85 : 2.05);
 
         return GridView.builder(
           shrinkWrap: true,
@@ -328,13 +327,12 @@ class _HomeViewState extends State<HomeView> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const DoctorListView()),
+                  MaterialPageRoute(
+                    builder: (context) => const DoctorListView(),
+                  ),
                 );
               },
-              child: Image.asset(
-                assetPath,
-                fit: BoxFit.contain,
-              ),
+              child: Image.asset(assetPath, fit: BoxFit.contain),
             );
           },
         );
@@ -395,7 +393,9 @@ class _HomeViewState extends State<HomeView> {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const HealthConsultationView()),
+          MaterialPageRoute(
+            builder: (context) => const HealthConsultationView(),
+          ),
         );
       },
       borderRadius: BorderRadius.circular(16),
@@ -411,7 +411,10 @@ class _HomeViewState extends State<HomeView> {
   }
 
   // Section Header Component
-  Widget _buildSectionHeader({required String title, required VoidCallback onSeeAllTap}) {
+  Widget _buildSectionHeader({
+    required String title,
+    required VoidCallback onSeeAllTap,
+  }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -481,30 +484,51 @@ class _HomeViewState extends State<HomeView> {
                   children: [
                     Text(
                       name,
-                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: textDark),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: textDark,
+                      ),
                     ),
                     if (isSponsor)
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: brandGreen,
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: const Text(
                           'Sponsor',
-                          style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white),
+                          style: TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                   ],
                 ),
                 const SizedBox(height: 2),
-                Text(specialty, style: const TextStyle(fontSize: 11.5, color: textMuted)),
+                Text(
+                  specialty,
+                  style: const TextStyle(fontSize: 11.5, color: textMuted),
+                ),
                 const SizedBox(height: 6),
                 Row(
                   children: [
-                    const Icon(Icons.access_time_rounded, size: 13, color: brandGreen),
+                    const Icon(
+                      Icons.access_time_rounded,
+                      size: 13,
+                      color: brandGreen,
+                    ),
                     const SizedBox(width: 4),
-                    Text(time, style: const TextStyle(fontSize: 11, color: textMuted)),
+                    Text(
+                      time,
+                      style: const TextStyle(fontSize: 11, color: textMuted),
+                    ),
                   ],
                 ),
               ],
@@ -534,7 +558,9 @@ class _HomeViewState extends State<HomeView> {
           Stack(
             children: [
               ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(16),
+                ),
                 child: Image.network(
                   imageUrl,
                   height: 90,
@@ -551,14 +577,21 @@ class _HomeViewState extends State<HomeView> {
                 top: 6,
                 left: 6,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: brandGreen,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Text(
                     'Sponsor',
-                    style: TextStyle(fontSize: 8.5, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: TextStyle(
+                      fontSize: 8.5,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
@@ -571,7 +604,11 @@ class _HomeViewState extends State<HomeView> {
               children: [
                 Text(
                   name,
-                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: textDark),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: textDark,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -582,7 +619,11 @@ class _HomeViewState extends State<HomeView> {
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    const Icon(Icons.access_time_rounded, size: 11, color: brandGreen),
+                    const Icon(
+                      Icons.access_time_rounded,
+                      size: 11,
+                      color: brandGreen,
+                    ),
                     const SizedBox(width: 3),
                     Text(
                       time,
@@ -617,7 +658,11 @@ class _HomeViewState extends State<HomeView> {
               Align(
                 alignment: Alignment.centerRight,
                 child: IconButton(
-                  icon: const Icon(Icons.close_rounded, color: Color(0xFF64748B), size: 24),
+                  icon: const Icon(
+                    Icons.close_rounded,
+                    color: Color(0xFF64748B),
+                    size: 24,
+                  ),
                   onPressed: () => Navigator.pop(context),
                 ),
               ),
@@ -652,7 +697,9 @@ class _HomeViewState extends State<HomeView> {
                   Navigator.pop(context);
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const AboutUsView()),
+                    MaterialPageRoute(
+                      builder: (context) => const AboutUsView(),
+                    ),
                   );
                 },
               ),
@@ -671,7 +718,9 @@ class _HomeViewState extends State<HomeView> {
                   Navigator.pop(context);
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const SocialMediaView()),
+                    MaterialPageRoute(
+                      builder: (context) => const SocialMediaView(),
+                    ),
                   );
                 },
               ),
@@ -692,7 +741,11 @@ class _HomeViewState extends State<HomeView> {
 
               // 4. Helpline (Headset Icon)
               _buildDrawerCard(
-                icon: const Icon(Icons.headset_mic_outlined, color: Color(0xFF334155), size: 22),
+                icon: const Icon(
+                  Icons.headset_mic_outlined,
+                  color: Color(0xFF334155),
+                  size: 22,
+                ),
                 title: 'Helpline',
                 onTap: () => Navigator.pop(context),
               ),
@@ -700,10 +753,16 @@ class _HomeViewState extends State<HomeView> {
 
               // 5. Language Selector (Bangla / English Expandable Options)
               _buildDrawerCard(
-                icon: const Icon(Icons.translate_rounded, color: Color(0xFF334155), size: 22),
+                icon: const Icon(
+                  Icons.translate_rounded,
+                  color: Color(0xFF334155),
+                  size: 22,
+                ),
                 title: _selectedLanguage,
                 trailing: Icon(
-                  _isLanguageExpanded ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
+                  _isLanguageExpanded
+                      ? Icons.keyboard_arrow_up_rounded
+                      : Icons.keyboard_arrow_down_rounded,
                   color: const Color(0xFF64748B),
                   size: 22,
                 ),
@@ -716,11 +775,17 @@ class _HomeViewState extends State<HomeView> {
               if (_isLanguageExpanded) ...[
                 const SizedBox(height: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 4,
+                    horizontal: 12,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFF8FAFC),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+                    border: Border.all(
+                      color: const Color(0xFFE2E8F0),
+                      width: 1,
+                    ),
                   ),
                   child: Column(
                     children: [
@@ -761,7 +826,11 @@ class _HomeViewState extends State<HomeView> {
               ),
             ),
             if (isSelected)
-              const Icon(Icons.check_circle_rounded, color: brandGreen, size: 18),
+              const Icon(
+                Icons.check_circle_rounded,
+                color: brandGreen,
+                size: 18,
+              ),
           ],
         ),
       ),

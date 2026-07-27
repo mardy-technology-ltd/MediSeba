@@ -7,6 +7,7 @@ class UserModel {
   final String upazila;
   final String union;
   final String? referId;
+  final String? profileImageUrl;
   final DateTime createdAt;
 
   UserModel({
@@ -18,6 +19,7 @@ class UserModel {
     required this.upazila,
     required this.union,
     this.referId,
+    this.profileImageUrl,
     required this.createdAt,
   });
 
@@ -31,6 +33,7 @@ class UserModel {
       upazila: data['upazila'] ?? '',
       union: data['union'] ?? '',
       referId: data['referId'],
+      profileImageUrl: data['profileImageUrl'],
       createdAt: data['createdAt'] != null 
           ? DateTime.parse(data['createdAt'].toString()) 
           : DateTime.now(),
@@ -46,6 +49,7 @@ class UserModel {
       'upazila': upazila,
       'union': union,
       'referId': referId,
+      'profileImageUrl': profileImageUrl,
       'createdAt': createdAt.toIso8601String(),
     };
   }

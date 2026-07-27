@@ -100,6 +100,17 @@ class FirebaseAuthRepository {
     }
   }
 
+  Future<void> updateUserProfileImage(String uid, String imageUrl) async {
+    try {
+      await _firestore.collection('users').doc(uid).set(
+        {'profileImageUrl': imageUrl},
+        SetOptions(merge: true),
+      );
+    } catch (e) {
+      throw Exception('Failed to update profile image in database: $e');
+    }
+  }
+
   Exception _handleAuthException(FirebaseAuthException e) {
     switch (e.code) {
       case 'user-not-found':
