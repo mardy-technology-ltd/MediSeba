@@ -24,6 +24,50 @@ class _LoginViewState extends State<LoginView> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
+  bool _isLoggingIn = false;
+
+  void _handleLogin() async {
+    final phone = _phoneController.text.trim();
+    final password = _passwordController.text;
+    
+    if (phone.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter mobile number and password')),
+      );
+      return;
+    }
+    
+    setState(() {
+      _isLoggingIn = true;
+    });
+    
+    final success = await widget.authController.login(phone, password);
+    
+    if (mounted) {
+      setState(() {
+        _isLoggingIn = false;
+      });
+      
+      if (success) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomeView(
+              homeController: widget.homeController,
+              authController: widget.authController,
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(widget.authController.errorMessage ?? 'Login failed'),
+            backgroundColor: brandRed,
+          ),
+        );
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -132,33 +176,29 @@ class _LoginViewState extends State<LoginView> {
                   width: double.infinity,
                   height: 56,
                   child: ElevatedButton(
-                    onPressed: () {
-                      // Navigate to Home View
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => HomeView(
-                            homeController: widget.homeController,
-                            authController: widget.authController,
-                          ),
-                        ),
-                      );
-                    },
+                    onPressed: _isLoggingIn ? null : _handleLogin,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: brandGreen,
+                      disabledBackgroundColor: brandGreen.withValues(alpha: 0.6),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
                       elevation: 0,
                     ),
-                    child: const Text(
-                      'Login',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
+                    child: _isLoggingIn
+                      ? const SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3),
+                        )
+                      : const Text(
+                          'Login',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
                   ),
                 ),
                 const SizedBox(height: 48),

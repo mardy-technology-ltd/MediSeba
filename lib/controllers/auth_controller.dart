@@ -1,54 +1,93 @@
 import 'package:flutter/material.dart';
-import '../models/patient_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../repositories/firebase_auth_repository.dart';
 
 class AuthController extends ChangeNotifier {
-  PatientModel? _currentUser;
-  bool _isLoggedIn = false;
+  final FirebaseAuthRepository _authRepository = FirebaseAuthRepository();
+  
+  User? _currentUser;
   bool _isLoading = false;
+  String? _errorMessage;
 
-  PatientModel? get currentUser => _currentUser;
-  bool get isLoggedIn => _isLoggedIn;
+  User? get currentUser => _currentUser;
+  bool get isLoggedIn => _currentUser != null;
   bool get isLoading => _isLoading;
+  String? get errorMessage => _errorMessage;
 
   AuthController() {
-    // Mock auto-login with default patient for demo
-    _currentUser = PatientModel(
-      id: 'patient_01',
-      name: 'আহমেদ হাসান',
-      email: 'ahmed.hasan@example.com',
-      phone: '01712345678',
-      age: 29,
-      gender: 'পুরুষ',
-      bloodGroup: 'B+',
-    );
-    _isLoggedIn = true;
+    _checkCurrentUser();
+  }
+
+  void _checkCurrentUser() {
+    _currentUser = _authRepository.currentUser;
+    notifyListeners();
+  }
+
+  void _setLoading(bool value) {
+    _isLoading = value;
+    notifyListeners();
+  }
+
+  void _setError(String? message) {
+    _errorMessage = message;
+    notifyListeners();
   }
 
   Future<bool> login(String phone, String password) async {
-    _isLoading = true;
-    notifyListeners();
-
-    await Future.delayed(const Duration(seconds: 1)); // Simulate network
-
-    _currentUser = PatientModel(
-      id: 'patient_01',
-      name: 'আহমেদ হাসান',
-      email: 'ahmed.hasan@example.com',
-      phone: phone,
-      age: 29,
-      gender: 'পুরুষ',
-      bloodGroup: 'B+',
-    );
-    _isLoggedIn = true;
-
-    _isLoading = false;
-    notifyListeners();
-    return true;
+    _setLoading(true);
+    _setError(null);
+    
+    try {
+      final user = await _authRepository.login(phone, password);
+      _currentUser = user;
+      _setLoading(false);
+      return true;
+    } catch (e) {
+      _setError(e.toString().replaceAll('Exception: ', ''));
+      _setLoading(false);
+      return false;
+    }
   }
 
-  void logout() {
+  Future<bool> signUp({
+    required String name,
+    required String phone,
+    required String password,
+    required String division,
+    required String district,
+    required String thana,
+    required String village,
+    required String birthYear,
+    String? referId,
+  }) async {
+    _setLoading(true);
+    _setError(null);
+    
+    try {
+      final user = await _authRepository.signUp(
+        name: name,
+        phone: phone,
+        password: password,
+        division: division,
+        district: district,
+        thana: thana,
+        village: village,
+        birthYear: birthYear,
+        referId: referId,
+      );
+      _currentUser = user;
+      _setLoading(false);
+      return true;
+    } catch (e) {
+      _setError(e.toString().replaceAll('Exception: ', ''));
+      _setLoading(false);
+      return false;
+    }
+  }
+
+  Future<void> logout() async {
+    await _authRepository.logout();
     _currentUser = null;
-    _isLoggedIn = false;
     notifyListeners();
   }
 }

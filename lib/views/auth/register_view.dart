@@ -29,7 +29,74 @@ class _RegisterViewState extends State<RegisterView> {
   final TextEditingController _referIdController = TextEditingController();
   
   bool _isPasswordVisible = false;
+  bool _isSigningUp = false;
   String? _selectedDivision;
+  
+  void _handleSignUp() async {
+    final name = _nameController.text.trim();
+    final phone = _phoneController.text.trim();
+    final password = _passwordController.text;
+    final village = _villageController.text.trim();
+    final birthYear = _birthYearController.text.trim();
+    final referId = _referIdController.text.trim();
+    
+    if (name.isEmpty || phone.isEmpty || password.isEmpty || 
+        _selectedDivision == null || _selectedDistrict == null || 
+        _selectedThana == null || village.isEmpty || birthYear.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all the required fields')),
+      );
+      return;
+    }
+    
+    setState(() {
+      _isSigningUp = true;
+    });
+    
+    final success = await widget.authController.signUp(
+      name: name,
+      phone: phone,
+      password: password,
+      division: _selectedDivision!,
+      district: _selectedDistrict!,
+      thana: _selectedThana!,
+      village: village,
+      birthYear: birthYear,
+      referId: referId.isEmpty ? null : referId,
+    );
+    
+    if (mounted) {
+      setState(() {
+        _isSigningUp = false;
+      });
+      
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Account created successfully! Please login.'),
+            backgroundColor: brandGreen,
+          ),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LoginView(
+              homeController: widget.homeController,
+              authController: widget.authController,
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(widget.authController.errorMessage ?? 'Signup failed'),
+            backgroundColor: brandRed,
+          ),
+        );
+      }
+    }
+  }
+
   String? _selectedDistrict;
   String? _selectedThana;
 
@@ -234,24 +301,29 @@ class _RegisterViewState extends State<RegisterView> {
                   width: double.infinity,
                   height: 56,
                   child: ElevatedButton(
-                    onPressed: () {
-                      // Implementation logic goes here later
-                    },
+                    onPressed: _isSigningUp ? null : _handleSignUp,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: brandGreen,
+                      disabledBackgroundColor: brandGreen.withValues(alpha: 0.6),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
                       elevation: 0,
                     ),
-                    child: const Text(
-                      'Sign Up',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
+                    child: _isSigningUp
+                      ? const SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3),
+                        )
+                      : const Text(
+                          'Sign Up',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
                   ),
                 ),
                 const SizedBox(height: 32),
