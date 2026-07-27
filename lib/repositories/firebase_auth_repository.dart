@@ -1,7 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../models/user_model.dart';
 
 class FirebaseAuthRepository {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // Convert phone number to a dummy email for Firebase Email/Password Auth
   String _phoneToEmail(String phone) {
@@ -52,8 +55,24 @@ class FirebaseAuthRepository {
         await user.updateDisplayName(name);
         await user.reload();
         
-        // TODO: In the future, send other details (division, district, thana, etc.)
-        // to the Laravel Backend API via UserApiRepository
+        // Save additional details to Cloud Firestore
+        final userModel = UserModel(
+          uid: user.uid,
+          name: name,
+          phone: phone,
+          division: division,
+          district: district,
+          thana: thana,
+          village: village,
+          birthYear: birthYear,
+          referId: referId,
+          createdAt: DateTime.now(),
+        );
+
+        await _firestore
+            .collection('users')
+            .doc(user.uid)
+            .set(userModel.toMap());
       }
       
       return _firebaseAuth.currentUser;
@@ -69,6 +88,19 @@ class FirebaseAuthRepository {
   }
 
   User? get currentUser => _firebaseAuth.currentUser;
+
+  Future<UserModel?> getUserData(String uid) async {
+    try {
+      final docSnapshot = await _firestore.collection('users').doc(uid).get();
+      if (docSnapshot.exists && docSnapshot.data() != null) {
+        return UserModel.fromMap(docSnapshot.data()!, docSnapshot.id);
+      }
+      return null;
+    } catch (e) {
+      print('Error fetching user data: $e');
+      return null;
+    }
+  }
 
   Exception _handleAuthException(FirebaseAuthException e) {
     switch (e.code) {

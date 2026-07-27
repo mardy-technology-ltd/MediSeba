@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../repositories/firebase_auth_repository.dart';
+import '../models/user_model.dart';
 
 class AuthController extends ChangeNotifier {
   final FirebaseAuthRepository _authRepository = FirebaseAuthRepository();
   
   User? _currentUser;
+  UserModel? _currentUserData;
   bool _isLoading = false;
   String? _errorMessage;
 
   User? get currentUser => _currentUser;
+  UserModel? get currentUserData => _currentUserData;
   bool get isLoggedIn => _currentUser != null;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
@@ -18,8 +21,16 @@ class AuthController extends ChangeNotifier {
     _checkCurrentUser();
   }
 
-  void _checkCurrentUser() {
+  Future<void> _checkCurrentUser() async {
     _currentUser = _authRepository.currentUser;
+    if (_currentUser != null) {
+      await _fetchUserData(_currentUser!.uid);
+    }
+    notifyListeners();
+  }
+
+  Future<void> _fetchUserData(String uid) async {
+    _currentUserData = await _authRepository.getUserData(uid);
     notifyListeners();
   }
 
@@ -40,6 +51,9 @@ class AuthController extends ChangeNotifier {
     try {
       final user = await _authRepository.login(phone, password);
       _currentUser = user;
+      if (user != null) {
+        await _fetchUserData(user.uid);
+      }
       _setLoading(false);
       return true;
     } catch (e) {
@@ -76,6 +90,9 @@ class AuthController extends ChangeNotifier {
         referId: referId,
       );
       _currentUser = user;
+      if (user != null) {
+        await _fetchUserData(user.uid);
+      }
       _setLoading(false);
       return true;
     } catch (e) {
@@ -88,6 +105,7 @@ class AuthController extends ChangeNotifier {
   Future<void> logout() async {
     await _authRepository.logout();
     _currentUser = null;
+    _currentUserData = null;
     notifyListeners();
   }
 }

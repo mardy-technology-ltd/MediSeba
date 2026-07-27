@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../controllers/home_controller.dart';
 import '../../controllers/auth_controller.dart';
-import '../doctors/doctor_list_view.dart';
 import '../doctor_bari/doctor_bari_view.dart';
+import '../profile/profile_view.dart';
+import '../doctors/doctor_list_view.dart';
 import '../about/about_us_view.dart';
 import '../social/social_media_view.dart';
 import '../health_consultation/health_consultation_view.dart';
@@ -64,7 +65,8 @@ class _HomeViewState extends State<HomeView> {
             ),
             const Spacer(),
 
-            // Doctor Bari Button
+            // Doctor Bari Button (Commented out as requested)
+            /*
             GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -85,6 +87,36 @@ class _HomeViewState extends State<HomeView> {
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
+                ),
+              ),
+            ),
+            */
+
+            // User Profile Button
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProfileView(
+                      authController: widget.authController,
+                      homeController: widget.homeController,
+                    ),
+                  ),
+                );
+              },
+              child: Container(
+                height: 36,
+                width: 36,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0xFFF1F5F9),
+                  border: Border.all(color: brandGreen, width: 1.5),
+                ),
+                child: const Icon(
+                  Icons.person_rounded,
+                  color: brandGreen,
+                  size: 20,
                 ),
               ),
             ),
