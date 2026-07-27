@@ -9,7 +9,6 @@ class DoctorBariView extends StatefulWidget {
 }
 
 class _DoctorBariViewState extends State<DoctorBariView> {
-  static const brandGreen = Color(0xFF009245);
   static const textDark = Color(0xFF222222);
 
   @override

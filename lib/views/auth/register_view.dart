@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import '../../controllers/auth_controller.dart';
+import 'login_view.dart';
 import '../../controllers/home_controller.dart';
-import '../home/home_view.dart';
+import '../../controllers/auth_controller.dart';
 
 class RegisterView extends StatefulWidget {
-  final AuthController authController;
   final HomeController homeController;
+  final AuthController authController;
 
   const RegisterView({
     super.key,
-    required this.authController,
     required this.homeController,
+    required this.authController,
   });
 
   @override
@@ -18,52 +18,29 @@ class RegisterView extends StatefulWidget {
 }
 
 class _RegisterViewState extends State<RegisterView> {
-  final _formKey = GlobalKey<FormState>();
-
-  final _userNameController = TextEditingController();
-  final _contactController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _villageController = TextEditingController();
-  final _birthYearController = TextEditingController();
-  final _referIdController = TextEditingController();
-
+  static const brandGreen = Color(0xFF0F9D58);
+  static const brandRed = Color(0xFFE53935);
+  
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _villageController = TextEditingController();
+  final TextEditingController _birthYearController = TextEditingController();
+  final TextEditingController _referIdController = TextEditingController();
+  
+  bool _isPasswordVisible = false;
   String? _selectedDivision;
   String? _selectedDistrict;
   String? _selectedThana;
 
-  final List<String> _divisions = [
-    'Dhaka',
-    'Chattogram',
-    'Rajshahi',
-    'Khulna',
-    'Barishal',
-    'Sylhet',
-    'Rangpur',
-    'Mymensingh',
-  ];
-
-  final Map<String, List<String>> _districts = {
-    'Dhaka': ['Dhaka', 'Gazipur', 'Narayanganj', 'Tangail'],
-    'Chattogram': ['Chattogram', 'Cox\'s Bazar', 'Cumilla', 'Noakhali'],
-    'Rajshahi': ['Rajshahi', 'Bogra', 'Pabna'],
-    'Khulna': ['Khulna', 'Jashore', 'Kushtia'],
-    'Barishal': ['Barishal', 'Bhola', 'Patuakhali'],
-    'Sylhet': ['Sylhet', 'Moulvibazar', 'Habiganj'],
-    'Rangpur': ['Rangpur', 'Dinajpur', 'Bogura'],
-    'Mymensingh': ['Mymensingh', 'Jamalpur', 'Netrokona'],
-  };
-
-  final Map<String, List<String>> _thanas = {
-    'Dhaka': ['Dhanmondi', 'Gulshan', 'Mirpur', 'Uttara', 'Mohammadpur'],
-    'Gazipur': ['Sadar', 'Tongii', 'Kaliakair'],
-    'Chattogram': ['Kotwali', 'Panchlaish', 'Halishahar'],
-    'Rajshahi': ['Boalia', 'Rajpara', 'Motihar'],
-  };
+  final List<String> _divisions = ['Dhaka', 'Chittagong', 'Rajshahi', 'Khulna', 'Barishal', 'Sylhet', 'Rangpur', 'Mymensingh'];
+  final List<String> _districts = ['Dhaka', 'Faridpur', 'Gazipur', 'Gopalganj', 'Kishoreganj'];
+  final List<String> _thanas = ['Mirpur', 'Dhanmondi', 'Gulshan', 'Uttara', 'Mohammadpur'];
 
   @override
   void dispose() {
-    _userNameController.dispose();
-    _contactController.dispose();
+    _nameController.dispose();
+    _phoneController.dispose();
     _passwordController.dispose();
     _villageController.dispose();
     _birthYearController.dispose();
@@ -71,299 +48,237 @@ class _RegisterViewState extends State<RegisterView> {
     super.dispose();
   }
 
-  void _handleSignUp() async {
-    if (_formKey.currentState!.validate()) {
-      final success = await widget.authController.login(
-        _contactController.text,
-        _passwordController.text,
-      );
-
-      if (success && mounted) {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (context) => HomeView(
-              homeController: widget.homeController,
-              authController: widget.authController,
-            ),
-          ),
-          (route) => false,
-        );
-      }
-    }
-  }
-
-  Widget _buildLabel(String labelText) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6.0),
-      child: Text(
-        labelText,
-        style: const TextStyle(
-          fontSize: 13.5,
-          fontWeight: FontWeight.w600,
-          color: Color(0xFF4A4A4A),
-        ),
-      ),
-    );
-  }
-
-  InputDecoration _inputDecoration(String? hint) {
-    const brandGreen = Color(0xFF009245);
-    const inputBg = Color(0xFFF7F8FA);
-
-    return InputDecoration(
-      hintText: hint,
-      hintStyle: const TextStyle(fontSize: 13, color: Color(0xFFA0A0A0)),
-      filled: true,
-      fillColor: inputBg,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide.none,
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide.none,
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: brandGreen, width: 1.5),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Colors.red, width: 1),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    const brandGreen = Color(0xFF009245);
-    const textDark = Color(0xFF333333);
-    const textMuted = Color(0xFF666666);
-
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        centerTitle: true,
+        title: const Text(
+          'Create Account',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF1E293B),
+          ),
+        ),
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.chevron_left_rounded,
+                color: Color(0xFF64748B),
+                size: 28,
+              ),
+            ),
+          ),
+        ),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
-          child: Form(
-            key: _formKey,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Top Header Section
-                Center(
-                  child: Column(
-                    children: [
-                      Image.asset(
-                        'assets/images/logo.png',
-                        height: 65,
-                        fit: BoxFit.contain,
-                      ),
-                      const SizedBox(height: 12),
-                      const Text(
-                        'Welcome to MediSheba App!',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: textDark,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      const Text(
-                        'Get your health update on a single click',
-                        style: TextStyle(fontSize: 12.5, color: textMuted),
-                      ),
-                      const SizedBox(height: 18),
-
-                      // Sign Up Heading
-                      const Text(
-                        'Sign Up To MediSheba',
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
-                          color: brandGreen,
-                        ),
-                      ),
-                    ],
+                // Logo
+                Image.asset(
+                  'assets/images/logo.png',
+                  height: 80,
+                  errorBuilder: (context, error, stackTrace) => const Icon(
+                    Icons.local_hospital_rounded,
+                    size: 60,
+                    color: brandRed,
                   ),
                 ),
+                const SizedBox(height: 16),
+                // Welcome Text
+                const Text(
+                  'Welcome to MediSheba App!',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1E293B),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Get your health update on a single click',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF64748B),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  'Sign Up To MediSheba',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: brandGreen,
+                  ),
+                ),
+                const SizedBox(height: 32),
 
-                const SizedBox(height: 28),
-
-                // 1. User Name
-                _buildLabel('User Name'),
-                TextFormField(
-                  controller: _userNameController,
-                  validator: (v) => v == null || v.trim().isEmpty ? 'Please enter user name' : null,
-                  decoration: _inputDecoration(null),
+                // Form Fields
+                _buildTextField(
+                  controller: _nameController,
+                  label: 'User Name',
+                  hintText: 'Enter your full name',
+                  prefixIcon: Icons.person_outline_rounded,
                 ),
                 const SizedBox(height: 16),
 
-                // 2. Contact number
-                _buildLabel('Contact number'),
-                TextFormField(
-                  controller: _contactController,
+                _buildTextField(
+                  controller: _phoneController,
+                  label: 'Contact number',
+                  hintText: 'Enter your phone number',
+                  prefixIcon: Icons.phone_android_rounded,
                   keyboardType: TextInputType.phone,
-                  validator: (v) => v == null || v.trim().isEmpty ? 'Please enter contact number' : null,
-                  decoration: _inputDecoration(null),
                 ),
                 const SizedBox(height: 16),
 
-                // 3. Password
-                _buildLabel('Password'),
-                TextFormField(
+                _buildTextField(
                   controller: _passwordController,
-                  obscureText: true,
-                  validator: (v) => v == null || v.trim().isEmpty ? 'Please enter password' : null,
-                  decoration: _inputDecoration(null),
+                  label: 'Password',
+                  hintText: 'Enter your password',
+                  prefixIcon: Icons.lock_outline_rounded,
+                  obscureText: !_isPasswordVisible,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _isPasswordVisible ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                      color: const Color(0xFF94A3B8),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _isPasswordVisible = !_isPasswordVisible;
+                      });
+                    },
+                  ),
                 ),
                 const SizedBox(height: 16),
 
-                // 4. Select Division
-                _buildLabel('Select Division'),
-                DropdownButtonFormField<String>(
-                  initialValue: _selectedDivision,
-                  icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF7A869A)),
-                  decoration: _inputDecoration(null),
-                  items: _divisions.map((div) {
-                    return DropdownMenuItem(
-                      value: div,
-                      child: Text(div, style: const TextStyle(fontSize: 14, color: textDark)),
-                    );
-                  }).toList(),
-                  onChanged: (val) {
-                    setState(() {
-                      _selectedDivision = val;
-                      _selectedDistrict = null;
-                      _selectedThana = null;
-                    });
-                  },
+                _buildDropdown(
+                  label: 'Select Division',
+                  hintText: 'Select your division',
+                  value: _selectedDivision,
+                  items: _divisions,
+                  onChanged: (val) => setState(() => _selectedDivision = val),
+                  prefixIcon: Icons.map_outlined,
                 ),
                 const SizedBox(height: 16),
 
-                // 5. Select District
-                _buildLabel('Select District'),
-                DropdownButtonFormField<String>(
-                  initialValue: _selectedDistrict,
-                  icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF7A869A)),
-                  decoration: _inputDecoration(null),
-                  items: (_selectedDivision != null && _districts.containsKey(_selectedDivision))
-                      ? _districts[_selectedDivision]!.map((dist) {
-                          return DropdownMenuItem(
-                            value: dist,
-                            child: Text(dist, style: const TextStyle(fontSize: 14, color: textDark)),
-                          );
-                        }).toList()
-                      : [],
-                  onChanged: (val) {
-                    setState(() {
-                      _selectedDistrict = val;
-                      _selectedThana = null;
-                    });
-                  },
+                _buildDropdown(
+                  label: 'Select District',
+                  hintText: 'Select your district',
+                  value: _selectedDistrict,
+                  items: _districts,
+                  onChanged: (val) => setState(() => _selectedDistrict = val),
+                  prefixIcon: Icons.location_city_outlined,
                 ),
                 const SizedBox(height: 16),
 
-                // 6. Select Thana
-                _buildLabel('Select Thana'),
-                DropdownButtonFormField<String>(
-                  initialValue: _selectedThana,
-                  icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF7A869A)),
-                  decoration: _inputDecoration(null),
-                  items: (_selectedDistrict != null && _thanas.containsKey(_selectedDistrict))
-                      ? _thanas[_selectedDistrict]!.map((thana) {
-                          return DropdownMenuItem(
-                            value: thana,
-                            child: Text(thana, style: const TextStyle(fontSize: 14, color: textDark)),
-                          );
-                        }).toList()
-                      : [],
-                  onChanged: (val) {
-                    setState(() => _selectedThana = val);
-                  },
+                _buildDropdown(
+                  label: 'Select Thana',
+                  hintText: 'Select your thana',
+                  value: _selectedThana,
+                  items: _thanas,
+                  onChanged: (val) => setState(() => _selectedThana = val),
+                  prefixIcon: Icons.location_on_outlined,
                 ),
                 const SizedBox(height: 16),
 
-                // 7. Village or Area
-                _buildLabel('Village or Area'),
-                TextFormField(
+                _buildTextField(
                   controller: _villageController,
-                  decoration: _inputDecoration(null),
+                  label: 'Village or Area',
+                  hintText: 'Enter your village or area',
+                  prefixIcon: Icons.home_outlined,
                 ),
                 const SizedBox(height: 16),
 
-                // 8. Birth Year
-                _buildLabel('Birth Year'),
-                TextFormField(
+                _buildTextField(
                   controller: _birthYearController,
+                  label: 'Birth Year',
+                  hintText: 'e.g. 1995',
+                  prefixIcon: Icons.calendar_today_outlined,
                   keyboardType: TextInputType.number,
-                  decoration: _inputDecoration(null),
                 ),
                 const SizedBox(height: 16),
 
-                // 9. Refer ID
-                _buildLabel('Refer ID'),
-                TextFormField(
+                _buildTextField(
                   controller: _referIdController,
-                  decoration: _inputDecoration(null),
+                  label: 'Refer ID',
+                  hintText: 'Enter refer ID (optional)',
+                  prefixIcon: Icons.group_add_outlined,
                 ),
-
-                const SizedBox(height: 28),
+                const SizedBox(height: 40),
 
                 // Sign Up Button
-                ListenableBuilder(
-                  listenable: widget.authController,
-                  builder: (context, child) {
-                    return SizedBox(
-                      width: double.infinity,
-                      height: 52,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: brandGreen,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        onPressed: widget.authController.isLoading ? null : _handleSignUp,
-                        child: widget.authController.isLoading
-                            ? const SizedBox(
-                                height: 24,
-                                width: 24,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2.5,
-                                ),
-                              )
-                            : const Text(
-                                'Sign Up',
-                                style: TextStyle(
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Implementation logic goes here later
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: brandGreen,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                    );
-                  },
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      'Sign Up',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
                 ),
+                const SizedBox(height: 32),
 
-                const SizedBox(height: 24),
-
-                // Bottom Sign In Link
+                // Sign In Link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      'Already have an account? ',
+                      "Already have an account? ",
                       style: TextStyle(
                         fontSize: 14,
-                        color: Color(0xFF888888),
+                        color: Color(0xFF64748B),
                       ),
                     ),
                     GestureDetector(
-                      onTap: () => Navigator.pop(context),
+                      onTap: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => LoginView(
+                              homeController: widget.homeController,
+                              authController: widget.authController,
+                            ),
+                          ),
+                        );
+                      },
                       child: const Text(
                         'Sign In',
                         style: TextStyle(
@@ -375,12 +290,138 @@ class _RegisterViewState extends State<RegisterView> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 40),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required String hintText,
+    required IconData prefixIcon,
+    bool obscureText = false,
+    TextInputType keyboardType = TextInputType.text,
+    Widget? suffixIcon,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: 
+            FontWeight.w700,
+            color: Color(0xFF334155),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFFF8FAFC),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFE2E8F0)),
+          ),
+          child: TextField(
+            controller: controller,
+            obscureText: obscureText,
+            keyboardType: keyboardType,
+            style: const TextStyle(
+              fontSize: 15,
+              color: Color(0xFF1E293B),
+            ),
+            decoration: InputDecoration(
+              hintText: hintText,
+              hintStyle: const TextStyle(
+                color: Color(0xFF94A3B8),
+                fontSize: 14,
+              ),
+              prefixIcon: Icon(
+                prefixIcon,
+                color: const Color(0xFF94A3B8),
+                size: 22,
+              ),
+              suffixIcon: suffixIcon,
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(vertical: 16),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDropdown({
+    required String label,
+    required String hintText,
+    required String? value,
+    required List<String> items,
+    required Function(String?) onChanged,
+    required IconData prefixIcon,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF334155),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFFF8FAFC),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFE2E8F0)),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            children: [
+              Icon(
+                prefixIcon,
+                color: const Color(0xFF94A3B8),
+                size: 22,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: value,
+                    hint: Text(
+                      hintText,
+                      style: const TextStyle(
+                        color: Color(0xFF94A3B8),
+                        fontSize: 14,
+                      ),
+                    ),
+                    isExpanded: true,
+                    icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF94A3B8)),
+                    style: const TextStyle(
+                      fontSize: 15,
+                      color: Color(0xFF1E293B),
+                    ),
+                    onChanged: onChanged,
+                    items: items.map<DropdownMenuItem<String>>((String item) {
+                      return DropdownMenuItem<String>(
+                        value: item,
+                        child: Text(item),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
