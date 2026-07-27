@@ -134,14 +134,7 @@ class ProfileView extends StatelessWidget {
                 _buildProfileItem(
                   icon: Icons.location_on_outlined,
                   title: 'Address',
-                  subtitle: '${userData.village}, ${userData.thana}, ${userData.district}, ${userData.division}',
-                ),
-                const SizedBox(height: 12),
-                
-                _buildProfileItem(
-                  icon: Icons.cake_outlined,
-                  title: 'Birth Year',
-                  subtitle: userData.birthYear,
+                  subtitle: '${userData.union}, ${userData.upazila}, ${userData.district}, ${userData.division}',
                 ),
                 const SizedBox(height: 12),
                 

@@ -4,9 +4,8 @@ class UserModel {
   final String phone;
   final String division;
   final String district;
-  final String thana;
-  final String village;
-  final String birthYear;
+  final String upazila;
+  final String union;
   final String? referId;
   final DateTime createdAt;
 
@@ -16,9 +15,8 @@ class UserModel {
     required this.phone,
     required this.division,
     required this.district,
-    required this.thana,
-    required this.village,
-    required this.birthYear,
+    required this.upazila,
+    required this.union,
     this.referId,
     required this.createdAt,
   });
@@ -30,9 +28,8 @@ class UserModel {
       phone: data['phone'] ?? '',
       division: data['division'] ?? '',
       district: data['district'] ?? '',
-      thana: data['thana'] ?? '',
-      village: data['village'] ?? '',
-      birthYear: data['birthYear'] ?? '',
+      upazila: data['upazila'] ?? '',
+      union: data['union'] ?? '',
       referId: data['referId'],
       createdAt: data['createdAt'] != null 
           ? DateTime.parse(data['createdAt'].toString()) 
@@ -46,9 +43,8 @@ class UserModel {
       'phone': phone,
       'division': division,
       'district': district,
-      'thana': thana,
-      'village': village,
-      'birthYear': birthYear,
+      'upazila': upazila,
+      'union': union,
       'referId': referId,
       'createdAt': createdAt.toIso8601String(),
     };

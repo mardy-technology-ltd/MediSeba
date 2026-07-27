@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'login_view.dart';
 import '../../controllers/home_controller.dart';
 import '../../controllers/auth_controller.dart';
+import '../../repositories/geo_repository.dart';
+import '../../models/geo_models.dart';
+import '../../widgets/searchable_dropdown.dart';
 
 class RegisterView extends StatefulWidget {
   final HomeController homeController;
@@ -24,25 +27,124 @@ class _RegisterViewState extends State<RegisterView> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _villageController = TextEditingController();
-  final TextEditingController _birthYearController = TextEditingController();
   final TextEditingController _referIdController = TextEditingController();
+  
+  final GeoRepository _geoRepo = GeoRepository();
+
+  // Selected Values
+  GeoDivision? _selectedDivision;
+  GeoDistrict? _selectedDistrict;
+  GeoUpazila? _selectedUpazila;
+  GeoUnion? _selectedUnion;
+
+  // Data Lists
+  List<GeoDivision> _divisions = [];
+  List<GeoDistrict> _districts = [];
+  List<GeoUpazila> _upazilas = [];
+  List<GeoUnion> _unions = [];
+
+  // Loading States
+  bool _isLoadingDivisions = false;
+  bool _isLoadingDistricts = false;
+  bool _isLoadingUpazilas = false;
+  bool _isLoadingUnions = false;
+
+  // Error States
+  String? _divisionError;
+  String? _districtError;
+  String? _upazilaError;
+  String? _unionError;
   
   bool _isPasswordVisible = false;
   bool _isSigningUp = false;
-  String? _selectedDivision;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchDivisions();
+  }
+
+  Future<void> _fetchDivisions() async {
+    setState(() {
+      _isLoadingDivisions = true;
+      _divisionError = null;
+    });
+    try {
+      final divs = await _geoRepo.getDivisions();
+      setState(() => _divisions = divs);
+    } catch (e) {
+      setState(() => _divisionError = e.toString());
+    } finally {
+      setState(() => _isLoadingDivisions = false);
+    }
+  }
+
+  Future<void> _fetchDistricts(int divisionId) async {
+    setState(() {
+      _isLoadingDistricts = true;
+      _districtError = null;
+      _districts = [];
+      _selectedDistrict = null;
+      _upazilas = [];
+      _selectedUpazila = null;
+      _unions = [];
+      _selectedUnion = null;
+    });
+    try {
+      final dists = await _geoRepo.getDistricts(divisionId);
+      setState(() => _districts = dists);
+    } catch (e) {
+      setState(() => _districtError = e.toString());
+    } finally {
+      setState(() => _isLoadingDistricts = false);
+    }
+  }
+
+  Future<void> _fetchUpazilas(int districtId) async {
+    setState(() {
+      _isLoadingUpazilas = true;
+      _upazilaError = null;
+      _upazilas = [];
+      _selectedUpazila = null;
+      _unions = [];
+      _selectedUnion = null;
+    });
+    try {
+      final upazilas = await _geoRepo.getUpazilas(districtId);
+      setState(() => _upazilas = upazilas);
+    } catch (e) {
+      setState(() => _upazilaError = e.toString());
+    } finally {
+      setState(() => _isLoadingUpazilas = false);
+    }
+  }
+
+  Future<void> _fetchUnions(int upazilaId) async {
+    setState(() {
+      _isLoadingUnions = true;
+      _unionError = null;
+      _unions = [];
+      _selectedUnion = null;
+    });
+    try {
+      final unions = await _geoRepo.getUnions(upazilaId);
+      setState(() => _unions = unions);
+    } catch (e) {
+      setState(() => _unionError = e.toString());
+    } finally {
+      setState(() => _isLoadingUnions = false);
+    }
+  }
   
   void _handleSignUp() async {
     final name = _nameController.text.trim();
     final phone = _phoneController.text.trim();
     final password = _passwordController.text;
-    final village = _villageController.text.trim();
-    final birthYear = _birthYearController.text.trim();
     final referId = _referIdController.text.trim();
     
     if (name.isEmpty || phone.isEmpty || password.isEmpty || 
         _selectedDivision == null || _selectedDistrict == null || 
-        _selectedThana == null || village.isEmpty || birthYear.isEmpty) {
+        _selectedUpazila == null || _selectedUnion == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill all the required fields')),
       );
@@ -57,11 +159,10 @@ class _RegisterViewState extends State<RegisterView> {
       name: name,
       phone: phone,
       password: password,
-      division: _selectedDivision!,
-      district: _selectedDistrict!,
-      thana: _selectedThana!,
-      village: village,
-      birthYear: birthYear,
+      division: _selectedDivision!.name,
+      district: _selectedDistrict!.name,
+      upazila: _selectedUpazila!.name,
+      union: _selectedUnion!.name,
       referId: referId.isEmpty ? null : referId,
     );
     
@@ -97,20 +198,11 @@ class _RegisterViewState extends State<RegisterView> {
     }
   }
 
-  String? _selectedDistrict;
-  String? _selectedThana;
-
-  final List<String> _divisions = ['Dhaka', 'Chittagong', 'Rajshahi', 'Khulna', 'Barishal', 'Sylhet', 'Rangpur', 'Mymensingh'];
-  final List<String> _districts = ['Dhaka', 'Faridpur', 'Gazipur', 'Gopalganj', 'Kishoreganj'];
-  final List<String> _thanas = ['Mirpur', 'Dhanmondi', 'Gulshan', 'Uttara', 'Mohammadpur'];
-
   @override
   void dispose() {
     _nameController.dispose();
     _phoneController.dispose();
     _passwordController.dispose();
-    _villageController.dispose();
-    _birthYearController.dispose();
     _referIdController.dispose();
     super.dispose();
   }
@@ -241,50 +333,87 @@ class _RegisterViewState extends State<RegisterView> {
                 ),
                 const SizedBox(height: 16),
 
-                _buildDropdown(
+                SearchableDropdown<GeoDivision>(
                   label: 'Select Division',
                   hintText: 'Select your division',
-                  value: _selectedDivision,
-                  items: _divisions,
-                  onChanged: (val) => setState(() => _selectedDivision = val),
                   prefixIcon: Icons.map_outlined,
+                  items: _divisions,
+                  selectedValue: _selectedDivision,
+                  itemAsString: (div) => div.name,
+                  isLoading: _isLoadingDivisions,
+                  errorMessage: _divisionError,
+                  onRetry: _fetchDivisions,
+                  onChanged: (val) {
+                    setState(() {
+                      _selectedDivision = val;
+                      _fetchDistricts(val.id);
+                    });
+                  },
                 ),
                 const SizedBox(height: 16),
 
-                _buildDropdown(
+                SearchableDropdown<GeoDistrict>(
                   label: 'Select District',
                   hintText: 'Select your district',
-                  value: _selectedDistrict,
-                  items: _districts,
-                  onChanged: (val) => setState(() => _selectedDistrict = val),
                   prefixIcon: Icons.location_city_outlined,
+                  items: _districts,
+                  selectedValue: _selectedDistrict,
+                  itemAsString: (dist) => dist.name,
+                  isEnabled: _selectedDivision != null,
+                  isLoading: _isLoadingDistricts,
+                  errorMessage: _districtError,
+                  onRetry: () {
+                    if (_selectedDivision != null) _fetchDistricts(_selectedDivision!.id);
+                  },
+                  onChanged: (val) {
+                    setState(() {
+                      _selectedDistrict = val;
+                      _fetchUpazilas(val.id);
+                    });
+                  },
                 ),
                 const SizedBox(height: 16),
 
-                _buildDropdown(
-                  label: 'Select Thana',
-                  hintText: 'Select your thana',
-                  value: _selectedThana,
-                  items: _thanas,
-                  onChanged: (val) => setState(() => _selectedThana = val),
+                SearchableDropdown<GeoUpazila>(
+                  label: 'Select Upazila',
+                  hintText: 'Select your upazila',
                   prefixIcon: Icons.location_on_outlined,
+                  items: _upazilas,
+                  selectedValue: _selectedUpazila,
+                  itemAsString: (upz) => upz.name,
+                  isEnabled: _selectedDistrict != null,
+                  isLoading: _isLoadingUpazilas,
+                  errorMessage: _upazilaError,
+                  onRetry: () {
+                    if (_selectedDistrict != null) _fetchUpazilas(_selectedDistrict!.id);
+                  },
+                  onChanged: (val) {
+                    setState(() {
+                      _selectedUpazila = val;
+                      _fetchUnions(val.id);
+                    });
+                  },
                 ),
                 const SizedBox(height: 16),
 
-                _buildTextField(
-                  controller: _villageController,
-                  label: 'Village or Area',
-                  hintText: 'Enter your village or area',
+                SearchableDropdown<GeoUnion>(
+                  label: 'Select Union/Area',
+                  hintText: 'Select your union or area',
                   prefixIcon: Icons.home_outlined,
-                ),
-                const SizedBox(height: 16),
-
-                _buildTextField(
-                  controller: _birthYearController,
-                  label: 'Birth Year',
-                  hintText: 'e.g. 1995',
-                  prefixIcon: Icons.calendar_today_outlined,
-                  keyboardType: TextInputType.number,
+                  items: _unions,
+                  selectedValue: _selectedUnion,
+                  itemAsString: (un) => un.name,
+                  isEnabled: _selectedUpazila != null,
+                  isLoading: _isLoadingUnions,
+                  errorMessage: _unionError,
+                  onRetry: () {
+                    if (_selectedUpazila != null) _fetchUnions(_selectedUpazila!.id);
+                  },
+                  onChanged: (val) {
+                    setState(() {
+                      _selectedUnion = val;
+                    });
+                  },
                 ),
                 const SizedBox(height: 16),
 
@@ -377,120 +506,46 @@ class _RegisterViewState extends State<RegisterView> {
     required String hintText,
     required IconData prefixIcon,
     bool obscureText = false,
-    TextInputType keyboardType = TextInputType.text,
     Widget? suffixIcon,
+    TextInputType? keyboardType,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
-            fontWeight: 
-            FontWeight.w700,
-            color: Color(0xFF334155),
+            fontWeight: FontWeight.w600,
+            color: Colors.grey.shade800,
           ),
         ),
         const SizedBox(height: 8),
-        Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFFF8FAFC),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFE2E8F0)),
-          ),
-          child: TextField(
-            controller: controller,
-            obscureText: obscureText,
-            keyboardType: keyboardType,
-            style: const TextStyle(
-              fontSize: 15,
-              color: Color(0xFF1E293B),
+        TextFormField(
+          controller: controller,
+          obscureText: obscureText,
+          keyboardType: keyboardType,
+          style: const TextStyle(fontSize: 15),
+          decoration: InputDecoration(
+            hintText: hintText,
+            hintStyle: TextStyle(color: Colors.grey.shade400),
+            prefixIcon: Icon(prefixIcon, color: Colors.grey.shade400, size: 20),
+            suffixIcon: suffixIcon,
+            filled: true,
+            fillColor: Colors.grey.shade50,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey.shade200),
             ),
-            decoration: InputDecoration(
-              hintText: hintText,
-              hintStyle: const TextStyle(
-                color: Color(0xFF94A3B8),
-                fontSize: 14,
-              ),
-              prefixIcon: Icon(
-                prefixIcon,
-                color: const Color(0xFF94A3B8),
-                size: 22,
-              ),
-              suffixIcon: suffixIcon,
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(vertical: 16),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey.shade200),
             ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDropdown({
-    required String label,
-    required String hintText,
-    required String? value,
-    required List<String> items,
-    required Function(String?) onChanged,
-    required IconData prefixIcon,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFF334155),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFFF8FAFC),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFE2E8F0)),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            children: [
-              Icon(
-                prefixIcon,
-                color: const Color(0xFF94A3B8),
-                size: 22,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    value: value,
-                    hint: Text(
-                      hintText,
-                      style: const TextStyle(
-                        color: Color(0xFF94A3B8),
-                        fontSize: 14,
-                      ),
-                    ),
-                    isExpanded: true,
-                    icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF94A3B8)),
-                    style: const TextStyle(
-                      fontSize: 15,
-                      color: Color(0xFF1E293B),
-                    ),
-                    onChanged: onChanged,
-                    items: items.map<DropdownMenuItem<String>>((String item) {
-                      return DropdownMenuItem<String>(
-                        value: item,
-                        child: Text(item),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ),
-            ],
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: brandGreen, width: 1.5),
+            ),
           ),
         ),
       ],

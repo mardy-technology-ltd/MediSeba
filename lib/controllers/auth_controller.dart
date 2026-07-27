@@ -69,9 +69,8 @@ class AuthController extends ChangeNotifier {
     required String password,
     required String division,
     required String district,
-    required String thana,
-    required String village,
-    required String birthYear,
+    required String upazila,
+    required String union,
     String? referId,
   }) async {
     _setLoading(true);
@@ -84,9 +83,8 @@ class AuthController extends ChangeNotifier {
         password: password,
         division: division,
         district: district,
-        thana: thana,
-        village: village,
-        birthYear: birthYear,
+        upazila: upazila,
+        union: union,
         referId: referId,
       );
       _currentUser = user;

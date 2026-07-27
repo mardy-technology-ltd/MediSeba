@@ -34,9 +34,8 @@ class FirebaseAuthRepository {
     required String password,
     required String division,
     required String district,
-    required String thana,
-    required String village,
-    required String birthYear,
+    required String upazila,
+    required String union,
     String? referId,
   }) async {
     try {
@@ -62,9 +61,8 @@ class FirebaseAuthRepository {
           phone: phone,
           division: division,
           district: district,
-          thana: thana,
-          village: village,
-          birthYear: birthYear,
+          upazila: upazila,
+          union: union,
           referId: referId,
           createdAt: DateTime.now(),
         );
