@@ -11,6 +11,7 @@ import '../health_consultation/health_consultation_view.dart';
 import '../../services/social_media_launcher.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../widgets/share_app_dialog.dart';
+import '../../widgets/helpline_bottom_sheet.dart';
 
 class HomeView extends StatefulWidget {
   final HomeController homeController;
@@ -859,7 +860,10 @@ class _HomeViewState extends State<HomeView> {
                   size: 22,
                 ),
                 title: 'Helpline',
-                onTap: () => Navigator.pop(context),
+                onTap: () {
+                  Navigator.pop(context);
+                  showHelplineBottomSheet(context);
+                },
               ),
               const SizedBox(height: 14),
 
