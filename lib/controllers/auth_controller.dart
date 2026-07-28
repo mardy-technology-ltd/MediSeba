@@ -47,6 +47,27 @@ class AuthController extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<bool> loginWithGoogle() async {
+    _setLoading(true);
+    _setError(null);
+
+    try {
+      final user = await _authRepository.signInWithGoogle();
+      if (user == null) {
+        _setLoading(false);
+        return false; // User cancelled
+      }
+      _currentUser = user;
+      await _fetchUserData(user.uid);
+      _setLoading(false);
+      return true;
+    } catch (e) {
+      _setError(e.toString().replaceAll('Exception: ', ''));
+      _setLoading(false);
+      return false;
+    }
+  }
+
   Future<bool> login(String phone, String password) async {
     _setLoading(true);
     _setError(null);

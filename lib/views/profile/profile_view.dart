@@ -30,7 +30,13 @@ class ProfileView extends StatelessWidget {
     final user = authController.currentUser;
     final userData = authController.currentUserData;
     final String name = user?.displayName ?? 'User';
-    final String phone = _extractPhone(user?.email);
+
+    final String userEmail = user?.email ?? '';
+    final bool isGoogleUser = userEmail.isNotEmpty && !userEmail.endsWith('@mediseba.com');
+
+    final String displayContact = isGoogleUser ? userEmail : _extractPhone(user?.email);
+    final String contactLabel = isGoogleUser ? 'Gmail' : 'Mobile Number';
+    final IconData contactIcon = isGoogleUser ? Icons.email_rounded : Icons.phone_android_rounded;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF0F4F8),
@@ -60,7 +66,7 @@ class ProfileView extends StatelessWidget {
               ),
             ),
             flexibleSpace: FlexibleSpaceBar(
-              background: _buildHeader(context, name, phone),
+              background: _buildHeader(context, name, displayContact, isGoogleUser),
             ),
             title: Text(
               name,
@@ -85,11 +91,11 @@ class ProfileView extends StatelessWidget {
                   _buildSectionLabel('Personal Info'),
                   const SizedBox(height: 12),
                   _buildInfoCard(
-                    icon: Icons.phone_android_rounded,
+                    icon: contactIcon,
                     iconColor: const Color(0xFF6366F1),
                     iconBg: const Color(0xFFEEF2FF),
-                    title: 'Mobile Number',
-                    subtitle: phone,
+                    title: contactLabel,
+                    subtitle: displayContact,
                   ),
                   const SizedBox(height: 10),
 
@@ -208,7 +214,7 @@ class ProfileView extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context, String name, String phone) {
+  Widget _buildHeader(BuildContext context, String name, String displayContact, bool isGoogleUser) {
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -359,18 +365,18 @@ class ProfileView extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
 
-                  // Phone
+                  // Contact (Phone or Gmail)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
-                        Icons.phone_rounded,
+                        isGoogleUser ? Icons.email_rounded : Icons.phone_rounded,
                         size: 14,
                         color: Colors.white.withValues(alpha: 0.8),
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        phone,
+                        displayContact,
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.white.withValues(alpha: 0.9),

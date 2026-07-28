@@ -12,7 +12,20 @@
           "package_name": "com.mediseba.mediseba"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "860056439191-8ebal1bfr1op47hqmvqanc9ivsahj355.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mediseba.mediseba",
+            "certificate_hash": "9a060bb5ca79138650b41b2b5e8c17508ac7924b"
+          }
+        },
+        {
+          "client_id": "860056439191-n891j169rbnt5f3f8mulpg1l5qd7rclv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBgKptzTFmLkPk4UGmW86W75AweLHgP0eQ"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "860056439191-n891j169rbnt5f3f8mulpg1l5qd7rclv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

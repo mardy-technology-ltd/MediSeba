@@ -1,16 +1,64 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import '../models/user_model.dart';
 
 class FirebaseAuthRepository {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   // Convert phone number to a dummy email for Firebase Email/Password Auth
   String _phoneToEmail(String phone) {
     // Remove any spaces or special characters if needed
     String cleanPhone = phone.replaceAll(RegExp(r'\s+'), '');
     return '$cleanPhone@mediseba.com';
+  }
+
+  Future<User?> signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) return null; // User canceled the sign-in
+
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final UserCredential userCredential = await _firebaseAuth.signInWithCredential(credential);
+      final User? user = userCredential.user;
+
+      if (user != null) {
+        // Check if user already exists in Firestore
+        final docSnapshot = await _firestore.collection('users').doc(user.uid).get();
+        if (!docSnapshot.exists) {
+          // Create user document for first time google login
+          final userModel = UserModel(
+            uid: user.uid,
+            name: user.displayName ?? 'Google User',
+            phone: user.phoneNumber ?? user.email ?? '',
+            division: '',
+            district: '',
+            upazila: '',
+            union: '',
+            profileImageUrl: user.photoURL,
+            createdAt: DateTime.now(),
+          );
+
+          await _firestore
+              .collection('users')
+              .doc(user.uid)
+              .set(userModel.toMap());
+        }
+      }
+
+      return user;
+    } on FirebaseAuthException catch (e) {
+      throw _handleAuthException(e);
+    } catch (e) {
+      throw Exception('Google Sign-In failed: $e');
+    }
   }
 
   Future<User?> login(String phone, String password) async {
