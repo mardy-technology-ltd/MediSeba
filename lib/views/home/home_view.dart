@@ -8,6 +8,7 @@ import '../doctors/doctor_list_view.dart';
 import '../about/about_us_view.dart';
 import '../social/social_media_view.dart';
 import '../health_consultation/health_consultation_view.dart';
+import '../../services/social_media_launcher.dart';
 
 class HomeView extends StatefulWidget {
   final HomeController homeController;
@@ -908,6 +909,8 @@ class _HomeViewState extends State<HomeView> {
       ),
     );
   }
+
+
 
   Widget _buildLanguageOption(String langKey, String label) {
     final isSelected = _selectedLanguage == langKey;

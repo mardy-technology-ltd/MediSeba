@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../services/social_media_launcher.dart';
 
 class SocialMediaView extends StatelessWidget {
   const SocialMediaView({super.key});
@@ -50,74 +51,21 @@ class SocialMediaView extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 44), // To balance the back button
+                  const SizedBox(width: 44),
                 ],
               ),
             ),
-            
-            // Content
+
+            // Social Media List
             Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                children: [
-                  _buildSocialCard(
-                    title: 'Facebook',
-                    icon: Icons.facebook,
-                    iconColor: const Color(0xFF1877F2),
-                    arrowColor: const Color(0xFF1877F2),
-                  ),
-                  const SizedBox(height: 12),
-                  _buildSocialCard(
-                    title: 'YouTube',
-                    iconWidget: Container(
-                      width: 24,
-                      height: 24,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFF0000),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 18),
-                    ),
-                    arrowColor: const Color(0xFFFF0000),
-                  ),
-                  const SizedBox(height: 12),
-                  _buildSocialCard(
-                    title: 'Telegram',
-                    icon: Icons.telegram,
-                    iconColor: const Color(0xFF0088CC),
-                    arrowColor: const Color(0xFF00B2FF),
-                  ),
-                  const SizedBox(height: 12),
-                  _buildSocialCard(
-                    title: 'WhatsApp',
-                    // Using wechat or generic chat as fallback since whatsapp icon isn't in standard set always
-                    iconWidget: Container(
-                      width: 24,
-                      height: 24,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF25D366),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: const Icon(Icons.call, color: Colors.white, size: 16),
-                    ),
-                    arrowColor: const Color(0xFF25D366),
-                  ),
-                  const SizedBox(height: 12),
-                  _buildSocialCard(
-                    title: 'Email',
-                    iconWidget: Container(
-                      width: 24,
-                      height: 24,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: const Color(0xFFE2E8F0)),
-                      ),
-                      child: const Icon(Icons.email, color: Color(0xFFDB4437), size: 16),
-                    ),
-                    arrowColor: const Color(0xFFDB4437),
-                  ),
-                ],
+              child: ListView.separated(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                itemCount: SocialMediaLauncher.items.length,
+                separatorBuilder: (context, index) => const SizedBox(height: 12),
+                itemBuilder: (context, index) {
+                  final item = SocialMediaLauncher.items[index];
+                  return _buildSocialCard(item);
+                },
               ),
             ),
           ],
@@ -126,56 +74,62 @@ class SocialMediaView extends StatelessWidget {
     );
   }
 
-  Widget _buildSocialCard({
-    required String title,
-    IconData? icon,
-    Color? iconColor,
-    Widget? iconWidget,
-    required Color arrowColor,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          if (iconWidget != null) 
-            iconWidget 
-          else 
-            Icon(icon, color: iconColor, size: 28),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Text(
-              title,
-              style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w500,
-                color: Color(0xFF475569),
+  Widget _buildSocialCard(SocialMediaItem item) {
+    return GestureDetector(
+      onTap: () => SocialMediaLauncher.open(item),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: item.brandColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                item.iconData,
+                color: item.brandColor,
+                size: 24,
               ),
             ),
-          ),
-          Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: arrowColor,
-              borderRadius: BorderRadius.circular(6),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Text(
+                item.title,
+                style: const TextStyle(
+                  fontSize: 15.5,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1E293B),
+                ),
+              ),
             ),
-            child: const Icon(
-              Icons.arrow_forward_rounded,
-              color: Colors.white,
-              size: 16,
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: item.brandColor,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.arrow_forward_rounded,
+                color: Colors.white,
+                size: 16,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
