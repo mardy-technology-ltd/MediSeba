@@ -9,6 +9,8 @@ import '../about/about_us_view.dart';
 import '../social/social_media_view.dart';
 import '../health_consultation/health_consultation_view.dart';
 import '../../services/social_media_launcher.dart';
+import 'package:share_plus/share_plus.dart';
+import '../../widgets/share_app_dialog.dart';
 
 class HomeView extends StatefulWidget {
   final HomeController homeController;
@@ -842,7 +844,10 @@ class _HomeViewState extends State<HomeView> {
                   fit: BoxFit.contain,
                 ),
                 title: 'Share App',
-                onTap: () => Navigator.pop(context),
+                onTap: () {
+                  Navigator.pop(context);
+                  showShareAppDialog(context);
+                },
               ),
               const SizedBox(height: 14),
 
