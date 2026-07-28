@@ -60,7 +60,7 @@ class _HomeViewState extends State<HomeView> {
             // MediSeba Logo
             Image.asset(
               'assets/images/logo.png',
-              height: 38,
+              height: 48,
               fit: BoxFit.contain,
             ),
           ],
@@ -291,54 +291,178 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  // Category Grid (6 Cards 100% pixel-perfect matching Figma design, responsive across devices)
+  // Category Grid — Modern Service Cards with Bengali Labels
   Widget _buildCategoryGrid() {
-    final perfectCardAssets = [
-      'assets/images/perfect_card_1.png',
-      'assets/images/perfect_card_2.png',
-      'assets/images/perfect_card_3.png',
-      'assets/images/perfect_card_4.png',
-      'assets/images/perfect_card_5.png',
-      'assets/images/perfect_card_6.png',
+    final categories = [
+      _CategoryItem(
+        label: 'ডাক্তার সিরিয়াল',
+        icon: Icons.schedule_rounded,
+        iconColor: const Color(0xFFE53935),
+        iconBg: const Color(0xFFFFEBEE),
+        borderColor: const Color(0xFFFFCDD2),
+        imagePath: 'assets/images/dr_serial.png',
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const DoctorListView()),
+        ),
+      ),
+      _CategoryItem(
+        label: 'ডাক্তার ঘর',
+        icon: Icons.house_rounded,
+        iconColor: const Color(0xFF0F9D58),
+        iconBg: const Color(0xFFE8F5E9),
+        borderColor: const Color(0xFFC8E6C9),
+        imagePath: 'assets/images/dr_ghor.png',
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const DoctorListView()),
+        ),
+      ),
+      _CategoryItem(
+        label: 'মেডিশপ',
+        icon: Icons.local_pharmacy_rounded,
+        iconColor: const Color(0xFFE53935),
+        iconBg: const Color(0xFFFFEBEE),
+        borderColor: const Color(0xFFFFCDD2),
+        imagePath: 'assets/images/medishop.png',
+        onTap: () {},
+      ),
+      _CategoryItem(
+        label: 'রক্তসেবা',
+        icon: Icons.bloodtype_rounded,
+        iconColor: const Color(0xFFE53935),
+        iconBg: const Color(0xFFFFEBEE),
+        borderColor: const Color(0xFFFFCDD2),
+        imagePath: 'assets/images/roktoseba.png',
+        onTap: () {},
+      ),
+      _CategoryItem(
+        label: 'ডিসকাউন্ট অফার',
+        icon: Icons.local_offer_rounded,
+        iconColor: const Color(0xFF1565C0),
+        iconBg: const Color(0xFFE3F2FD),
+        borderColor: const Color(0xFFBBDEFB),
+        imagePath: 'assets/images/discount_offer.png',
+        onTap: () {},
+      ),
+      _CategoryItem(
+        label: 'অ্যাম্বুলেন্স সেবা',
+        icon: Icons.airport_shuttle_rounded,
+        iconColor: const Color(0xFF0F9D58),
+        iconBg: const Color(0xFFE8F5E9),
+        borderColor: const Color(0xFFC8E6C9),
+        imagePath: 'assets/images/ambulance_seba.png',
+        onTap: () {},
+      ),
+      _CategoryItem(
+        label: 'মাতৃসেবা',
+        icon: Icons.pregnant_woman_rounded,
+        iconColor: const Color(0xFFAD1457),
+        iconBg: const Color(0xFFFCE4EC),
+        borderColor: const Color(0xFFF8BBD0),
+        imagePath: 'assets/images/matriseba.png',
+        onTap: () {},
+      ),
+      _CategoryItem(
+        label: 'কাস্টমার সাপোর্ট',
+        icon: Icons.headset_mic_rounded,
+        iconColor: const Color(0xFF1565C0),
+        iconBg: const Color(0xFFE3F2FD),
+        borderColor: const Color(0xFFBBDEFB),
+        imagePath: 'assets/images/customer_support.png',
+        onTap: () {},
+      ),
     ];
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final screenWidth = constraints.maxWidth;
-        final crossAxisCount = screenWidth > 600 ? 3 : 2;
-        final aspectRatio = screenWidth > 600
-            ? 1.85
-            : (screenWidth < 360 ? 1.85 : 2.05);
-
-        return GridView.builder(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Grid
+        GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: crossAxisCount,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
             crossAxisSpacing: 10,
             mainAxisSpacing: 10,
-            childAspectRatio: aspectRatio,
+            childAspectRatio: 1.6,
           ),
-          itemCount: perfectCardAssets.length,
+          itemCount: categories.length,
           itemBuilder: (context, index) {
-            final assetPath = perfectCardAssets[index];
-
-            return GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const DoctorListView(),
-                  ),
-                );
-              },
-              child: Image.asset(assetPath, fit: BoxFit.contain),
-            );
+            final item = categories[index];
+            return _buildServiceCard(item);
           },
-        );
-      },
+        ),
+      ],
     );
   }
+
+  Widget _buildServiceCard(_CategoryItem item) {
+    return GestureDetector(
+      onTap: item.onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: item.borderColor, width: 1.2),
+          boxShadow: [
+            BoxShadow(
+              color: item.iconColor.withValues(alpha: 0.08),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Image or Icon placeholder
+            item.imagePath != null
+                ? SizedBox(
+                    width: 64,
+                    height: 64,
+                    child: Image.asset(
+                      item.imagePath!,
+                      fit: BoxFit.contain,
+                    ),
+                  )
+                : Container(
+                    width: 54,
+                    height: 54,
+                    decoration: BoxDecoration(
+                      color: item.iconBg,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Icon(
+                      item.icon,
+                      color: item.iconColor,
+                      size: 30,
+                    ),
+                  ),
+            const SizedBox(height: 2),
+
+            // Bengali Label
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              child: Text(
+                item.label,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: textDark,
+                  height: 1.3,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
 
   // Hero Banner Slider Card (5 sliding banner pages 100% pixel-matched)
   Widget _buildHeroBanner() {
@@ -879,4 +1003,25 @@ class _HomeViewState extends State<HomeView> {
       ),
     );
   }
+}
+
+// Data class for service category items
+class _CategoryItem {
+  final String label;
+  final IconData icon;
+  final Color iconColor;
+  final Color iconBg;
+  final Color borderColor;
+  final String? imagePath;
+  final VoidCallback onTap;
+
+  const _CategoryItem({
+    required this.label,
+    required this.icon,
+    required this.iconColor,
+    required this.iconBg,
+    required this.borderColor,
+    this.imagePath,
+    required this.onTap,
+  });
 }

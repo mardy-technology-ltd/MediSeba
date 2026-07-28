@@ -101,7 +101,7 @@ class _LoginViewState extends State<LoginView> {
                 const SizedBox(height: 24),
                 // Welcome Text
                 const Text(
-                  'Welcome to MediSheba App!',
+                  'Welcome to MediSeba!',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,

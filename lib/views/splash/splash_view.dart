@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../controllers/home_controller.dart';
 import '../../controllers/auth_controller.dart';
 import '../auth/login_view.dart';
+import '../home/home_view.dart';
 
 class SplashView extends StatefulWidget {
   final HomeController homeController;

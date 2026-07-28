@@ -269,7 +269,7 @@ class _RegisterViewState extends State<RegisterView> {
                 const SizedBox(height: 16),
                 // Welcome Text
                 const Text(
-                  'Welcome to MediSheba App!',
+                  'Welcome to MediSeba!',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -286,7 +286,7 @@ class _RegisterViewState extends State<RegisterView> {
                 ),
                 const SizedBox(height: 24),
                 const Text(
-                  'Sign Up To MediSheba',
+                  'Sign Up To MediSeba',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
