@@ -159,6 +159,44 @@ class FirebaseAuthRepository {
     }
   }
 
+  Future<void> updateUserProfile({
+    required String uid,
+    required String name,
+    required String phone,
+    required String division,
+    required String district,
+    required String upazila,
+    required String union,
+    String? referId,
+  }) async {
+    try {
+      final user = _firebaseAuth.currentUser;
+      if (user != null && name.isNotEmpty && user.displayName != name) {
+        await user.updateDisplayName(name);
+      }
+
+      final Map<String, dynamic> updateData = {
+        'name': name,
+        'phone': phone,
+        'division': division,
+        'district': district,
+        'upazila': upazila,
+        'union': union,
+      };
+
+      if (referId != null && referId.isNotEmpty) {
+        updateData['referId'] = referId;
+      }
+
+      await _firestore.collection('users').doc(uid).set(
+        updateData,
+        SetOptions(merge: true),
+      );
+    } catch (e) {
+      throw Exception('Failed to update profile details: $e');
+    }
+  }
+
   Exception _handleAuthException(FirebaseAuthException e) {
     switch (e.code) {
       case 'user-not-found':
