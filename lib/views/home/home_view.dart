@@ -511,27 +511,9 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  // Health Query Banner (100% pixel-matched with Figma screenshot)
+  // Health Query Banner (Interactive Banner with larger Proceed button and tap effect)
   Widget _buildQueryBanner() {
-    return InkWell(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const HealthConsultationView(),
-          ),
-        );
-      },
-      borderRadius: BorderRadius.circular(16),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Image.asset(
-          'assets/images/perfect_query_banner.png',
-          width: double.infinity,
-          fit: BoxFit.fitWidth,
-        ),
-      ),
-    );
+    return const _QueryBannerCard();
   }
 
   // Section Header Component
@@ -1024,4 +1006,167 @@ class _CategoryItem {
     this.imagePath,
     required this.onTap,
   });
+}
+
+// Health Query Banner Card with Larger Interactive Animated Proceed Button
+class _QueryBannerCard extends StatefulWidget {
+  const _QueryBannerCard();
+
+  @override
+  State<_QueryBannerCard> createState() => _QueryBannerCardState();
+}
+
+class _QueryBannerCardState extends State<_QueryBannerCard> {
+  double _scale = 1.0;
+
+  void _onTapDown(TapDownDetails details) {
+    setState(() => _scale = 0.94);
+  }
+
+  void _onTapUp(TapUpDetails details) {
+    setState(() => _scale = 1.0);
+  }
+
+  void _onTapCancel() {
+    setState(() => _scale = 1.0);
+  }
+
+  void _navigateToHealthConsultation() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const HealthConsultationView(),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF9FF7E8), Color(0xFF85E6D4)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF009245).withValues(alpha: 0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(18),
+        child: InkWell(
+          onTap: _navigateToHealthConsultation,
+          borderRadius: BorderRadius.circular(18),
+          splashColor: Colors.white.withValues(alpha: 0.2),
+          highlightColor: Colors.white.withValues(alpha: 0.1),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+            child: Row(
+              children: [
+                // Illustration
+                SizedBox(
+                  width: 125,
+                  height: 105,
+                  child: Image.asset(
+                    'assets/images/query_people.png',
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) => Image.asset(
+                      'assets/images/perfect_query_banner.png',
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+
+                // Text & Button Column
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'স্বাস্থ্য বিষয়ক জিজ্ঞাসা',
+                        style: TextStyle(
+                          fontSize: 16.5,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF1E293B),
+                          height: 1.2,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'We will answer you in 48 hours',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF334155).withValues(alpha: 0.75),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Interactive Larger Proceed Button
+                      GestureDetector(
+                        onTapDown: _onTapDown,
+                        onTapUp: (d) {
+                          _onTapUp(d);
+                          _navigateToHealthConsultation();
+                        },
+                        onTapCancel: _onTapCancel,
+                        child: AnimatedScale(
+                          scale: _scale,
+                          duration: const Duration(milliseconds: 100),
+                          curve: Curves.easeInOut,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF0F9D58),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF0F9D58).withValues(alpha: 0.35),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'Proceed',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                                SizedBox(width: 6),
+                                Icon(
+                                  Icons.arrow_forward_rounded,
+                                  color: Colors.white,
+                                  size: 17,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
