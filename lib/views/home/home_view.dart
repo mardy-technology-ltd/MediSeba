@@ -257,20 +257,20 @@ class _HomeViewState extends State<HomeView> {
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(
-        color: Color(0xFFE6F7F5),
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
+        color: Color(0xFFE2F4F2), // Exact soft mint cyan tint from design mockup
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(36)),
       ),
-      padding: const EdgeInsets.fromLTRB(18, 16, 18, 20),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
       child: SafeArea(
         bottom: false,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Row 1: User Greeting + Notification Bell + Profile Avatar + Drawer Button
+            // Row 1: Greeting + Bell + Profile + Drawer
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Greeting Text
+                // "Hello, Tanvir" Greeting
                 ListenableBuilder(
                   listenable: widget.authController,
                   builder: (context, _) {
@@ -281,10 +281,10 @@ class _HomeViewState extends State<HomeView> {
                     return Text(
                       'Hello, $userName',
                       style: const TextStyle(
-                        fontSize: 22,
+                        fontSize: 24,
                         fontWeight: FontWeight.w800,
                         color: Color(0xFF0F172A),
-                        letterSpacing: -0.4,
+                        letterSpacing: -0.5,
                       ),
                     );
                   },
@@ -293,7 +293,7 @@ class _HomeViewState extends State<HomeView> {
                 // Top Actions Right
                 Row(
                   children: [
-                    // Notification Bell Icon Button with Red Badge Dot
+                    // Notification Bell Button with Red Badge Dot
                     GestureDetector(
                       onTap: () {
                         Navigator.push(
@@ -302,16 +302,16 @@ class _HomeViewState extends State<HomeView> {
                         );
                       },
                       child: Container(
-                        width: 42,
-                        height: 42,
-                        decoration: const BoxDecoration(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
                           color: Colors.white,
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black12,
-                              blurRadius: 8,
-                              offset: Offset(0, 2),
+                              color: Colors.black.withValues(alpha: 0.06),
+                              blurRadius: 12,
+                              offset: const Offset(0, 3),
                             ),
                           ],
                         ),
@@ -319,13 +319,13 @@ class _HomeViewState extends State<HomeView> {
                           alignment: Alignment.center,
                           children: [
                             const Icon(
-                              Icons.notifications_outlined,
-                              color: Color(0xFF1E293B),
-                              size: 22,
+                              Icons.notifications_none_rounded,
+                              color: Color(0xFF0F172A),
+                              size: 24,
                             ),
                             Positioned(
-                              top: 9,
-                              right: 10,
+                              top: 11,
+                              right: 12,
                               child: Container(
                                 width: 8,
                                 height: 8,
@@ -340,7 +340,7 @@ class _HomeViewState extends State<HomeView> {
                       ),
                     ),
 
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 12),
 
                     // User Profile Avatar
                     ListenableBuilder(
@@ -363,17 +363,16 @@ class _HomeViewState extends State<HomeView> {
                             );
                           },
                           child: Container(
-                            width: 42,
-                            height: 42,
+                            width: 44,
+                            height: 44,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: Colors.white,
-                              border: Border.all(color: Colors.white, width: 2),
-                              boxShadow: const [
+                              boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black12,
-                                  blurRadius: 8,
-                                  offset: Offset(0, 2),
+                                  color: Colors.black.withValues(alpha: 0.08),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 3),
                                 ),
                               ],
                               image: hasImage
@@ -387,9 +386,9 @@ class _HomeViewState extends State<HomeView> {
                                 ? const CircleAvatar(
                                     backgroundColor: Color(0xFFCBD5E1),
                                     child: Icon(
-                                      Icons.person,
+                                      Icons.person_rounded,
                                       color: Color(0xFF334155),
-                                      size: 22,
+                                      size: 24,
                                     ),
                                   )
                                 : null,
@@ -400,7 +399,7 @@ class _HomeViewState extends State<HomeView> {
 
                     const SizedBox(width: 4),
 
-                    // Sidebar Drawer Trigger
+                    // Sidebar Drawer Trigger Icon
                     Builder(
                       builder: (context) => IconButton(
                         icon: const Icon(Icons.menu_rounded, color: Color(0xFF0F766E), size: 26),
@@ -412,7 +411,7 @@ class _HomeViewState extends State<HomeView> {
               ],
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 18),
 
             // Row 2: Search Bar Input Widget
             GestureDetector(
@@ -425,32 +424,32 @@ class _HomeViewState extends State<HomeView> {
                 );
               },
               child: Container(
-                height: 50,
+                height: 52,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(30),
-                  boxShadow: const [
+                  boxShadow: [
                     BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 10,
-                      offset: Offset(0, 3),
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 14,
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 18),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: const Row(
                   children: [
                     Icon(
                       Icons.search_rounded,
-                      color: Color(0xFF94A3B8),
+                      color: Color(0xFF64748B),
                       size: 24,
                     ),
-                    SizedBox(width: 10),
+                    SizedBox(width: 12),
                     Text(
                       'Doctors, Medicine, or Services',
                       style: TextStyle(
-                        color: Color(0xFF94A3B8),
-                        fontSize: 14.5,
+                        color: Color(0xFF64748B),
+                        fontSize: 15,
                         fontWeight: FontWeight.w400,
                       ),
                     ),
@@ -459,7 +458,7 @@ class _HomeViewState extends State<HomeView> {
               ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 18),
 
             // Row 3: 24/7 Teleconsultation Banner Card
             GestureDetector(
@@ -472,33 +471,40 @@ class _HomeViewState extends State<HomeView> {
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: const [
+                  borderRadius: BorderRadius.circular(22),
+                  boxShadow: [
                     BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 12,
-                      offset: Offset(0, 4),
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 16,
+                      offset: const Offset(0, 5),
                     ),
                   ],
                 ),
-                padding: const EdgeInsets.all(14),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 child: Row(
                   children: [
                     // Green Avatar Box
                     Container(
-                      width: 48,
-                      height: 48,
+                      width: 52,
+                      height: 52,
                       decoration: BoxDecoration(
                         color: const Color(0xFF00A884),
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF00A884).withValues(alpha: 0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
                       ),
                       child: const Icon(
-                        Icons.medical_services_rounded,
+                        Icons.person_outline_rounded,
                         color: Colors.white,
-                        size: 26,
+                        size: 30,
                       ),
                     ),
-                    const SizedBox(width: 14),
+                    const SizedBox(width: 16),
                     const Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -506,19 +512,20 @@ class _HomeViewState extends State<HomeView> {
                           Text(
                             '24/7 Teleconsultation &\nExpress Healthcare',
                             style: TextStyle(
-                              fontSize: 14.5,
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: Color(0xFF0F172A),
-                              height: 1.25,
+                              height: 1.2,
+                              letterSpacing: -0.2,
                             ),
                           ),
-                          SizedBox(height: 3),
+                          SizedBox(height: 4),
                           Text(
                             'Connect with medical professionals instantly.',
                             style: TextStyle(
-                              fontSize: 12,
-                              color: Color(0xFF64748B),
-                              height: 1.2,
+                              fontSize: 13,
+                              color: Color(0xFF475569),
+                              height: 1.25,
                             ),
                           ),
                         ],
