@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="heartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#fecdd3"/>
+    </linearGradient>
+    <linearGradient id="dropGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f43f5e"/>
+      <stop offset="100%" stop-color="#be123c"/>
+    </linearGradient>
+  </defs>
+  <!-- Heart Shape -->
+  <path d="M 32 54 C 32 54 10 38 10 24 C 10 16 16 10 24 10 C 29 10 32 13 32 13 C 32 13 35 10 40 10 C 48 10 54 16 54 24 C 54 38 32 54 32 54 Z" fill="url(#heartGrad)"/>
+  <!-- Blood Drop overlay on right -->
+  <path d="M 44 26 C 44 26 36 37 36 43 C 36 47.4 39.6 51 44 51 C 48.4 51 52 47.4 52 43 C 52 37 44 26 44 26 Z" fill="url(#dropGrad)"/>
+  <!-- Drop Highlight -->
+  <circle cx="41.5" cy="42" r="1.5" fill="#ffffff" opacity="0.7"/>
+</svg>

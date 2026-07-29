@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="tagGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#ccfbf1"/>
+    </linearGradient>
+  </defs>
+  <!-- Rotated Discount Tag -->
+  <g transform="rotate(-25 32 32)">
+    <path d="M 12 14 L 34 14 L 54 34 C 56 36 56 39 54 41 L 41 54 C 39 56 36 56 34 54 L 14 34 Z" fill="url(#tagGrad)"/>
+    <!-- Tag Hole -->
+    <circle cx="22" cy="24" r="4" fill="#0d9488"/>
+    <!-- Percent Sign on Tag -->
+    <text x="32" y="42" font-family="Arial, sans-serif" font-weight="900" font-size="18" fill="#0d9488">%</text>
+  </g>
+</svg>

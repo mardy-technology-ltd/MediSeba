@@ -8,8 +8,6 @@ import '../doctors/doctor_list_view.dart';
 import '../about/about_us_view.dart';
 import '../social/social_media_view.dart';
 import '../health_consultation/health_consultation_view.dart';
-import '../../services/social_media_launcher.dart';
-import 'package:share_plus/share_plus.dart';
 import '../../widgets/share_app_dialog.dart';
 import '../../widgets/helpline_bottom_sheet.dart';
 import '../../widgets/modern_glow_navbar.dart';
@@ -17,6 +15,7 @@ import '../notifications/notification_view.dart';
 import '../offers/offer_list_view.dart';
 import '../hospitals/hospital_list_view.dart';
 import '../more/more_menu_view.dart';
+import 'widgets/service_tile_card.dart';
 
 class HomeView extends StatefulWidget {
   final HomeController homeController;
@@ -57,72 +56,36 @@ class _HomeViewState extends State<HomeView> {
     return Scaffold(
       key: _scaffoldKey,
       endDrawer: _buildSidebarDrawer(context),
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        automaticallyImplyLeading: false,
-        titleSpacing: 16,
-        title: Row(
-          children: [
-            // MediSeba Logo
-            Image.asset(
-              'assets/images/logo.png',
-              height: 48,
-              fit: BoxFit.contain,
-            ),
-          ],
-        ),
-        actions: [
-          // User Profile Button (Switches to Profile Tab)
-          ListenableBuilder(
-            listenable: widget.authController,
-            builder: (context, _) {
-              final uData = widget.authController.currentUserData;
-              final hasImage = uData?.profileImageUrl != null && uData!.profileImageUrl!.isNotEmpty;
-
-              return GestureDetector(
-                onTap: () {
-                  setState(() => _currentBottomNavIndex = 4);
-                },
-                child: Container(
-                  height: 30,
-                  width: 30,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: const Color(0xFFF1F5F9),
-                    border: Border.all(color: brandGreen, width: 1.5),
-                    image: hasImage
-                        ? DecorationImage(
-                            image: NetworkImage(uData!.profileImageUrl!),
-                            fit: BoxFit.cover,
-                          )
-                        : null,
+      backgroundColor: const Color(0xFFF8FAFC),
+      appBar: _currentBottomNavIndex == 0
+          ? null
+          : AppBar(
+              backgroundColor: Colors.white,
+              elevation: 0,
+              scrolledUnderElevation: 0,
+              automaticallyImplyLeading: false,
+              titleSpacing: 16,
+              title: Row(
+                children: [
+                  Image.asset(
+                    'assets/images/logo.png',
+                    height: 44,
+                    fit: BoxFit.contain,
                   ),
-                  child: !hasImage
-                      ? const Icon(
-                          Icons.person_rounded,
-                          color: brandGreen,
-                          size: 18,
-                        )
-                      : null,
+                ],
+              ),
+              actions: [
+                Builder(
+                  builder: (context) => IconButton(
+                    icon: const Icon(Icons.menu_rounded, color: brandGreen, size: 28),
+                    onPressed: () {
+                      Scaffold.of(context).openEndDrawer();
+                    },
+                  ),
                 ),
-              );
-            },
-          ),
-          const SizedBox(width: 4),
-          Builder(
-            builder: (context) => IconButton(
-              icon: const Icon(Icons.menu_rounded, color: brandGreen, size: 28),
-              onPressed: () {
-                Scaffold.of(context).openEndDrawer();
-              },
+                const SizedBox(width: 4),
+              ],
             ),
-          ),
-          const SizedBox(width: 4),
-        ],
-      ),
       body: IndexedStack(
         index: _currentBottomNavIndex,
         children: [
@@ -147,25 +110,33 @@ class _HomeViewState extends State<HomeView> {
           setState(() => _currentBottomNavIndex = index);
         },
         items: const [
-          ModernGlowNavBarItem(icon: Icons.home_rounded, label: 'হোম'),
-          ModernGlowNavBarItem(icon: Icons.local_offer_rounded, label: 'অফার'),
-          ModernGlowNavBarItem(icon: Icons.local_hospital_rounded, label: 'হাসপাতাল'),
-          ModernGlowNavBarItem(icon: Icons.medical_services_rounded, label: 'ডাক্তার'),
-          ModernGlowNavBarItem(icon: Icons.grid_view_rounded, label: 'আরও'),
+          ModernGlowNavBarItem(icon: Icons.home_rounded, label: 'Home'),
+          ModernGlowNavBarItem(icon: Icons.local_offer_rounded, label: 'Offers'),
+          ModernGlowNavBarItem(icon: Icons.apartment_rounded, label: 'Hospitals'),
+          ModernGlowNavBarItem(icon: Icons.person_rounded, label: 'Doctors'),
+          ModernGlowNavBarItem(icon: Icons.more_horiz_rounded, label: 'More'),
         ],
       ),
     );
   }
 
-  // Home Screen Center Scroll Body
+  // Home Screen Center Scroll Body with Cyan Header Container
   Widget _buildHomeBodyContent() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+      physics: const BouncingScrollPhysics(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. Category 2x3 Grid Section
-          _buildCategoryGrid(),
+          // 1. Soft Cyan Header Container
+          _buildTopCyanHeader(),
+
+          const SizedBox(height: 18),
+
+          // 2. 8 Service Grid Cards
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: _buildCategoryGrid(),
+          ),
 
           const SizedBox(height: 20),
 
@@ -281,175 +252,392 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  // Category Grid — Modern Service Cards with Bengali Labels
-  Widget _buildCategoryGrid() {
-    final categories = [
-      _CategoryItem(
-        label: 'ডাক্তার সিরিয়াল',
-        icon: Icons.schedule_rounded,
-        iconColor: const Color(0xFFE53935),
-        iconBg: const Color(0xFFFFEBEE),
-        borderColor: const Color(0xFFFFCDD2),
-        imagePath: 'assets/images/dr_serial.png',
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const DoctorListView()),
-        ),
+  // 1. Top Soft Cyan Header Section matching reference image
+  Widget _buildTopCyanHeader() {
+    return Container(
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        color: Color(0xFFE6F7F5),
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
       ),
-      _CategoryItem(
-        label: 'ডাক্তার ঘর',
-        icon: Icons.house_rounded,
-        iconColor: const Color(0xFF0F9D58),
-        iconBg: const Color(0xFFE8F5E9),
-        borderColor: const Color(0xFFC8E6C9),
-        imagePath: 'assets/images/dr_ghor.png',
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const DoctorListView()),
-        ),
-      ),
-      _CategoryItem(
-        label: 'মেডিশপ',
-        icon: Icons.local_pharmacy_rounded,
-        iconColor: const Color(0xFFE53935),
-        iconBg: const Color(0xFFFFEBEE),
-        borderColor: const Color(0xFFFFCDD2),
-        imagePath: 'assets/images/medishop.png',
-        onTap: () {},
-      ),
-      _CategoryItem(
-        label: 'রক্তসেবা',
-        icon: Icons.bloodtype_rounded,
-        iconColor: const Color(0xFFE53935),
-        iconBg: const Color(0xFFFFEBEE),
-        borderColor: const Color(0xFFFFCDD2),
-        imagePath: 'assets/images/roktoseba.png',
-        onTap: () {},
-      ),
-      _CategoryItem(
-        label: 'ডিসকাউন্ট অফার',
-        icon: Icons.local_offer_rounded,
-        iconColor: const Color(0xFF1565C0),
-        iconBg: const Color(0xFFE3F2FD),
-        borderColor: const Color(0xFFBBDEFB),
-        imagePath: 'assets/images/discount_offer.png',
-        onTap: () {},
-      ),
-      _CategoryItem(
-        label: 'অ্যাম্বুলেন্স সেবা',
-        icon: Icons.airport_shuttle_rounded,
-        iconColor: const Color(0xFF0F9D58),
-        iconBg: const Color(0xFFE8F5E9),
-        borderColor: const Color(0xFFC8E6C9),
-        imagePath: 'assets/images/ambulance_seba.png',
-        onTap: () {},
-      ),
-      _CategoryItem(
-        label: 'মাতৃসেবা',
-        icon: Icons.pregnant_woman_rounded,
-        iconColor: const Color(0xFFAD1457),
-        iconBg: const Color(0xFFFCE4EC),
-        borderColor: const Color(0xFFF8BBD0),
-        imagePath: 'assets/images/matriseba.png',
-        onTap: () {},
-      ),
-      _CategoryItem(
-        label: 'কাস্টমার সাপোর্ট',
-        icon: Icons.headset_mic_rounded,
-        iconColor: const Color(0xFF1565C0),
-        iconBg: const Color(0xFFE3F2FD),
-        borderColor: const Color(0xFFBBDEFB),
-        imagePath: 'assets/images/customer_support.png',
-        onTap: () {},
-      ),
-    ];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Grid
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            childAspectRatio: 1.6,
-          ),
-          itemCount: categories.length,
-          itemBuilder: (context, index) {
-            final item = categories[index];
-            return _buildServiceCard(item);
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildServiceCard(_CategoryItem item) {
-    return GestureDetector(
-      onTap: item.onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: item.borderColor, width: 1.2),
-          boxShadow: [
-            BoxShadow(
-              color: item.iconColor.withValues(alpha: 0.08),
-              blurRadius: 10,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
+      padding: const EdgeInsets.fromLTRB(18, 16, 18, 20),
+      child: SafeArea(
+        bottom: false,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image or Icon placeholder
-            item.imagePath != null
-                ? SizedBox(
-                    width: 64,
-                    height: 64,
-                    child: Image.asset(
-                      item.imagePath!,
-                      fit: BoxFit.contain,
-                    ),
-                  )
-                : Container(
-                    width: 54,
-                    height: 54,
-                    decoration: BoxDecoration(
-                      color: item.iconBg,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Icon(
-                      item.icon,
-                      color: item.iconColor,
-                      size: 30,
-                    ),
-                  ),
-            const SizedBox(height: 2),
+            // Row 1: User Greeting + Notification Bell + Profile Avatar + Drawer Button
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Greeting Text
+                ListenableBuilder(
+                  listenable: widget.authController,
+                  builder: (context, _) {
+                    final uData = widget.authController.currentUserData;
+                    final userName = (uData?.name != null && uData!.name.trim().isNotEmpty)
+                        ? uData.name
+                        : 'Tanvir';
+                    return Text(
+                      'Hello, $userName',
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF0F172A),
+                        letterSpacing: -0.4,
+                      ),
+                    );
+                  },
+                ),
 
-            // Bengali Label
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 6),
-              child: Text(
-                item.label,
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: textDark,
-                  height: 1.3,
+                // Top Actions Right
+                Row(
+                  children: [
+                    // Notification Bell Icon Button with Red Badge Dot
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const NotificationView()),
+                        );
+                      },
+                      child: Container(
+                        width: 42,
+                        height: 42,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 8,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            const Icon(
+                              Icons.notifications_outlined,
+                              color: Color(0xFF1E293B),
+                              size: 22,
+                            ),
+                            Positioned(
+                              top: 9,
+                              right: 10,
+                              child: Container(
+                                width: 8,
+                                height: 8,
+                                decoration: const BoxDecoration(
+                                  color: Color(0xFFEF4444),
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(width: 10),
+
+                    // User Profile Avatar
+                    ListenableBuilder(
+                      listenable: widget.authController,
+                      builder: (context, _) {
+                        final uData = widget.authController.currentUserData;
+                        final profileImg = uData?.profileImageUrl;
+                        final hasImage = profileImg != null && profileImg.isNotEmpty;
+
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ProfileView(
+                                  authController: widget.authController,
+                                  homeController: widget.homeController,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            width: 42,
+                            height: 42,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white,
+                              border: Border.all(color: Colors.white, width: 2),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 8,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                              image: hasImage
+                                  ? DecorationImage(
+                                      image: NetworkImage(profileImg),
+                                      fit: BoxFit.cover,
+                                    )
+                                  : null,
+                            ),
+                            child: !hasImage
+                                ? const CircleAvatar(
+                                    backgroundColor: Color(0xFFCBD5E1),
+                                    child: Icon(
+                                      Icons.person,
+                                      color: Color(0xFF334155),
+                                      size: 22,
+                                    ),
+                                  )
+                                : null,
+                          ),
+                        );
+                      },
+                    ),
+
+                    const SizedBox(width: 4),
+
+                    // Sidebar Drawer Trigger
+                    Builder(
+                      builder: (context) => IconButton(
+                        icon: const Icon(Icons.menu_rounded, color: Color(0xFF0F766E), size: 26),
+                        onPressed: () => Scaffold.of(context).openEndDrawer(),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 16),
+
+            // Row 2: Search Bar Input Widget
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const DoctorListView(showAppBar: true),
+                  ),
+                );
+              },
+              child: Container(
+                height: 50,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 10,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 18),
+                child: const Row(
+                  children: [
+                    Icon(
+                      Icons.search_rounded,
+                      color: Color(0xFF94A3B8),
+                      size: 24,
+                    ),
+                    SizedBox(width: 10),
+                    Text(
+                      'Doctors, Medicine, or Services',
+                      style: TextStyle(
+                        color: Color(0xFF94A3B8),
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Row 3: 24/7 Teleconsultation Banner Card
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const DoctorBariView()),
+                );
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 12,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                padding: const EdgeInsets.all(14),
+                child: Row(
+                  children: [
+                    // Green Avatar Box
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF00A884),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: const Icon(
+                        Icons.medical_services_rounded,
+                        color: Colors.white,
+                        size: 26,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '24/7 Teleconsultation &\nExpress Healthcare',
+                            style: TextStyle(
+                              fontSize: 14.5,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF0F172A),
+                              height: 1.25,
+                            ),
+                          ),
+                          SizedBox(height: 3),
+                          Text(
+                            'Connect with medical professionals instantly.',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFF64748B),
+                              height: 1.2,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  // Category Grid — 8 Vibrant Service Cards matching reference image
+  Widget _buildCategoryGrid() {
+    return GridView.count(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisCount: 2,
+      crossAxisSpacing: 14,
+      mainAxisSpacing: 14,
+      childAspectRatio: 1.45,
+      children: [
+        ServiceTileCard(
+          title: 'Doctor\nSerial',
+          svgPath: 'assets/icons/doctor_serial.svg',
+          backgroundColor: const Color(0xFF00A884),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const DoctorListView()),
+            );
+          },
+        ),
+        ServiceTileCard(
+          title: 'Doctor Home/\nTeleconsult',
+          svgPath: 'assets/icons/doctor_home.svg',
+          backgroundColor: const Color(0xFFE53935),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const DoctorBariView()),
+            );
+          },
+        ),
+        ServiceTileCard(
+          title: 'MediShop',
+          svgPath: 'assets/icons/medishop.svg',
+          backgroundColor: const Color(0xFF475569),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const HealthConsultationView(),
+              ),
+            );
+          },
+        ),
+        ServiceTileCard(
+          title: 'Blood\nDonation',
+          svgPath: 'assets/icons/blood_donation.svg',
+          backgroundColor: const Color(0xFFD32F2F),
+          onTap: () {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              builder: (_) => const HelplineBottomSheet(),
+            );
+          },
+        ),
+        ServiceTileCard(
+          title: 'Special\nDiscounts',
+          svgPath: 'assets/icons/special_discounts.svg',
+          backgroundColor: const Color(0xFF00A884),
+          onTap: () {
+            setState(() => _currentBottomNavIndex = 1);
+          },
+        ),
+        ServiceTileCard(
+          title: 'Emergency\nAmbulance',
+          svgPath: 'assets/icons/ambulance.svg',
+          backgroundColor: const Color(0xFF475569),
+          onTap: () {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              builder: (_) => const HelplineBottomSheet(),
+            );
+          },
+        ),
+        ServiceTileCard(
+          title: 'Maternal &\nChild Care',
+          svgPath: 'assets/icons/maternal_care.svg',
+          backgroundColor: const Color(0xFF475569),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const DoctorBariView()),
+            );
+          },
+        ),
+        ServiceTileCard(
+          title: '24/7 Customer\nSupport',
+          svgPath: 'assets/icons/customer_support.svg',
+          backgroundColor: const Color(0xFF78350F),
+          onTap: () {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              builder: (_) => const HelplineBottomSheet(),
+            );
+          },
+        ),
+      ],
     );
   }
 
@@ -983,27 +1171,6 @@ class _HomeViewState extends State<HomeView> {
       ),
     );
   }
-}
-
-// Data class for service category items
-class _CategoryItem {
-  final String label;
-  final IconData icon;
-  final Color iconColor;
-  final Color iconBg;
-  final Color borderColor;
-  final String? imagePath;
-  final VoidCallback onTap;
-
-  const _CategoryItem({
-    required this.label,
-    required this.icon,
-    required this.iconColor,
-    required this.iconBg,
-    required this.borderColor,
-    this.imagePath,
-    required this.onTap,
-  });
 }
 
 // Health Query Banner Card with Larger Interactive Animated Proceed Button

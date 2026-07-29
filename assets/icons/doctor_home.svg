@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="camGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f1f5f9"/>
+    </linearGradient>
+  </defs>
+  <!-- Video Camera Body -->
+  <rect x="10" y="18" width="34" height="28" rx="7" fill="url(#camGrad)"/>
+  <!-- Cross Medical Icon on Camera -->
+  <path d="M 27 25 L 27 39 M 20 32 L 34 32" stroke="#e11d48" stroke-width="4" stroke-linecap="round"/>
+  <!-- Camera Lens -->
+  <path d="M 44 26 L 54 20 C 55.5 19 57 20 57 22 L 57 42 C 57 44 55.5 45 54 44 L 44 38 Z" fill="url(#camGrad)"/>
+</svg>

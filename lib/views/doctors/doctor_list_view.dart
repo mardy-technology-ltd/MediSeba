@@ -135,7 +135,7 @@ class _DoctorListViewState extends State<DoctorListView> {
                 }
 
                 return ListView.builder(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
                   itemCount: _doctorController.doctors.length,
                   itemBuilder: (context, index) {
                     final doctor = _doctorController.doctors[index];

@@ -3,6 +3,7 @@ import 'register_view.dart';
 import '../home/home_view.dart';
 import '../../controllers/home_controller.dart';
 import '../../controllers/auth_controller.dart';
+import '../../screens/main_screen.dart';
 
 class LoginView extends StatefulWidget {
   final HomeController homeController;
@@ -235,7 +236,7 @@ class _LoginViewState extends State<LoginView> {
                             if (success && mounted) {
                               Navigator.of(context).pushReplacement(
                                 MaterialPageRoute(
-                                  builder: (context) => HomeView(
+                                  builder: (context) => MainScreen(
                                     homeController: widget.homeController,
                                     authController: widget.authController,
                                   ),

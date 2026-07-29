@@ -26,6 +26,14 @@ class AppColors {
   static const Color statusPending = Color(0xFFF59E0B);  // Amber
   static const Color statusCancelled = Color(0xFFEF4444);// Red
 
+  // UI Redesign Colors
+  static const Color headerBg = Color(0xFFE6F7F5);      // Soft Cyan Header Tint
+  static const Color cardTeal = Color(0xFF00A884);      // Vibrant Teal Green Card
+  static const Color cardRed = Color(0xFFE53935);       // Crimson Red Card
+  static const Color cardBloodRed = Color(0xFFD32F2F);  // Deep Blood Red Card
+  static const Color cardSlate = Color(0xFF475569);     // Charcoal Slate Card
+  static const Color cardBrown = Color(0xFF78350F);     // Warm Bronze Brown Card
+
   // Gradients
   static const LinearGradient primaryGradient = LinearGradient(
     colors: [Color(0xFF0F766E), Color(0xFF0D9488)],
