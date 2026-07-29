@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'health_consultation_success_view.dart';
 
 class HealthConsultationView extends StatefulWidget {
-  const HealthConsultationView({super.key});
+  final bool showBackBtn;
+  const HealthConsultationView({super.key, this.showBackBtn = true});
 
   @override
   State<HealthConsultationView> createState() => _HealthConsultationViewState();
@@ -55,14 +56,15 @@ class _HealthConsultationViewState extends State<HealthConsultationView> {
               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
               child: Row(
                 children: [
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
+                  if (widget.showBackBtn) ...[
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 0.04),
@@ -78,6 +80,8 @@ class _HealthConsultationViewState extends State<HealthConsultationView> {
                       ),
                     ),
                   ),
+                  const SizedBox(width: 8),
+                  ],
                   const Expanded(
                     child: Center(
                       child: Text(

@@ -7,7 +7,8 @@ import 'widgets/doctor_card.dart';
 import 'doctor_detail_view.dart';
 
 class DoctorListView extends StatefulWidget {
-  const DoctorListView({super.key});
+  final bool showAppBar;
+  const DoctorListView({super.key, this.showAppBar = true});
 
   @override
   State<DoctorListView> createState() => _DoctorListViewState();
@@ -28,16 +29,18 @@ class _DoctorListViewState extends State<DoctorListView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.surface,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        title: Text('ডাক্তার খুঁজুন', style: AppTextStyles.heading2),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 20),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
+      appBar: widget.showAppBar
+          ? AppBar(
+              backgroundColor: AppColors.surface,
+              elevation: 0,
+              scrolledUnderElevation: 0,
+              title: Text('ডাক্তার খুঁজুন', style: AppTextStyles.heading2),
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 20),
+                onPressed: () => Navigator.pop(context),
+              ),
+            )
+          : null,
       body: Column(
         children: [
           // Search & Filter Box

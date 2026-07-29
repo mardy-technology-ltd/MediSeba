@@ -7,11 +7,13 @@ import 'edit_profile_view.dart';
 class ProfileView extends StatelessWidget {
   final AuthController authController;
   final HomeController homeController;
+  final bool showAppBarLeading;
 
   const ProfileView({
     super.key,
     required this.authController,
     required this.homeController,
+    this.showAppBarLeading = true,
   });
 
   static const brandGreen = Color(0xFF0F9D58);
@@ -75,23 +77,26 @@ class ProfileView extends StatelessWidget {
                 pinned: true,
                 elevation: 0,
                 backgroundColor: brandGreen,
-                leading: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        Icons.chevron_left_rounded,
-                        color: Colors.white,
-                        size: 28,
-                      ),
-                    ),
-                  ),
-                ),
+                automaticallyImplyLeading: showAppBarLeading,
+                leading: showAppBarLeading
+                    ? Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(
+                              Icons.chevron_left_rounded,
+                              color: Colors.white,
+                              size: 28,
+                            ),
+                          ),
+                        ),
+                      )
+                    : null,
                 actions: [
                   Padding(
                     padding: const EdgeInsets.all(8.0),

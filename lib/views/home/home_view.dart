@@ -12,6 +12,11 @@ import '../../services/social_media_launcher.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../widgets/share_app_dialog.dart';
 import '../../widgets/helpline_bottom_sheet.dart';
+import '../../widgets/modern_glow_navbar.dart';
+import '../notifications/notification_view.dart';
+import '../offers/offer_list_view.dart';
+import '../hospitals/hospital_list_view.dart';
+import '../more/more_menu_view.dart';
 
 class HomeView extends StatefulWidget {
   final HomeController homeController;
@@ -70,7 +75,7 @@ class _HomeViewState extends State<HomeView> {
           ],
         ),
         actions: [
-          // User Profile Button
+          // User Profile Button (Switches to Profile Tab)
           ListenableBuilder(
             listenable: widget.authController,
             builder: (context, _) {
@@ -79,15 +84,7 @@ class _HomeViewState extends State<HomeView> {
 
               return GestureDetector(
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ProfileView(
-                        authController: widget.authController,
-                        homeController: widget.homeController,
-                      ),
-                    ),
-                  );
+                  setState(() => _currentBottomNavIndex = 4);
                 },
                 child: Container(
                   height: 30,
@@ -126,171 +123,160 @@ class _HomeViewState extends State<HomeView> {
           const SizedBox(width: 4),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 1. Category 2x3 Grid Section
-            _buildCategoryGrid(),
-
-            const SizedBox(height: 20),
-
-            // 2. Banner Slider Carousel
-            _buildHeroBanner(),
-
-            const SizedBox(height: 16),
-
-            // 3. Health Query Banner
-            _buildQueryBanner(),
-
-            const SizedBox(height: 24),
-
-            // 4. Top Doctors Section Header
-            _buildSectionHeader(
-              title: 'Top Doctors In Your Area',
-              onSeeAllTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const DoctorListView(),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 12),
-
-            // Doctor List
-            _buildDoctorItem(
-              name: 'Dr. Billy',
-              specialty: 'GP-general practitioner',
-              time: '07:00 am - 09:30 pm',
-              isSponsor: true,
-              imageUrl:
-                  'https://img.freepik.com/free-photo/doctor-offering-medical-teleconsultation_23-2149329007.jpg',
-            ),
-            _buildDoctorItem(
-              name: 'Dr. Billy',
-              specialty: 'GP-general practitioner',
-              time: '07:00 am - 09:30 pm',
-              isSponsor: true,
-              imageUrl:
-                  'https://img.freepik.com/free-photo/female-doctor-hospital-with-stethoscope_23-2148827766.jpg',
-            ),
-            _buildDoctorItem(
-              name: 'Dr. Harry',
-              specialty: 'GP-general practitioner',
-              time: '09:30 am - 12:00 pm',
-              isSponsor: true,
-              imageUrl:
-                  'https://img.freepik.com/free-photo/young-handsome-physician-medical-robe-with-stethoscope_1303-17818.jpg',
-            ),
-            _buildDoctorItem(
-              name: 'Dr. Angel',
-              specialty: 'GP-general practitioner',
-              time: '07:00 am - 15:30 pm',
-              isSponsor: false,
-              imageUrl:
-                  'https://img.freepik.com/free-photo/pleased-young-female-doctor-wearing-medical-robe-stethoscope-around-neck-standing-with-crossed-arms_409827-254.jpg',
-            ),
-
-            const SizedBox(height: 24),
-
-            // 5. Nearby Hospitals Section Header
-            _buildSectionHeader(title: 'Nearby Hospitals', onSeeAllTap: () {}),
-            const SizedBox(height: 12),
-
-            // Hospitals Grid (Responsive Grid)
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final screenWidth = constraints.maxWidth;
-                final crossAxisCount = screenWidth > 600 ? 3 : 2;
-                final aspectRatio = screenWidth > 600
-                    ? 0.95
-                    : (screenWidth < 360 ? 0.82 : 0.92);
-
-                return GridView.count(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  crossAxisCount: crossAxisCount,
-                  mainAxisSpacing: 12,
-                  crossAxisSpacing: 12,
-                  childAspectRatio: aspectRatio,
-                  children: [
-                    _buildHospitalCard(
-                      name: 'Popular Diagonistic',
-                      address: 'Street Address',
-                      time: '07:00 am - 15:30 pm',
-                      imageUrl:
-                          'https://img.freepik.com/free-photo/empty-emergency-room-with-medical-equipment_23-2149138092.jpg',
-                    ),
-                    _buildHospitalCard(
-                      name: 'Popular Diagonistic',
-                      address: 'Street Address',
-                      time: '07:00 am - 15:30 pm',
-                      imageUrl:
-                          'https://img.freepik.com/free-photo/modern-operating-room-hospital_23-2148942918.jpg',
-                    ),
-                    _buildHospitalCard(
-                      name: 'Popular Diagonistic',
-                      address: 'Street Address',
-                      time: '07:00 am - 15:30 pm',
-                      imageUrl:
-                          'https://img.freepik.com/free-photo/interior-view-operating-room_1170-2254.jpg',
-                    ),
-                    _buildHospitalCard(
-                      name: 'Popular Diagonistic',
-                      address: 'Street Address',
-                      time: '07:00 am - 15:30 pm',
-                      imageUrl:
-                          'https://img.freepik.com/free-photo/medical-clinic-reception-counter-registration_482257-26804.jpg',
-                    ),
-                  ],
-                );
-              },
-            ),
-
-            const SizedBox(height: 20),
-          ],
-        ),
+      body: IndexedStack(
+        index: _currentBottomNavIndex,
+        children: [
+          // Tab 0: Home Content
+          _buildHomeBodyContent(),
+          // Tab 1: Offer List View
+          const OfferListView(),
+          // Tab 2: Hospital List View
+          const HospitalListView(),
+          // Tab 3: Doctor List View
+          const DoctorListView(showAppBar: false),
+          // Tab 4: More Menu View
+          MoreMenuView(
+            authController: widget.authController,
+            homeController: widget.homeController,
+          ),
+        ],
       ),
-      bottomNavigationBar: Container(
-        height: 64,
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: Color(0xFFF1F5F9), width: 1)),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildNavItem('assets/images/Group 1000004073.svg', 0),
-            _buildNavItem('assets/images/Group 1000004069.svg', 1),
-            _buildNavItem('assets/images/Group 1000004070.svg', 2),
-            _buildNavItem('assets/images/Group 1000004071.svg', 3),
-            _buildNavItem('assets/images/Group 1000004072.svg', 4),
-          ],
-        ),
+      bottomNavigationBar: ModernGlowNavBar(
+        currentIndex: _currentBottomNavIndex,
+        onTap: (index) {
+          setState(() => _currentBottomNavIndex = index);
+        },
+        items: const [
+          ModernGlowNavBarItem(icon: Icons.home_rounded, label: 'হোম'),
+          ModernGlowNavBarItem(icon: Icons.local_offer_rounded, label: 'অফার'),
+          ModernGlowNavBarItem(icon: Icons.local_hospital_rounded, label: 'হাসপাতাল'),
+          ModernGlowNavBarItem(icon: Icons.medical_services_rounded, label: 'ডাক্তার'),
+          ModernGlowNavBarItem(icon: Icons.grid_view_rounded, label: 'আরও'),
+        ],
       ),
     );
   }
 
-  Widget _buildNavItem(String assetPath, int index) {
-    final isSelected = _currentBottomNavIndex == index;
-    return GestureDetector(
-      onTap: () {
-        setState(() => _currentBottomNavIndex = index);
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-        child: SvgPicture.asset(
-          assetPath,
-          height: 42,
-          fit: BoxFit.contain,
-          colorFilter: isSelected
-              ? const ColorFilter.mode(brandGreen, BlendMode.srcIn)
-              : const ColorFilter.mode(Color(0xFFBCBCBC), BlendMode.srcIn),
-        ),
+  // Home Screen Center Scroll Body
+  Widget _buildHomeBodyContent() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 1. Category 2x3 Grid Section
+          _buildCategoryGrid(),
+
+          const SizedBox(height: 20),
+
+          // 2. Banner Slider Carousel
+          _buildHeroBanner(),
+
+          const SizedBox(height: 16),
+
+          // 3. Health Query Banner
+          _buildQueryBanner(),
+
+          const SizedBox(height: 24),
+
+          // 4. Top Doctors Section Header
+          _buildSectionHeader(
+            title: 'Top Doctors In Your Area',
+            onSeeAllTap: () {
+              setState(() => _currentBottomNavIndex = 3);
+            },
+          ),
+          const SizedBox(height: 12),
+
+          // Doctor List
+          _buildDoctorItem(
+            name: 'Dr. Billy',
+            specialty: 'GP-general practitioner',
+            time: '07:00 am - 09:30 pm',
+            isSponsor: true,
+            imageUrl:
+                'https://img.freepik.com/free-photo/doctor-offering-medical-teleconsultation_23-2149329007.jpg',
+          ),
+          _buildDoctorItem(
+            name: 'Dr. Billy',
+            specialty: 'GP-general practitioner',
+            time: '07:00 am - 09:30 pm',
+            isSponsor: true,
+            imageUrl:
+                'https://img.freepik.com/free-photo/female-doctor-hospital-with-stethoscope_23-2148827766.jpg',
+          ),
+          _buildDoctorItem(
+            name: 'Dr. Billy',
+            specialty: 'GP-general practitioner',
+            time: '07:00 am - 09:30 pm',
+            isSponsor: false,
+            imageUrl:
+                'https://img.freepik.com/free-photo/woman-doctor-wearing-stethoscope_23-2148827768.jpg',
+          ),
+
+          const SizedBox(height: 24),
+
+          // 5. Nearby Hospitals Section Header
+          _buildSectionHeader(
+            title: 'Nearby Hospitals',
+            onSeeAllTap: () {
+              setState(() => _currentBottomNavIndex = 2);
+            },
+          ),
+          const SizedBox(height: 12),
+
+          // Hospitals Grid (Responsive Grid)
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final screenWidth = constraints.maxWidth;
+              final crossAxisCount = screenWidth > 600 ? 3 : 2;
+              final aspectRatio = screenWidth > 600
+                  ? 0.95
+                  : (screenWidth < 360 ? 0.82 : 0.92);
+
+              return GridView.count(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisCount: crossAxisCount,
+                mainAxisSpacing: 12,
+                crossAxisSpacing: 12,
+                childAspectRatio: aspectRatio,
+                children: [
+                  _buildHospitalCard(
+                    name: 'Popular Diagonistic',
+                    address: 'Street Address',
+                    time: '07:00 am - 15:30 pm',
+                    imageUrl:
+                        'https://img.freepik.com/free-photo/empty-emergency-room-with-medical-equipment_23-2149138092.jpg',
+                  ),
+                  _buildHospitalCard(
+                    name: 'Popular Diagonistic',
+                    address: 'Street Address',
+                    time: '07:00 am - 15:30 pm',
+                    imageUrl:
+                        'https://img.freepik.com/free-photo/modern-operating-room-hospital_23-2148942918.jpg',
+                  ),
+                  _buildHospitalCard(
+                    name: 'Popular Diagonistic',
+                    address: 'Street Address',
+                    time: '07:00 am - 15:30 pm',
+                    imageUrl:
+                        'https://img.freepik.com/free-photo/interior-view-operating-room_1170-2254.jpg',
+                  ),
+                  _buildHospitalCard(
+                    name: 'Popular Diagonistic',
+                    address: 'Street Address',
+                    time: '07:00 am - 15:30 pm',
+                    imageUrl:
+                        'https://img.freepik.com/free-photo/medical-clinic-reception-counter-registration_482257-26804.jpg',
+                  ),
+                ],
+              );
+            },
+          ),
+
+          const SizedBox(height: 20),
+        ],
       ),
     );
   }
