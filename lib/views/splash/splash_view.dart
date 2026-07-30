@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../controllers/home_controller.dart';
 import '../../controllers/auth_controller.dart';
-import '../auth/login_view.dart';
+// import '../auth/login_view.dart';
 import '../home/home_view.dart';
 
 class SplashView extends StatefulWidget {
@@ -42,12 +42,30 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
 
     _animationController.forward();
 
-    // Navigate to LoginView after 2.5 seconds delay
+    // Navigate directly to HomeView (LoginView commented out for now)
+    /*
     Future.delayed(const Duration(milliseconds: 2500), () {
       if (mounted) {
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) => LoginView(
+              homeController: widget.homeController,
+              authController: widget.authController,
+            ),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+            transitionDuration: const Duration(milliseconds: 600),
+          ),
+        );
+      }
+    });
+    */
+    Future.delayed(const Duration(milliseconds: 2000), () {
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) => HomeView(
               homeController: widget.homeController,
               authController: widget.authController,
             ),

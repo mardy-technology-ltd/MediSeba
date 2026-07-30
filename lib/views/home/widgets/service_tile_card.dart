@@ -68,9 +68,11 @@ class _ServiceTileCardState extends State<ServiceTileCard> {
                 right: 48,
                 child: Text(
                   widget.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 15,
+                    fontSize: 14.5,
                     fontWeight: FontWeight.bold,
                     height: 1.25,
                     letterSpacing: -0.2,

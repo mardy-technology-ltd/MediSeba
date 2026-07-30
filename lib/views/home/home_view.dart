@@ -252,6 +252,17 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
+  String _getTimeBasedGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour >= 5 && hour < 12) {
+      return 'Good Morning, 👋';
+    } else if (hour >= 12 && hour < 17) {
+      return 'Good Afternoon, 👋';
+    } else {
+      return 'Good Evening, 👋';
+    }
+  }
+
   // 1. Top Soft Cyan Header Section matching reference image
   Widget _buildTopCyanHeader() {
     return Container(
@@ -269,31 +280,56 @@ class _HomeViewState extends State<HomeView> {
             // Row 1: Greeting + Bell + Profile + Drawer
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // "Hello, Tanvir" Greeting
-                ListenableBuilder(
-                  listenable: widget.authController,
-                  builder: (context, _) {
-                    final uData = widget.authController.currentUserData;
-                    final userName = (uData?.name != null && uData!.name.trim().isNotEmpty)
-                        ? uData.name
-                        : 'Tanvir';
-                    return Text(
-                      'Hello, $userName',
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w800,
-                        color: Color(0xFF0F172A),
-                        letterSpacing: -0.5,
-                      ),
-                    );
-                  },
-                ),
+                // 2-Line Dynamic Time-Based Greeting Layout (Wrapped in Expanded for overflow safety)
+                Expanded(
+                  child: ListenableBuilder(
+                    listenable: widget.authController,
+                    builder: (context, _) {
+                      final uData = widget.authController.currentUserData;
+                      final userName = (uData?.name != null && uData!.name.trim().isNotEmpty)
+                          ? uData.name
+                          : 'Basic Learner';
+                      final greetingSubtitle = _getTimeBasedGreeting();
 
-                // Top Actions Right
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Line 1: Top Subtitle (Time-based Greeting)
+                          Text(
+                            greetingSubtitle,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF64748B),
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          // Line 2: Bottom Title (User Name)
+                          Text(
+                            userName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF1E293B),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(width: 10),
+
+                // Top Actions Right (3 Uniform 40x40 Action Containers)
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Notification Bell Button with Red Badge Dot
+                    // 1. Notification Bell Button (40x40)
                     GestureDetector(
                       onTap: () {
                         Navigator.push(
@@ -302,15 +338,15 @@ class _HomeViewState extends State<HomeView> {
                         );
                       },
                       child: Container(
-                        width: 44,
-                        height: 44,
+                        width: 40,
+                        height: 40,
                         decoration: BoxDecoration(
                           color: Colors.white,
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withValues(alpha: 0.06),
-                              blurRadius: 12,
+                              blurRadius: 10,
                               offset: const Offset(0, 3),
                             ),
                           ],
@@ -321,11 +357,11 @@ class _HomeViewState extends State<HomeView> {
                             const Icon(
                               Icons.notifications_none_rounded,
                               color: Color(0xFF0F172A),
-                              size: 24,
+                              size: 22,
                             ),
                             Positioned(
-                              top: 11,
-                              right: 12,
+                              top: 9,
+                              right: 10,
                               child: Container(
                                 width: 8,
                                 height: 8,
@@ -340,9 +376,9 @@ class _HomeViewState extends State<HomeView> {
                       ),
                     ),
 
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 8),
 
-                    // User Profile Avatar
+                    // 2. User Profile Avatar Button (40x40)
                     ListenableBuilder(
                       listenable: widget.authController,
                       builder: (context, _) {
@@ -363,14 +399,14 @@ class _HomeViewState extends State<HomeView> {
                             );
                           },
                           child: Container(
-                            width: 44,
-                            height: 44,
+                            width: 40,
+                            height: 40,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: Colors.white,
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.08),
+                                  color: Colors.black.withValues(alpha: 0.06),
                                   blurRadius: 10,
                                   offset: const Offset(0, 3),
                                 ),
@@ -388,7 +424,7 @@ class _HomeViewState extends State<HomeView> {
                                     child: Icon(
                                       Icons.person_rounded,
                                       color: Color(0xFF334155),
-                                      size: 24,
+                                      size: 20,
                                     ),
                                   )
                                 : null,
@@ -397,13 +433,34 @@ class _HomeViewState extends State<HomeView> {
                       },
                     ),
 
-                    const SizedBox(width: 4),
+                    const SizedBox(width: 8),
 
-                    // Sidebar Drawer Trigger Icon
+                    // 3. Hamburger Menu Button (40x40)
                     Builder(
-                      builder: (context) => IconButton(
-                        icon: const Icon(Icons.menu_rounded, color: Color(0xFF0F766E), size: 26),
-                        onPressed: () => Scaffold.of(context).openEndDrawer(),
+                      builder: (context) => GestureDetector(
+                        onTap: () => Scaffold.of(context).openEndDrawer(),
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.06),
+                                blurRadius: 10,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: const Center(
+                            child: Icon(
+                              Icons.menu_rounded,
+                              color: Color(0xFF0F172A),
+                              size: 22,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -445,12 +502,16 @@ class _HomeViewState extends State<HomeView> {
                       size: 24,
                     ),
                     SizedBox(width: 12),
-                    Text(
-                      'Doctors, Medicine, or Services',
-                      style: TextStyle(
-                        color: Color(0xFF64748B),
-                        fontSize: 15,
-                        fontWeight: FontWeight.w400,
+                    Expanded(
+                      child: Text(
+                        'Doctors, Medicine, or Services',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: Color(0xFF64748B),
+                          fontSize: 15,
+                          fontWeight: FontWeight.w400,
+                        ),
                       ),
                     ),
                   ],
