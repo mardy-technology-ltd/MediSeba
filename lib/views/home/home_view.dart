@@ -55,6 +55,7 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
+      extendBody: false,
       endDrawer: _buildSidebarDrawer(context),
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: _currentBottomNavIndex == 0
@@ -246,7 +247,7 @@ class _HomeViewState extends State<HomeView> {
             },
           ),
 
-          const SizedBox(height: 100),
+          const SizedBox(height: 24),
         ],
       ),
     );

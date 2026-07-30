@@ -31,83 +31,91 @@ class ModernGlowNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 8),
-      height: 68,
-      clipBehavior: Clip.antiAlias,
+      margin: EdgeInsets.zero,
+      padding: const EdgeInsets.only(top: 8, bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(32),
+        border: const Border(
+          top: BorderSide(color: Color(0xFFF1F5F9), width: 1),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
           ),
         ],
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: List.generate(items.length, (index) {
-          final item = items[index];
-          final isSelected = currentIndex == index;
-          final iconColor = isSelected ? primaryTeal : textMuted;
+      child: SafeArea(
+        top: false,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: List.generate(items.length, (index) {
+            final item = items[index];
+            final isSelected = currentIndex == index;
+            final iconColor = isSelected ? primaryTeal : textMuted;
 
-          return Expanded(
-            child: GestureDetector(
-              onTap: () => onTap(index),
-              behavior: HitTestBehavior.opaque,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Centered Top Active Line Indicator
-                  Container(
-                    height: 3.5,
-                    width: 24,
-                    decoration: BoxDecoration(
-                      color: isSelected ? primaryTeal : Colors.transparent,
-                      borderRadius: BorderRadius.circular(2),
+            final iconWidget = SizedBox(
+              width: 24,
+              height: 24,
+              child: item.isPng
+                  ? Image.asset(
+                      item.iconPath,
+                      width: 24,
+                      height: 24,
+                      color: iconColor,
+                      colorBlendMode: BlendMode.srcIn,
+                      fit: BoxFit.contain,
+                    )
+                  : SvgPicture.asset(
+                      item.iconPath,
+                      width: 24,
+                      height: 24,
+                      colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+                      fit: BoxFit.contain,
                     ),
-                  ),
+            );
 
-                  // Custom Asset Icon (SVG or PNG)
-                  SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: item.isPng
-                        ? Image.asset(
-                            item.iconPath,
-                            width: 24,
-                            height: 24,
-                            color: iconColor,
-                            colorBlendMode: BlendMode.srcIn,
-                            fit: BoxFit.contain,
-                          )
-                        : SvgPicture.asset(
-                            item.iconPath,
-                            width: 24,
-                            height: 24,
-                            colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
-                            fit: BoxFit.contain,
-                          ),
-                  ),
+            return Expanded(
+              child: GestureDetector(
+                onTap: () => onTap(index),
+                behavior: HitTestBehavior.opaque,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Active Pill Container Badge or Regular Icon
+                    if (isSelected)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: primaryTeal.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: iconWidget,
+                      )
+                    else
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: iconWidget,
+                      ),
 
-                  // Label
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Text(
+                    const SizedBox(height: 4),
+
+                    // Label
+                    Text(
                       item.label,
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: 12,
                         fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                         color: iconColor,
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          );
-        }),
+            );
+          }),
+        ),
       ),
     );
   }

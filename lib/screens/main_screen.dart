@@ -58,7 +58,8 @@ class _MainScreenState extends State<MainScreen> {
 
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: const Color(0xFFF4F8F7),
+      extendBody: false,
+      backgroundColor: const Color(0xFFF8FAFC),
 
       // ─── Top AppBar (Shown on subpages) ────────────────
       appBar: _selectedIndex == 0
