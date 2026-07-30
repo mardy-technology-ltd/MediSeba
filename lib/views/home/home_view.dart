@@ -58,35 +58,7 @@ class _HomeViewState extends State<HomeView> {
       extendBody: false,
       endDrawer: _buildSidebarDrawer(context),
       backgroundColor: const Color(0xFFF0FDFA),
-      appBar: _currentBottomNavIndex == 0
-          ? null
-          : AppBar(
-              backgroundColor: Colors.white,
-              elevation: 0,
-              scrolledUnderElevation: 0,
-              automaticallyImplyLeading: false,
-              titleSpacing: 16,
-              title: Row(
-                children: [
-                  Image.asset(
-                    'assets/images/logo.png',
-                    height: 44,
-                    fit: BoxFit.contain,
-                  ),
-                ],
-              ),
-              actions: [
-                Builder(
-                  builder: (context) => IconButton(
-                    icon: const Icon(Icons.menu_rounded, color: brandGreen, size: 28),
-                    onPressed: () {
-                      Scaffold.of(context).openEndDrawer();
-                    },
-                  ),
-                ),
-                const SizedBox(width: 4),
-              ],
-            ),
+      appBar: _buildPinnedAppBar(),
       body: IndexedStack(
         index: _currentBottomNavIndex,
         children: [
@@ -266,7 +238,130 @@ class _HomeViewState extends State<HomeView> {
     }
   }
 
-  // 1. Top Soft Cyan Header Section matching reference image
+  // Static Pinned Top AppBar (MediSeba Logo, Notification Bell, and Profile Avatar)
+  PreferredSizeWidget _buildPinnedAppBar() {
+    return AppBar(
+      backgroundColor: const Color(0xFFF0FDFA),
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      automaticallyImplyLeading: false,
+      titleSpacing: 16,
+      title: Image.asset(
+        'assets/images/logo.png',
+        height: 45,
+        fit: BoxFit.contain,
+      ),
+      actions: [
+        // 1. Notification Bell Button (40x40)
+        GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const NotificationView()),
+            );
+          },
+          child: Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.06),
+                  blurRadius: 10,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                const Icon(
+                  Icons.notifications_none_rounded,
+                  color: Color(0xFF0F172A),
+                  size: 22,
+                ),
+                Positioned(
+                  top: 9,
+                  right: 10,
+                  child: Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFEF4444),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        const SizedBox(width: 10),
+
+        // 2. User Profile Avatar Button (40x40)
+        ListenableBuilder(
+          listenable: widget.authController,
+          builder: (context, _) {
+            final uData = widget.authController.currentUserData;
+            final profileImg = uData?.profileImageUrl;
+            final hasImage = profileImg != null && profileImg.isNotEmpty;
+
+            return GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ProfileView(
+                      authController: widget.authController,
+                      homeController: widget.homeController,
+                    ),
+                  ),
+                );
+              },
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.06),
+                      blurRadius: 10,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                  image: hasImage
+                      ? DecorationImage(
+                          image: NetworkImage(profileImg),
+                          fit: BoxFit.cover,
+                        )
+                      : null,
+                ),
+                child: !hasImage
+                    ? const CircleAvatar(
+                        backgroundColor: Color(0xFFCBD5E1),
+                        child: Icon(
+                          Icons.person_rounded,
+                          color: Color(0xFF334155),
+                          size: 20,
+                        ),
+                      )
+                    : null,
+              ),
+            );
+          },
+        ),
+
+        const SizedBox(width: 16),
+      ],
+    );
+  }
+
+  // 1. Top Soft Cyan Header Section (Scrolls with body: Greeting, Search Bar, Teleconsult Promo Banner)
   Widget _buildTopCyanHeader() {
     return Container(
       width: double.infinity,
@@ -274,286 +369,159 @@ class _HomeViewState extends State<HomeView> {
         color: Color(0xFFE2F4F2), // Exact soft mint cyan tint from design mockup
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(36)),
       ),
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 18),
-      child: SafeArea(
-        bottom: false,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Row 1: Top AppBar (Left: MediSeba Logo, Right: 2 Action Containers - Notification & Profile)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // Left: MediSeba Logo (height: 45)
-                Image.asset(
-                  'assets/images/logo.png',
-                  height: 45,
-                  fit: BoxFit.contain,
-                ),
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Single-Line Inline Dynamic Greeting right above Search Bar
+          Padding(
+            padding: const EdgeInsets.only(left: 4, top: 4, bottom: 8),
+            child: ListenableBuilder(
+              listenable: widget.authController,
+              builder: (context, _) {
+                final uData = widget.authController.currentUserData;
+                final userName = (uData?.name != null && uData!.name.trim().isNotEmpty)
+                    ? uData.name
+                    : 'Basic';
+                final firstName = userName.trim().split(' ').first;
+                final cleanGreeting = _getGreeting().replaceAll('👋', '').trim();
 
-                // Right: Top Actions Right (2 Action Containers: Notification Bell & Profile Avatar)
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    // 1. Notification Bell Button (40x40)
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const NotificationView()),
-                        );
-                      },
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.06),
-                              blurRadius: 10,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            const Icon(
-                              Icons.notifications_none_rounded,
-                              color: Color(0xFF0F172A),
-                              size: 22,
-                            ),
-                            Positioned(
-                              top: 9,
-                              right: 10,
-                              child: Container(
-                                width: 8,
-                                height: 8,
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFFEF4444),
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(width: 10),
-
-                    // 2. User Profile Avatar Button (40x40)
-                    ListenableBuilder(
-                      listenable: widget.authController,
-                      builder: (context, _) {
-                        final uData = widget.authController.currentUserData;
-                        final profileImg = uData?.profileImageUrl;
-                        final hasImage = profileImg != null && profileImg.isNotEmpty;
-
-                        return GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => ProfileView(
-                                  authController: widget.authController,
-                                  homeController: widget.homeController,
-                                ),
-                              ),
-                            );
-                          },
-                          child: Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.06),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ],
-                              image: hasImage
-                                  ? DecorationImage(
-                                      image: NetworkImage(profileImg),
-                                      fit: BoxFit.cover,
-                                    )
-                                  : null,
-                            ),
-                            child: !hasImage
-                                ? const CircleAvatar(
-                                    backgroundColor: Color(0xFFCBD5E1),
-                                    child: Icon(
-                                      Icons.person_rounded,
-                                      color: Color(0xFF334155),
-                                      size: 20,
-                                    ),
-                                  )
-                                : null,
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ],
-            ),
-
-            // Single-Line Inline Dynamic Greeting right above Search Bar
-            Padding(
-              padding: const EdgeInsets.only(left: 4, top: 12, bottom: 8),
-              child: ListenableBuilder(
-                listenable: widget.authController,
-                builder: (context, _) {
-                  final uData = widget.authController.currentUserData;
-                  final userName = (uData?.name != null && uData!.name.trim().isNotEmpty)
-                      ? uData.name
-                      : 'Basic';
-                  final firstName = userName.trim().split(' ').first;
-                  final cleanGreeting = _getGreeting().replaceAll('👋', '').trim();
-
-                  return Text(
-                    '$cleanGreeting $firstName! 👋',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF1E293B),
-                    ),
-                  );
-                },
-              ),
-            ),
-
-            const SizedBox(height: 4),
-
-            // Row 2: Search Bar Input Widget
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const DoctorListView(showAppBar: true),
+                return Text(
+                  '$cleanGreeting $firstName! 👋',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF1E293B),
                   ),
                 );
               },
-              child: Container(
-                height: 52,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(30),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 14,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+            ),
+          ),
+
+          const SizedBox(height: 4),
+
+          // Row 2: Search Bar Input Widget
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const DoctorListView(showAppBar: true),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: const Row(
-                  children: [
-                    Icon(
-                      Icons.search_rounded,
-                      color: Color(0xFF64748B),
-                      size: 24,
+              );
+            },
+            child: Container(
+              height: 52,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 14,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: const Row(
+                children: [
+                  Icon(
+                    Icons.search_rounded,
+                    color: Color(0xFF64748B),
+                    size: 24,
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Doctors, Medicine, or Services',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: Color(0xFF64748B),
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'Doctors, Medicine, or Services',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: Color(0xFF64748B),
-                          fontSize: 15,
-                          fontWeight: FontWeight.w400,
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 18),
+
+          // Row 3: 24/7 Teleconsultation Banner Card (Glassmorphism Light Teal Design)
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const DoctorBariView()),
+              );
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFFF0FDFA),
+                borderRadius: BorderRadius.circular(22),
+                border: Border.all(color: Colors.white, width: 1.5),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF0D9488).withValues(alpha: 0.06),
+                    blurRadius: 16,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  // Teal Doctor Icon Box Badge
+                  Container(
+                    width: 52,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF0D9488),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: const Icon(
+                      Icons.medical_services_rounded,
+                      color: Colors.white,
+                      size: 28,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '24/7 Teleconsultation &\nExpress Healthcare',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF1E293B),
+                            height: 1.25,
+                          ),
                         ),
-                      ),
+                        SizedBox(height: 4),
+                        Text(
+                          'Connect with medical professionals instantly.',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Color(0xFF475569),
+                            height: 1.3,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-
-            const SizedBox(height: 18),
-
-            // Row 3: 24/7 Teleconsultation Banner Card (Glassmorphism Light Teal Design)
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const DoctorBariView()),
-                );
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF0FDFA),
-                  borderRadius: BorderRadius.circular(22),
-                  border: Border.all(color: Colors.white, width: 1.5),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF0D9488).withValues(alpha: 0.06),
-                      blurRadius: 16,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    // Teal Doctor Icon Box Badge
-                    Container(
-                      width: 52,
-                      height: 52,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF0D9488),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: const Icon(
-                        Icons.medical_services_rounded,
-                        color: Colors.white,
-                        size: 28,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '24/7 Teleconsultation &\nExpress Healthcare',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF1E293B),
-                              height: 1.25,
-                            ),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            'Connect with medical professionals instantly.',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Color(0xFF475569),
-                              height: 1.3,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
