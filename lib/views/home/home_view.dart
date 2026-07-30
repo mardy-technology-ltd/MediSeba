@@ -110,11 +110,11 @@ class _HomeViewState extends State<HomeView> {
           setState(() => _currentBottomNavIndex = index);
         },
         items: const [
-          ModernGlowNavBarItem(icon: Icons.home_rounded, label: 'Home'),
-          ModernGlowNavBarItem(icon: Icons.local_offer_rounded, label: 'Offers'),
-          ModernGlowNavBarItem(icon: Icons.apartment_rounded, label: 'Hospitals'),
-          ModernGlowNavBarItem(icon: Icons.person_rounded, label: 'Doctors'),
-          ModernGlowNavBarItem(icon: Icons.more_horiz_rounded, label: 'More'),
+          ModernGlowNavBarItem(iconPath: 'assets/icons/nav_home.svg', label: 'Home'),
+          ModernGlowNavBarItem(iconPath: 'assets/icons/nav_offers.png', label: 'Offers', isPng: true),
+          ModernGlowNavBarItem(iconPath: 'assets/icons/nav_hospitals.svg', label: 'Hospitals'),
+          ModernGlowNavBarItem(iconPath: 'assets/icons/nav_doctors.svg', label: 'Doctors'),
+          ModernGlowNavBarItem(iconPath: 'assets/icons/nav_more.svg', label: 'More'),
         ],
       ),
     );
@@ -246,7 +246,7 @@ class _HomeViewState extends State<HomeView> {
             },
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 100),
         ],
       ),
     );

@@ -152,11 +152,11 @@ class _MainScreenState extends State<MainScreen> {
           });
         },
         items: const [
-          ModernGlowNavBarItem(icon: Icons.home_rounded, label: 'হোম'),
-          ModernGlowNavBarItem(icon: Icons.local_offer_rounded, label: 'অফার'),
-          ModernGlowNavBarItem(icon: Icons.local_hospital_rounded, label: 'হাসপাতাল'),
-          ModernGlowNavBarItem(icon: Icons.medical_services_rounded, label: 'ডাক্তার'),
-          ModernGlowNavBarItem(icon: Icons.grid_view_rounded, label: 'আরও'),
+          ModernGlowNavBarItem(iconPath: 'assets/icons/nav_home.svg', label: 'হোম'),
+          ModernGlowNavBarItem(iconPath: 'assets/icons/nav_offers.png', label: 'অফার', isPng: true),
+          ModernGlowNavBarItem(iconPath: 'assets/icons/nav_hospitals.svg', label: 'হাসপাতাল'),
+          ModernGlowNavBarItem(iconPath: 'assets/icons/nav_doctors.svg', label: 'ডাক্তার'),
+          ModernGlowNavBarItem(iconPath: 'assets/icons/nav_more.svg', label: 'আরও'),
         ],
       ),
     );

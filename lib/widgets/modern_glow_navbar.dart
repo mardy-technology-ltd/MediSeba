@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class ModernGlowNavBarItem {
-  final IconData icon;
+  final String iconPath;
   final String label;
+  final bool isPng;
 
   const ModernGlowNavBarItem({
-    required this.icon,
+    required this.iconPath,
     required this.label,
+    this.isPng = false,
   });
 }
 
@@ -23,17 +26,17 @@ class ModernGlowNavBar extends StatelessWidget {
   });
 
   static const primaryTeal = Color(0xFF0D9488);
-  static const textMuted = Color(0xFF94A3B8);
+  static const textMuted = Color(0xFF64748B);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+      margin: const EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 8),
       height: 68,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.06),
@@ -47,6 +50,7 @@ class ModernGlowNavBar extends StatelessWidget {
         children: List.generate(items.length, (index) {
           final item = items[index];
           final isSelected = currentIndex == index;
+          final iconColor = isSelected ? primaryTeal : textMuted;
 
           return Expanded(
             child: GestureDetector(
@@ -55,23 +59,36 @@ class ModernGlowNavBar extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Top Active Line Indicator
+                  // Centered Top Active Line Indicator
                   Container(
                     height: 3.5,
                     width: 24,
                     decoration: BoxDecoration(
                       color: isSelected ? primaryTeal : Colors.transparent,
-                      borderRadius: const BorderRadius.vertical(
-                        bottom: Radius.circular(3),
-                      ),
+                      borderRadius: BorderRadius.circular(2),
                     ),
                   ),
 
-                  // Icon
-                  Icon(
-                    item.icon,
-                    color: isSelected ? primaryTeal : textMuted,
-                    size: 23,
+                  // Custom Asset Icon (SVG or PNG)
+                  SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: item.isPng
+                        ? Image.asset(
+                            item.iconPath,
+                            width: 24,
+                            height: 24,
+                            color: iconColor,
+                            colorBlendMode: BlendMode.srcIn,
+                            fit: BoxFit.contain,
+                          )
+                        : SvgPicture.asset(
+                            item.iconPath,
+                            width: 24,
+                            height: 24,
+                            colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+                            fit: BoxFit.contain,
+                          ),
                   ),
 
                   // Label
@@ -82,7 +99,7 @@ class ModernGlowNavBar extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                        color: isSelected ? primaryTeal : textMuted,
+                        color: iconColor,
                       ),
                     ),
                   ),
