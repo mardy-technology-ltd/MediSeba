@@ -34,15 +34,19 @@ class ModernGlowNavBar extends StatelessWidget {
       margin: EdgeInsets.zero,
       padding: const EdgeInsets.only(top: 8, bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: const Border(
-          top: BorderSide(color: Color(0xFFF1F5F9), width: 1),
+        color: const Color(0xFFF0FDFA), // Soft mint tint matching app background & cards
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
+        ),
+        border: Border(
+          top: BorderSide(color: Colors.white.withValues(alpha: 0.8), width: 1.5),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
+            color: const Color(0xFF0D9488).withValues(alpha: 0.06),
+            blurRadius: 12,
+            offset: const Offset(0, -3),
           ),
         ],
       ),
@@ -83,19 +87,19 @@ class ModernGlowNavBar extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Active Pill Container Badge or Regular Icon
+                    // Active Mint Pill Container Badge or Regular Icon
                     if (isSelected)
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                         decoration: BoxDecoration(
-                          color: primaryTeal.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(16),
+                          color: primaryTeal.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(20),
                         ),
                         child: iconWidget,
                       )
                     else
                       Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        padding: const EdgeInsets.symmetric(vertical: 6),
                         child: iconWidget,
                       ),
 

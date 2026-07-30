@@ -57,7 +57,7 @@ class _HomeViewState extends State<HomeView> {
       key: _scaffoldKey,
       extendBody: false,
       endDrawer: _buildSidebarDrawer(context),
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: const Color(0xFFF0FDFA),
       appBar: _currentBottomNavIndex == 0
           ? null
           : AppBar(
@@ -131,7 +131,7 @@ class _HomeViewState extends State<HomeView> {
           // 1. Soft Cyan Header Container
           _buildTopCyanHeader(),
 
-          const SizedBox(height: 18),
+          const SizedBox(height: 14),
 
           // 2. 8 Service Grid Cards
           Padding(
@@ -274,7 +274,7 @@ class _HomeViewState extends State<HomeView> {
         color: Color(0xFFE2F4F2), // Exact soft mint cyan tint from design mockup
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(36)),
       ),
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 18),
       child: SafeArea(
         bottom: false,
         child: Column(
