@@ -4,14 +4,16 @@ import 'package:flutter_svg/flutter_svg.dart';
 class ServiceTileCard extends StatefulWidget {
   final String title;
   final String svgPath;
-  final Color backgroundColor;
+  final Color? backgroundColor;
+  final Gradient? gradient;
   final VoidCallback onTap;
 
   const ServiceTileCard({
     super.key,
     required this.title,
     required this.svgPath,
-    required this.backgroundColor,
+    this.backgroundColor,
+    this.gradient,
     required this.onTap,
   });
 
@@ -24,6 +26,20 @@ class _ServiceTileCardState extends State<ServiceTileCard> {
 
   @override
   Widget build(BuildContext context) {
+    final effectiveGradient = widget.gradient ??
+        (widget.backgroundColor != null
+            ? LinearGradient(
+                colors: [widget.backgroundColor!, widget.backgroundColor!],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              )
+            : null);
+
+    final primaryColor = (effectiveGradient is LinearGradient &&
+            effectiveGradient.colors.isNotEmpty)
+        ? effectiveGradient.colors.first
+        : (widget.backgroundColor ?? const Color(0xFF0D9488));
+
     return GestureDetector(
       onTapDown: (_) => setState(() => _isPressed = true),
       onTapUp: (_) => setState(() => _isPressed = false),
@@ -34,13 +50,14 @@ class _ServiceTileCardState extends State<ServiceTileCard> {
         duration: const Duration(milliseconds: 120),
         child: Container(
           decoration: BoxDecoration(
-            color: widget.backgroundColor,
-            borderRadius: BorderRadius.circular(20),
+            color: effectiveGradient == null ? widget.backgroundColor : null,
+            gradient: effectiveGradient,
+            borderRadius: BorderRadius.circular(22),
             boxShadow: [
               BoxShadow(
-                color: widget.backgroundColor.withValues(alpha: 0.32),
+                color: primaryColor.withValues(alpha: 0.25),
                 blurRadius: 12,
-                offset: const Offset(0, 5),
+                offset: const Offset(0, 6),
               ),
             ],
           ),

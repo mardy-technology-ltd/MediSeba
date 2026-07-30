@@ -570,7 +570,11 @@ class _HomeViewState extends State<HomeView> {
         ServiceTileCard(
           title: 'Doctor\nSerial',
           svgPath: 'assets/icons/doctor_serial.svg',
-          backgroundColor: const Color(0xFF00A884),
+          gradient: const LinearGradient(
+            colors: [Color(0xFF0D9488), Color(0xFF059669)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
           onTap: () {
             Navigator.push(
               context,
@@ -581,7 +585,11 @@ class _HomeViewState extends State<HomeView> {
         ServiceTileCard(
           title: 'Doctor Home/\nTeleconsult',
           svgPath: 'assets/icons/doctor_home.svg',
-          backgroundColor: const Color(0xFFE53935),
+          gradient: const LinearGradient(
+            colors: [Color(0xFFE11D48), Color(0xFFBE123C)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
           onTap: () {
             Navigator.push(
               context,
@@ -592,7 +600,11 @@ class _HomeViewState extends State<HomeView> {
         ServiceTileCard(
           title: 'MediShop',
           svgPath: 'assets/icons/medishop.svg',
-          backgroundColor: const Color(0xFF475569),
+          gradient: const LinearGradient(
+            colors: [Color(0xFF475569), Color(0xFF334155)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
           onTap: () {
             Navigator.push(
               context,
@@ -605,7 +617,11 @@ class _HomeViewState extends State<HomeView> {
         ServiceTileCard(
           title: 'Blood\nDonation',
           svgPath: 'assets/icons/blood_donation.svg',
-          backgroundColor: const Color(0xFFD32F2F),
+          gradient: const LinearGradient(
+            colors: [Color(0xFFF43F5E), Color(0xFFE11D48)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
           onTap: () {
             showModalBottomSheet(
               context: context,
@@ -618,7 +634,11 @@ class _HomeViewState extends State<HomeView> {
         ServiceTileCard(
           title: 'Special\nDiscounts',
           svgPath: 'assets/icons/special_discounts.svg',
-          backgroundColor: const Color(0xFF00A884),
+          gradient: const LinearGradient(
+            colors: [Color(0xFF0F766E), Color(0xFF0D9488)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
           onTap: () {
             setState(() => _currentBottomNavIndex = 1);
           },
@@ -626,7 +646,11 @@ class _HomeViewState extends State<HomeView> {
         ServiceTileCard(
           title: 'Emergency\nAmbulance',
           svgPath: 'assets/icons/ambulance.svg',
-          backgroundColor: const Color(0xFF475569),
+          gradient: const LinearGradient(
+            colors: [Color(0xFF334155), Color(0xFF1E293B)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
           onTap: () {
             showModalBottomSheet(
               context: context,
@@ -639,7 +663,11 @@ class _HomeViewState extends State<HomeView> {
         ServiceTileCard(
           title: 'Maternal &\nChild Care',
           svgPath: 'assets/icons/maternal_care.svg',
-          backgroundColor: const Color(0xFF475569),
+          gradient: const LinearGradient(
+            colors: [Color(0xFF64748B), Color(0xFF475569)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
           onTap: () {
             Navigator.push(
               context,
@@ -650,7 +678,11 @@ class _HomeViewState extends State<HomeView> {
         ServiceTileCard(
           title: '24/7 Customer\nSupport',
           svgPath: 'assets/icons/customer_support.svg',
-          backgroundColor: const Color(0xFF78350F),
+          gradient: const LinearGradient(
+            colors: [Color(0xFF854D0E), Color(0xFFA16207)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
           onTap: () {
             showModalBottomSheet(
               context: context,
