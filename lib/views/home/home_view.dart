@@ -252,14 +252,16 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  String _getTimeBasedGreeting() {
+  String _getGreeting() {
     final hour = DateTime.now().hour;
     if (hour >= 5 && hour < 12) {
       return 'Good Morning, 👋';
     } else if (hour >= 12 && hour < 17) {
       return 'Good Afternoon, 👋';
-    } else {
+    } else if (hour >= 17 && hour < 22) {
       return 'Good Evening, 👋';
+    } else {
+      return 'Good Night, 👋';
     }
   }
 
@@ -277,55 +279,19 @@ class _HomeViewState extends State<HomeView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Row 1: Greeting + Bell + Profile + Drawer
+            // Row 1: Top AppBar (Left: MediSeba Logo, Right: 2 Action Containers - Notification & Profile)
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // 2-Line Dynamic Time-Based Greeting Layout (Wrapped in Expanded for overflow safety)
-                Expanded(
-                  child: ListenableBuilder(
-                    listenable: widget.authController,
-                    builder: (context, _) {
-                      final uData = widget.authController.currentUserData;
-                      final userName = (uData?.name != null && uData!.name.trim().isNotEmpty)
-                          ? uData.name
-                          : 'Basic Learner';
-                      final greetingSubtitle = _getTimeBasedGreeting();
-
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // Line 1: Top Subtitle (Time-based Greeting)
-                          Text(
-                            greetingSubtitle,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xFF64748B),
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          // Line 2: Bottom Title (User Name)
-                          Text(
-                            userName,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF1E293B),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
+                // Left: MediSeba Logo (height: 45)
+                Image.asset(
+                  'assets/images/logo.png',
+                  height: 45,
+                  fit: BoxFit.contain,
                 ),
-                const SizedBox(width: 10),
 
-                // Top Actions Right (3 Uniform 40x40 Action Containers)
+                // Right: Top Actions Right (2 Action Containers: Notification Bell & Profile Avatar)
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -376,7 +342,7 @@ class _HomeViewState extends State<HomeView> {
                       ),
                     ),
 
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 10),
 
                     // 2. User Profile Avatar Button (40x40)
                     ListenableBuilder(
@@ -432,43 +398,39 @@ class _HomeViewState extends State<HomeView> {
                         );
                       },
                     ),
-
-                    const SizedBox(width: 8),
-
-                    // 3. Hamburger Menu Button (40x40)
-                    Builder(
-                      builder: (context) => GestureDetector(
-                        onTap: () => Scaffold.of(context).openEndDrawer(),
-                        child: Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.06),
-                                blurRadius: 10,
-                                offset: const Offset(0, 3),
-                              ),
-                            ],
-                          ),
-                          child: const Center(
-                            child: Icon(
-                              Icons.menu_rounded,
-                              color: Color(0xFF0F172A),
-                              size: 22,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ],
             ),
 
-            const SizedBox(height: 18),
+            // Single-Line Inline Dynamic Greeting right above Search Bar
+            Padding(
+              padding: const EdgeInsets.only(left: 4, top: 12, bottom: 8),
+              child: ListenableBuilder(
+                listenable: widget.authController,
+                builder: (context, _) {
+                  final uData = widget.authController.currentUserData;
+                  final userName = (uData?.name != null && uData!.name.trim().isNotEmpty)
+                      ? uData.name
+                      : 'Basic';
+                  final firstName = userName.trim().split(' ').first;
+                  final cleanGreeting = _getGreeting().replaceAll('👋', '').trim();
+
+                  return Text(
+                    '$cleanGreeting $firstName! 👋',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF1E293B),
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            const SizedBox(height: 4),
 
             // Row 2: Search Bar Input Widget
             GestureDetector(
