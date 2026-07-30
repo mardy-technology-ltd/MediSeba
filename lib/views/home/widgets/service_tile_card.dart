@@ -61,39 +61,35 @@ class _ServiceTileCardState extends State<ServiceTileCard> {
               ),
             ],
           ),
-          padding: const EdgeInsets.all(16.0),
-          child: Stack(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Top Right SVG Icon
-              Positioned(
-                top: 0,
-                right: 0,
-                child: SizedBox(
-                  width: 48,
-                  height: 48,
-                  child: SvgPicture.asset(
-                    widget.svgPath,
-                    fit: BoxFit.contain,
-                  ),
+              // Centered Top SVG Icon (44x44)
+              SizedBox(
+                width: 44,
+                height: 44,
+                child: SvgPicture.asset(
+                  widget.svgPath,
+                  width: 44,
+                  height: 44,
+                  fit: BoxFit.contain,
                 ),
               ),
-
-              // Bottom Left White Text Label
-              Positioned(
-                left: 0,
-                bottom: 0,
-                right: 48,
-                child: Text(
-                  widget.title,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 14.5,
-                    fontWeight: FontWeight.bold,
-                    height: 1.25,
-                    letterSpacing: -0.2,
-                  ),
+              const SizedBox(height: 8),
+              // Centered Bottom White Text Label
+              Text(
+                widget.title.replaceAll('\n', ' '),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.bold,
+                  height: 1.2,
+                  letterSpacing: -0.2,
                 ),
               ),
             ],
