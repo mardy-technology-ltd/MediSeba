@@ -521,7 +521,7 @@ class _HomeViewState extends State<HomeView> {
 
             const SizedBox(height: 18),
 
-            // Row 3: 24/7 Teleconsultation Banner Card
+            // Row 3: 24/7 Teleconsultation Banner Card (Glassmorphism Light Teal Design)
             GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -531,38 +531,32 @@ class _HomeViewState extends State<HomeView> {
               },
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: const Color(0xFFF0FDFA),
                   borderRadius: BorderRadius.circular(22),
+                  border: Border.all(color: Colors.white, width: 1.5),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
+                      color: const Color(0xFF0D9488).withValues(alpha: 0.06),
                       blurRadius: 16,
-                      offset: const Offset(0, 5),
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
-                    // Green Avatar Box
+                    // Teal Doctor Icon Box Badge
                     Container(
                       width: 52,
                       height: 52,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF00A884),
+                        color: const Color(0xFF0D9488),
                         borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFF00A884).withValues(alpha: 0.3),
-                            blurRadius: 8,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
                       ),
                       child: const Icon(
-                        Icons.person_outline_rounded,
+                        Icons.medical_services_rounded,
                         color: Colors.white,
-                        size: 30,
+                        size: 28,
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -573,11 +567,10 @@ class _HomeViewState extends State<HomeView> {
                           Text(
                             '24/7 Teleconsultation &\nExpress Healthcare',
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 15,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF0F172A),
-                              height: 1.2,
-                              letterSpacing: -0.2,
+                              color: Color(0xFF1E293B),
+                              height: 1.25,
                             ),
                           ),
                           SizedBox(height: 4),
@@ -586,7 +579,7 @@ class _HomeViewState extends State<HomeView> {
                             style: TextStyle(
                               fontSize: 13,
                               color: Color(0xFF475569),
-                              height: 1.25,
+                              height: 1.3,
                             ),
                           ),
                         ],
