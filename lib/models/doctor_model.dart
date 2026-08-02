@@ -27,17 +27,21 @@ class DoctorModel {
 
   factory DoctorModel.fromJson(Map<String, dynamic> json) {
     return DoctorModel(
-      id: json['id'] ?? '',
-      name: json['name'] ?? '',
-      degree: json['degree'] ?? '',
-      specialty: json['specialty'] ?? '',
-      hospital: json['hospital'] ?? '',
-      rating: (json['rating'] ?? 0.0).toDouble(),
-      totalReviews: json['totalReviews'] ?? 0,
-      experienceYears: json['experienceYears'] ?? 0,
-      consultationFee: (json['consultationFee'] ?? 0.0).toDouble(),
-      imageUrl: json['imageUrl'] ?? '',
-      isAvailableToday: json['isAvailableToday'] ?? true,
+      id: json['uuid']?.toString() ?? json['id']?.toString() ?? json['slug']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      degree: json['qualification']?.toString() ?? json['degree']?.toString() ?? '',
+      specialty: json['speciality']?.toString() ?? json['specialty']?.toString() ?? '',
+      hospital: json['hospital']?.toString() ?? '',
+      rating: double.tryParse(json['rating']?.toString() ?? '') ?? 0.0,
+      totalReviews: json['rating_count'] is int
+          ? json['rating_count']
+          : (int.tryParse(json['rating_count']?.toString() ?? json['totalReviews']?.toString() ?? '') ?? 0),
+      experienceYears: json['experience'] is int
+          ? json['experience']
+          : (int.tryParse(json['experience']?.toString() ?? json['experienceYears']?.toString() ?? '') ?? 0),
+      consultationFee: double.tryParse(json['fee']?.toString() ?? json['consultationFee']?.toString() ?? '') ?? 0.0,
+      imageUrl: json['image']?.toString() ?? json['imageUrl']?.toString() ?? '',
+      isAvailableToday: json['available'] ?? json['isAvailableToday'] ?? true,
     );
   }
 

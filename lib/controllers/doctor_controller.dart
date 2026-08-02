@@ -8,25 +8,34 @@ class DoctorController extends ChangeNotifier {
   String _selectedSpecialty = 'সকল (All)';
   String _searchQuery = '';
   bool _isLoading = false;
+  String? _errorMessage;
 
   List<DoctorModel> get doctors => _filteredDoctors;
   String get selectedSpecialty => _selectedSpecialty;
   String get searchQuery => _searchQuery;
   bool get isLoading => _isLoading;
+  String? get errorMessage => _errorMessage;
 
   DoctorController() {
     fetchDoctors();
   }
 
-  void fetchDoctors() {
+  Future<void> fetchDoctors() async {
     _isLoading = true;
+    _errorMessage = null;
     notifyListeners();
 
-    _allDoctors = ApiService.getSampleDoctors();
-    _filteredDoctors = List.from(_allDoctors);
-
-    _isLoading = false;
-    notifyListeners();
+    try {
+      _allDoctors = await ApiService.getDoctors();
+      _applyFilters();
+    } catch (e) {
+      _errorMessage = 'নেটওয়ার্ক ত্রুটি: $e';
+      _allDoctors = [];
+      _applyFilters();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   void filterBySpecialty(String specialty) {
@@ -41,8 +50,24 @@ class DoctorController extends ChangeNotifier {
 
   void _applyFilters() {
     _filteredDoctors = _allDoctors.where((doctor) {
-      bool matchesSpecialty = _selectedSpecialty == 'সকল (All)' || 
-          doctor.specialty.contains(_selectedSpecialty.split(' ')[0]);
+      bool matchesSpecialty = _selectedSpecialty == 'সকল (All)';
+      if (!matchesSpecialty) {
+        final categoryBengali = _selectedSpecialty.split(' ')[0].toLowerCase();
+        String categoryEnglish = '';
+        if (_selectedSpecialty.contains('(') && _selectedSpecialty.contains(')')) {
+          categoryEnglish = _selectedSpecialty
+              .split('(')
+              .last
+              .replaceAll(')', '')
+              .trim()
+              .toLowerCase();
+        }
+
+        final docSpecialty = doctor.specialty.toLowerCase();
+        matchesSpecialty = docSpecialty.contains(categoryBengali) ||
+            (categoryEnglish.isNotEmpty && docSpecialty.contains(categoryEnglish));
+      }
+
       bool matchesSearch = _searchQuery.isEmpty ||
           doctor.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
           doctor.specialty.toLowerCase().contains(_searchQuery.toLowerCase()) ||

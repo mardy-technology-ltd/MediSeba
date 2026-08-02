@@ -16,7 +16,7 @@ class HomeController extends ChangeNotifier {
     loadHomeData();
   }
 
-  void loadHomeData() {
+  Future<void> loadHomeData() async {
     _isLoading = true;
     notifyListeners();
 
@@ -53,7 +53,12 @@ class HomeController extends ChangeNotifier {
     ];
 
     // Load Top Doctors
-    _topDoctors = ApiService.getSampleDoctors().take(3).toList();
+    try {
+      final doctors = await ApiService.getDoctors();
+      _topDoctors = doctors.take(3).toList();
+    } catch (_) {
+      _topDoctors = [];
+    }
 
     _isLoading = false;
     notifyListeners();

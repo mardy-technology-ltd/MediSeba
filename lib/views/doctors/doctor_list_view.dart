@@ -119,6 +119,35 @@ class _DoctorListViewState extends State<DoctorListView> {
                   return const Center(child: CircularProgressIndicator(color: AppColors.primary));
                 }
 
+                if (_doctorController.errorMessage != null && _doctorController.doctors.isEmpty) {
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.wifi_off_rounded, size: 50, color: AppColors.primary),
+                          const SizedBox(height: 12),
+                          Text(
+                            _doctorController.errorMessage!,
+                            textAlign: TextAlign.center,
+                            style: AppTextStyles.bodyMedium,
+                          ),
+                          const SizedBox(height: 16),
+                          ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                            ),
+                            onPressed: () => _doctorController.fetchDoctors(),
+                            icon: const Icon(Icons.refresh_rounded, color: Colors.white),
+                            label: const Text('পুনরায় চেষ্টা করুন', style: TextStyle(color: Colors.white)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+
                 if (_doctorController.doctors.isEmpty) {
                   return Center(
                     child: Column(
@@ -134,23 +163,27 @@ class _DoctorListViewState extends State<DoctorListView> {
                   );
                 }
 
-                return ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: _doctorController.doctors.length,
-                  itemBuilder: (context, index) {
-                    final doctor = _doctorController.doctors[index];
-                    return DoctorCard(
-                      doctor: doctor,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => DoctorDetailView(doctor: doctor),
-                          ),
-                        );
-                      },
-                    );
-                  },
+                return RefreshIndicator(
+                  color: AppColors.primary,
+                  onRefresh: () => _doctorController.fetchDoctors(),
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: _doctorController.doctors.length,
+                    itemBuilder: (context, index) {
+                      final doctor = _doctorController.doctors[index];
+                      return DoctorCard(
+                        doctor: doctor,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DoctorDetailView(doctor: doctor),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
                 );
               },
             ),

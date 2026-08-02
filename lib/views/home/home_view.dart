@@ -305,7 +305,7 @@ class _HomeViewState extends State<HomeView> {
         imagePath: 'assets/images/dr_ghor.png',
         onTap: () => Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => const DoctorListView()),
+          MaterialPageRoute(builder: (_) => const DoctorBariView()),
         ),
       ),
       _CategoryItem(

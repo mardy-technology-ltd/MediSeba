@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../controllers/doctor_controller.dart';
+import '../../models/doctor_model.dart';
 import 'doctor_details_view.dart';
 
 class DoctorBariView extends StatefulWidget {
@@ -10,6 +12,26 @@ class DoctorBariView extends StatefulWidget {
 
 class _DoctorBariViewState extends State<DoctorBariView> {
   static const textDark = Color(0xFF222222);
+  final DoctorController _doctorController = DoctorController();
+  final TextEditingController _searchController = TextEditingController();
+
+  final List<String> _categories = [
+    'সকল (All)',
+    'মেডিসিন (Medicine)',
+    'হৃদরোগ (Cardiology)',
+    'শিশু রোগ (Pediatrics)',
+    'গাইনি ও স্ত্রী রোগ (Gynecology)',
+    'চর্ম ও যৌন (Dermatology)',
+    'নিউরোমেডিসিন (Neurology)',
+    'অর্থোপেডিক্স (Orthopedics)',
+  ];
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _doctorController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,8 +87,10 @@ class _DoctorBariViewState extends State<DoctorBariView> {
                   color: const Color(0xFFF8F9FA),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const TextField(
-                  decoration: InputDecoration(
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: (val) => _doctorController.searchDoctors(val),
+                  decoration: const InputDecoration(
                     hintText: 'ডাক্তারের নাম, বিশেষজ্ঞ বা হাসপাতাল...',
                     hintStyle: TextStyle(color: Color(0xFF94A3B8), fontSize: 14),
                     prefixIcon: Icon(Icons.search_rounded, color: Color(0xFF0F9D58)),
@@ -78,20 +102,26 @@ class _DoctorBariViewState extends State<DoctorBariView> {
             ),
             
             // Categories Row
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Row(
-                children: [
-                  _buildCategoryChip('সকল (All)', isSelected: true),
-                  const SizedBox(width: 8),
-                  _buildCategoryChip('মেডিসিন (Medicine)'),
-                  const SizedBox(width: 8),
-                  _buildCategoryChip('হৃদরোগ (Cardiology)'),
-                  const SizedBox(width: 8),
-                  _buildCategoryChip('শিশু (Pediatrics)'),
-                ],
-              ),
+            ListenableBuilder(
+              listenable: _doctorController,
+              builder: (context, child) {
+                return SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Row(
+                    children: _categories.map((cat) {
+                      final isSelected = _doctorController.selectedSpecialty == cat;
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: GestureDetector(
+                          onTap: () => _doctorController.filterBySpecialty(cat),
+                          child: _buildCategoryChip(cat, isSelected: isSelected),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                );
+              },
             ),
             
             const SizedBox(height: 16),
@@ -99,50 +129,66 @@ class _DoctorBariViewState extends State<DoctorBariView> {
             // Doctors List
             Expanded(
               child: Container(
-                color: const Color(0xFFF8FAFC), // Very light background for the list area
-                child: ListView(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                  children: [
-                    _buildDoctorCard(
-                      name: 'ডাঃ মোহাম্মদ আরিফ রহমান',
-                      specialty: 'MBBS, FCPS (Medicine), MD (Cardiol...',
-                      hospital: 'ঢাকা মেডিকেল কলেজ ও হাসপাতাল',
-                      rating: '4.9',
-                      reviews: '(128)',
-                      price: '৳800',
-                      imageUrl: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&auto=format&fit=crop',
-                      isPremium: true,
-                    ),
-                    _buildDoctorCard(
-                      name: 'ডাঃ ফারজানা আক্তার',
-                      specialty: 'MBBS, MS (Gynecology & Obstetrics)',
-                      hospital: 'স্কয়ার হাসপাতাল, ঢাকা',
-                      rating: '4.8',
-                      reviews: '(95)',
-                      price: '৳700',
-                      imageUrl: 'https://images.unsplash.com/photo-1594824436998-d88623267d3b?q=80&w=200&auto=format&fit=crop',
-                      isMediSeba: true,
-                    ),
-                    _buildDoctorCard(
-                      name: 'ডাঃ তামিম হাসান',
-                      specialty: 'MBBS, DCH, MD (Pediatrics)',
-                      hospital: 'বঙ্গবন্ধু শেখ মুজিব মেডিকেল বিশ্ববিদ্যাল...',
-                      rating: '4.7',
-                      reviews: '(74)',
-                      price: '৳600',
-                      imageUrl: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?q=80&w=200&auto=format&fit=crop',
-                    ),
-                    _buildDoctorCard(
-                      name: 'ডাঃ সায়মা পারভীন',
-                      specialty: 'MBBS, DDV (Dermatology)',
-                      hospital: 'পপুলার ডায়াগনস্টিক সেন্টার',
-                      rating: '4.9',
-                      reviews: '(140)',
-                      price: '৳1000',
-                      imageUrl: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=200&auto=format&fit=crop',
-                      isPremium: true,
-                    ),
-                  ],
+                color: const Color(0xFFF8FAFC),
+                child: ListenableBuilder(
+                  listenable: _doctorController,
+                  builder: (context, child) {
+                    if (_doctorController.isLoading) {
+                      return const Center(
+                        child: CircularProgressIndicator(color: Color(0xFF0F9D58)),
+                      );
+                    }
+
+                    if (_doctorController.errorMessage != null && _doctorController.doctors.isEmpty) {
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.wifi_off_rounded, size: 50, color: Colors.grey),
+                            const SizedBox(height: 12),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                              child: Text(
+                                _doctorController.errorMessage!,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(color: Color(0xFF64748B), fontSize: 14),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF0F9D58),
+                              ),
+                              onPressed: () => _doctorController.fetchDoctors(),
+                              child: const Text('পুনরায় চেষ্টা করুন', style: TextStyle(color: Colors.white)),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+
+                    if (_doctorController.doctors.isEmpty) {
+                      return const Center(
+                        child: Text(
+                          'কোনো ডাক্তার পাওয়া যায়নি',
+                          style: TextStyle(color: Color(0xFF64748B), fontSize: 15),
+                        ),
+                      );
+                    }
+
+                    return RefreshIndicator(
+                      color: const Color(0xFF0F9D58),
+                      onRefresh: () => _doctorController.fetchDoctors(),
+                      child: ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                        itemCount: _doctorController.doctors.length,
+                        itemBuilder: (context, index) {
+                          final doctor = _doctorController.doctors[index];
+                          return _buildDoctorCard(doctor);
+                        },
+                      ),
+                    );
+                  },
                 ),
               ),
             ),
@@ -182,30 +228,23 @@ class _DoctorBariViewState extends State<DoctorBariView> {
     );
   }
 
-  Widget _buildDoctorCard({
-    required String name,
-    required String specialty,
-    required String hospital,
-    required String rating,
-    required String reviews,
-    required String price,
-    required String imageUrl,
-    bool isPremium = false,
-    bool isMediSeba = false,
-  }) {
+  Widget _buildDoctorCard(DoctorModel doctor) {
+    final bool isPremium = doctor.rating >= 4.8;
+    final bool isMediSeba = doctor.isAvailableToday;
+
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => DoctorDetailsView(
-              name: name,
-              specialty: specialty,
-              hospital: hospital,
-              rating: rating,
-              reviews: reviews,
-              price: price,
-              imageUrl: imageUrl,
+              name: doctor.name,
+              specialty: doctor.degree.isNotEmpty ? '${doctor.degree} • ${doctor.specialty}' : doctor.specialty,
+              hospital: doctor.hospital,
+              rating: doctor.rating.toString(),
+              reviews: '(${doctor.totalReviews})',
+              price: '৳${doctor.consultationFee.toInt()}',
+              imageUrl: doctor.imageUrl,
               isPremium: isPremium,
               isMediSeba: isMediSeba,
             ),
@@ -233,7 +272,7 @@ class _DoctorBariViewState extends State<DoctorBariView> {
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.network(
-                imageUrl,
+                doctor.imageUrl,
                 width: 80,
                 height: 80,
                 fit: BoxFit.cover,
@@ -259,7 +298,7 @@ class _DoctorBariViewState extends State<DoctorBariView> {
                     children: [
                       Flexible(
                         child: Text(
-                          name,
+                          doctor.name,
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
@@ -294,7 +333,7 @@ class _DoctorBariViewState extends State<DoctorBariView> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    specialty,
+                    doctor.degree.isNotEmpty ? '${doctor.degree} • ${doctor.specialty}' : doctor.specialty,
                     style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
@@ -305,7 +344,7 @@ class _DoctorBariViewState extends State<DoctorBariView> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    hospital,
+                    doctor.hospital,
                     style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
@@ -323,7 +362,7 @@ class _DoctorBariViewState extends State<DoctorBariView> {
                           const Icon(Icons.star_rounded, color: Color(0xFFF59E0B), size: 18),
                           const SizedBox(width: 4),
                           Text(
-                            rating,
+                            doctor.rating.toString(),
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
@@ -332,7 +371,7 @@ class _DoctorBariViewState extends State<DoctorBariView> {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            reviews,
+                            '(${doctor.totalReviews})',
                             style: const TextStyle(
                               fontSize: 13,
                               color: Color(0xFF94A3B8),
@@ -341,7 +380,7 @@ class _DoctorBariViewState extends State<DoctorBariView> {
                         ],
                       ),
                       Text(
-                        price,
+                        '৳${doctor.consultationFee.toInt()}',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,

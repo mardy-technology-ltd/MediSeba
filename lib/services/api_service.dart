@@ -1,7 +1,37 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import '../models/doctor_model.dart';
 import '../models/appointment_model.dart';
 
 class ApiService {
+  static const String doctorsEndpoint = 'https://mediseba-api.loca.lt/api/v1/doctors?bypass-tunnel-reminder=true';
+
+  static Future<List<DoctorModel>> getDoctors() async {
+    try {
+      final response = await http.get(
+        Uri.parse(doctorsEndpoint),
+        headers: {
+          'bypass-tunnel-reminder': 'true',
+          'Bypass-Tunnel-Reminder': 'true',
+          'Accept': 'application/json',
+          'User-Agent': 'MediSebaApp/1.0',
+        },
+      ).timeout(const Duration(seconds: 15));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> body = jsonDecode(response.body);
+        if (body['success'] == true && body['data'] is List) {
+          final List<dynamic> list = body['data'];
+          return list.map((item) => DoctorModel.fromJson(item as Map<String, dynamic>)).toList();
+        }
+      }
+      throw Exception('HTTP ${response.statusCode}: ${response.body}');
+    } catch (e) {
+      print('ApiService.getDoctors exception: $e');
+      rethrow;
+    }
+  }
+
   // Mock Data for Doctors
   static List<DoctorModel> getSampleDoctors() {
     return [
