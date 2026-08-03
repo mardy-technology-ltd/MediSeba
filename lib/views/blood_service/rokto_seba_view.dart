@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'request_blood_view.dart';
 import 'donor_list_view.dart';
+import 'donate_blood_view.dart';
 
 class RoktoSebaView extends StatelessWidget {
   const RoktoSebaView({super.key});
@@ -158,6 +159,13 @@ class RoktoSebaView extends StatelessWidget {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => const DonorListView()),
+      );
+      return;
+    }
+    if (option == 'রক্ত দিতে চাই') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const DonateBloodView()),
       );
       return;
     }

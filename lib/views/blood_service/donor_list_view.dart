@@ -1,18 +1,29 @@
 import 'package:flutter/material.dart';
+import 'donor_profile_view.dart';
 
 class BloodDonor {
   final String name;
-  final String bloodGroup;
+  final String division;
+  final String district;
+  final String thana;
   final String contactNumber;
+  final String address;
+  final String bloodGroup;
+  final String gender;
+  final String lastDonationDate;
   final String imageUrl;
-  final String location;
 
   const BloodDonor({
     required this.name,
-    required this.bloodGroup,
+    this.division = 'Dhaka',
+    this.district = 'Dhaka',
+    this.thana = 'Dhanmondi',
     required this.contactNumber,
+    this.address = 'House #12, Road #5, Dhanmondi',
+    required this.bloodGroup,
+    this.gender = 'Female',
+    this.lastDonationDate = '12/08/2024',
     required this.imageUrl,
-    this.location = 'Dhaka, Bangladesh',
   });
 }
 
@@ -396,28 +407,10 @@ class _DonorListViewState extends State<DonorListView> {
   }
 
   void _showDonorDetail(BloodDonor donor) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(donor.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('রক্তের গ্রুপ: ${donor.bloodGroup}', style: const TextStyle(color: Color(0xFF008744), fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            Text('যোগাযোগ: ${donor.contactNumber}'),
-            const SizedBox(height: 8),
-            Text('লোকেশন: ${donor.location}'),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('বন্ধ করুন', style: TextStyle(color: Color(0xFF008744))),
-          ),
-        ],
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => DonorProfileView(donor: donor),
       ),
     );
   }
