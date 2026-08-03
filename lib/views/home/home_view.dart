@@ -3,17 +3,14 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../controllers/home_controller.dart';
 import '../../controllers/auth_controller.dart';
 import '../doctor_bari/doctor_bari_view.dart';
-import '../profile/profile_view.dart';
 import '../doctors/doctor_list_view.dart';
 import '../about/about_us_view.dart';
 import '../social/social_media_view.dart';
 import '../health_consultation/health_consultation_view.dart';
-import '../../services/social_media_launcher.dart';
-import 'package:share_plus/share_plus.dart';
 import '../../widgets/share_app_dialog.dart';
 import '../../widgets/helpline_bottom_sheet.dart';
 import '../../widgets/modern_glow_navbar.dart';
-import '../notifications/notification_view.dart';
+import '../blood_service/rokto_seba_view.dart';
 import '../offers/offer_list_view.dart';
 import '../hospitals/hospital_list_view.dart';
 import '../more/more_menu_view.dart';
@@ -56,23 +53,25 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      endDrawer: _buildSidebarDrawer(context),
+      drawer: _buildSidebarDrawer(context),
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         scrolledUnderElevation: 0,
-        automaticallyImplyLeading: false,
-        titleSpacing: 16,
-        title: Row(
-          children: [
-            // MediSeba Logo
-            Image.asset(
-              'assets/images/logo.png',
-              height: 48,
-              fit: BoxFit.contain,
-            ),
-          ],
+        centerTitle: true,
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu_rounded, color: brandGreen, size: 28),
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
+          ),
+        ),
+        title: Image.asset(
+          'assets/images/logo.png',
+          height: 42,
+          fit: BoxFit.contain,
         ),
         actions: [
           // User Profile Button (Switches to Profile Tab)
@@ -87,15 +86,15 @@ class _HomeViewState extends State<HomeView> {
                   setState(() => _currentBottomNavIndex = 4);
                 },
                 child: Container(
-                  height: 30,
-                  width: 30,
+                  height: 34,
+                  width: 34,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: const Color(0xFFF1F5F9),
                     border: Border.all(color: brandGreen, width: 1.5),
                     image: hasImage
                         ? DecorationImage(
-                            image: NetworkImage(uData!.profileImageUrl!),
+                            image: NetworkImage(uData.profileImageUrl!),
                             fit: BoxFit.cover,
                           )
                         : null,
@@ -104,23 +103,14 @@ class _HomeViewState extends State<HomeView> {
                       ? const Icon(
                           Icons.person_rounded,
                           color: brandGreen,
-                          size: 18,
+                          size: 20,
                         )
                       : null,
                 ),
               );
             },
           ),
-          const SizedBox(width: 4),
-          Builder(
-            builder: (context) => IconButton(
-              icon: const Icon(Icons.menu_rounded, color: brandGreen, size: 28),
-              onPressed: () {
-                Scaffold.of(context).openEndDrawer();
-              },
-            ),
-          ),
-          const SizedBox(width: 4),
+          const SizedBox(width: 16),
         ],
       ),
       body: IndexedStack(
@@ -324,7 +314,10 @@ class _HomeViewState extends State<HomeView> {
         iconBg: const Color(0xFFFFEBEE),
         borderColor: const Color(0xFFFFCDD2),
         imagePath: 'assets/images/roktoseba.png',
-        onTap: () {},
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const RoktoSebaView()),
+        ),
       ),
       _CategoryItem(
         label: 'ডিসকাউন্ট অফার',

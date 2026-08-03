@@ -43,7 +43,6 @@ class AuthController extends ChangeNotifier {
     // 4. Phone Number (20%)
     // Check if user has a valid phone number (not an email pretending to be phone)
     final phone = _currentUserData?.phone ?? '';
-    final email = _currentUser?.email ?? '';
     final isRealPhone = phone.isNotEmpty && 
                         !phone.contains('@') && 
                         (RegExp(r'^01[3-9]\d{8}$').hasMatch(phone.replaceAll(RegExp(r'\s+'), '')) || phone.length >= 10);
