@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'donor_list_view.dart';
 import 'donor_reviews_view.dart';
+import 'review_submitted_success_view.dart';
 
 class DonorProfileView extends StatelessWidget {
   final BloodDonor donor;
@@ -340,11 +341,10 @@ class DonorProfileView extends StatelessWidget {
                       ),
                       onPressed: () {
                         Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('আপনার রিভিউ সফলভাবে জমা নেওয়া হয়েছে!'),
-                            behavior: SnackBarBehavior.floating,
-                            backgroundColor: Color(0xFF008744),
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const ReviewSubmittedSuccessView(),
                           ),
                         );
                       },
