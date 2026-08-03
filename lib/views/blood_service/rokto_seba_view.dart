@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'request_blood_view.dart';
 
 class RoktoSebaView extends StatelessWidget {
   const RoktoSebaView({super.key});
@@ -145,6 +146,13 @@ class RoktoSebaView extends StatelessWidget {
   }
 
   void _handleOptionTap(BuildContext context, String option) {
+    if (option == 'রক্ত চাই') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const RequestBloodView()),
+      );
+      return;
+    }
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
