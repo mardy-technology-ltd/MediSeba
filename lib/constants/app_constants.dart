@@ -1,7 +1,9 @@
 class AppConstants {
   static const String appName = 'MediSeba';
   static const String appTagline = 'আপনার বিশ্বস্ত অনলাইন স্বাস্থ্য সেবা';
-  static const String apiBaseUrl = 'https://api.mediseba.com/v1';
+  static const String apiBaseUrl = 'https://mediseba-web.vercel.app/api/v1';
+  static const String privacyPolicyUrl = 'https://mediseba-web.vercel.app/privacy-policy';
+  static const String termsOfServiceUrl = 'https://mediseba-web.vercel.app/terms-of-service';
 
   // Categories
   static const List<String> doctorSpecialties = [

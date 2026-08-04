@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../constants/app_constants.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/home_controller.dart';
 import '../health_consultation/health_consultation_view.dart';
@@ -257,6 +259,19 @@ class MoreMenuView extends StatelessWidget {
                         context,
                         MaterialPageRoute(builder: (_) => const AboutUsView()),
                       ),
+                    ),
+                    const Divider(height: 1, indent: 60, color: Color(0xFFF1F5F9)),
+                    _buildListOption(
+                      icon: Icons.privacy_tip_outlined,
+                      iconBg: const Color(0xFFE8F5E9),
+                      iconColor: const Color(0xFF0F9D58),
+                      title: 'প্রাইভেসি পলিসি (Privacy Policy)',
+                      onTap: () async {
+                        final uri = Uri.parse(AppConstants.privacyPolicyUrl);
+                        if (await canLaunchUrl(uri)) {
+                          await launchUrl(uri, mode: LaunchMode.externalApplication);
+                        }
+                      },
                     ),
                     const Divider(height: 1, indent: 60, color: Color(0xFFF1F5F9)),
                     _buildListOption(
