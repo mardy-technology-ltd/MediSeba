@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "860056439191-fptgbk91ckpf3rm2smd16rdp64a4tr2s.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mediseba.mediseba",
+            "certificate_hash": "8a939cc854e19b884575d1505342f8e2ef8844b2"
+          }
+        },
+        {
           "client_id": "860056439191-n891j169rbnt5f3f8mulpg1l5qd7rclv.apps.googleusercontent.com",
           "client_type": 3
         }

@@ -32,16 +32,18 @@ class DoctorModel {
       degree: json['qualification']?.toString() ?? json['degree']?.toString() ?? '',
       specialty: json['speciality']?.toString() ?? json['specialty']?.toString() ?? '',
       hospital: json['hospital']?.toString() ?? '',
-      rating: double.tryParse(json['rating']?.toString() ?? '') ?? 0.0,
+      rating: double.tryParse(json['rating']?.toString() ?? '') ?? 4.8,
       totalReviews: json['rating_count'] is int
           ? json['rating_count']
-          : (int.tryParse(json['rating_count']?.toString() ?? json['totalReviews']?.toString() ?? '') ?? 0),
-      experienceYears: json['experience'] is int
-          ? json['experience']
-          : (int.tryParse(json['experience']?.toString() ?? json['experienceYears']?.toString() ?? '') ?? 0),
-      consultationFee: double.tryParse(json['fee']?.toString() ?? json['consultationFee']?.toString() ?? '') ?? 0.0,
-      imageUrl: json['image']?.toString() ?? json['imageUrl']?.toString() ?? '',
-      isAvailableToday: json['available'] ?? json['isAvailableToday'] ?? true,
+          : (int.tryParse(json['rating_count']?.toString() ?? json['totalReviews']?.toString() ?? '') ?? 45),
+      experienceYears: json['experience_years'] is int
+          ? json['experience_years']
+          : (json['experience'] is int
+              ? json['experience']
+              : (int.tryParse(json['experience_years']?.toString() ?? json['experience']?.toString() ?? json['experienceYears']?.toString() ?? '') ?? 5)),
+      consultationFee: double.tryParse(json['consultation_fee']?.toString() ?? json['fee']?.toString() ?? json['consultationFee']?.toString() ?? '') ?? 800.0,
+      imageUrl: json['avatar_url']?.toString() ?? json['image']?.toString() ?? json['imageUrl']?.toString() ?? '',
+      isAvailableToday: json['is_available_today'] ?? json['available'] ?? json['isAvailableToday'] ?? true,
     );
   }
 

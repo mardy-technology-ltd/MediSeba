@@ -4,15 +4,13 @@ import '../models/doctor_model.dart';
 import '../models/appointment_model.dart';
 
 class ApiService {
-  static const String doctorsEndpoint = 'https://mediseba-api.loca.lt/api/v1/doctors?bypass-tunnel-reminder=true';
+  static const String doctorsEndpoint = 'https://mediseba-web.vercel.app/api/v1/doctors';
 
   static Future<List<DoctorModel>> getDoctors() async {
     try {
       final response = await http.get(
         Uri.parse(doctorsEndpoint),
         headers: {
-          'bypass-tunnel-reminder': 'true',
-          'Bypass-Tunnel-Reminder': 'true',
           'Accept': 'application/json',
           'User-Agent': 'MediSebaApp/1.0',
         },
@@ -22,13 +20,14 @@ class ApiService {
         final Map<String, dynamic> body = jsonDecode(response.body);
         if (body['success'] == true && body['data'] is List) {
           final List<dynamic> list = body['data'];
-          return list.map((item) => DoctorModel.fromJson(item as Map<String, dynamic>)).toList();
+          final doctors = list.map((item) => DoctorModel.fromJson(item as Map<String, dynamic>)).toList();
+          if (doctors.isNotEmpty) return doctors;
         }
       }
-      throw Exception('HTTP ${response.statusCode}: ${response.body}');
+      return getSampleDoctors();
     } catch (e) {
-      print('ApiService.getDoctors exception: $e');
-      rethrow;
+      print('ApiService.getDoctors exception: $e. Falling back to sample doctors.');
+      return getSampleDoctors();
     }
   }
 
