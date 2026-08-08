@@ -20,8 +20,8 @@ class MoreMenuView extends StatelessWidget {
     required this.homeController,
   });
 
-  static const brandGreen = Color(0xFF0F9D58);
-  static const brandRed = Color(0xFFE53935);
+  static const brandGreen = Color(0xFF008536);
+  static const brandRed = Color(0xFFED1B24);
   static const textDark = Color(0xFF1E293B);
   static const textMuted = Color(0xFF64748B);
 

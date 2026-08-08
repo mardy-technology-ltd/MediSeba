@@ -22,8 +22,8 @@ class ModernGlowNavBar extends StatelessWidget {
     required this.items,
   });
 
-  static const brandGreen = Color(0xFF0F9D58);
-  static const brandAccent = Color(0xFF00C853);
+  static const brandGreen = Color(0xFF008536);
+  static const brandAccent = Color(0xFF02A946);
   static const textDark = Color(0xFF1E293B);
   static const textMuted = Color(0xFF64748B);
 

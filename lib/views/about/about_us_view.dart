@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class AboutUsView extends StatelessWidget {
   const AboutUsView({super.key});
 
-  static const brandGreen = Color(0xFF0F9D58);
+  static const brandGreen = Color(0xFF008536);
   static const textDark = Color(0xFF1E293B);
   static const textMuted = Color(0xFF64748B);
 

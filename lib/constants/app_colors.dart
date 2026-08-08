@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Primary Palette (Medical Teal & Fresh Mint)
-  static const Color primary = Color(0xFF0F766E);       // Deep Medical Teal
-  static const Color primaryLight = Color(0xFF14B8A6);  // Bright Teal
-  static const Color primaryDark = Color(0xFF115E59);   // Dark Teal
+  // Primary Palette (Brand Green #008536)
+  static const Color primary = Color(0xFF008536);       // Brand Green
+  static const Color primaryLight = Color(0xFF02A946);  // Bright Green
+  static const Color primaryDark = Color(0xFF006428);   // Dark Green
   
-  // Secondary / Accent Colors
+  // Secondary / Accent Colors (Brand Red #ED1B24)
   static const Color accent = Color(0xFF38BDF8);        // Sky Blue Accent
   static const Color highlight = Color(0xFFF59E0B);     // Amber Warning/Rating
-  static const Color danger = Color(0xFFEF4444);        // Coral Red Alert
+  static const Color danger = Color(0xFFED1B24);        // Brand Red
+  static const Color brandRed = Color(0xFFED1B24);      // Brand Red
 
   // Background & Cards
   static const Color background = Color(0xFFF8FAFC);    // Soft Slate Grey
@@ -22,19 +23,19 @@ class AppColors {
   static const Color textLight = Color(0xFF94A3B8);     // Subtitle Grey
   
   // Status Colors
-  static const Color success = Color(0xFF10B981);       // Emerald Green
+  static const Color success = Color(0xFF008536);       // Brand Green
   static const Color statusPending = Color(0xFFF59E0B);  // Amber
-  static const Color statusCancelled = Color(0xFFEF4444);// Red
+  static const Color statusCancelled = Color(0xFFED1B24);// Brand Red
 
   // Gradients
   static const LinearGradient primaryGradient = LinearGradient(
-    colors: [Color(0xFF0F766E), Color(0xFF0D9488)],
+    colors: [Color(0xFF008536), Color(0xFF02A946)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   static const LinearGradient heroGradient = LinearGradient(
-    colors: [Color(0xFF115E59), Color(0xFF0F766E), Color(0xFF14B8A6)],
+    colors: [Color(0xFF006428), Color(0xFF008536), Color(0xFF02A946)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );

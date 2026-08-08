@@ -37,7 +37,7 @@ class _HomeViewState extends State<HomeView> {
 
   String _selectedLanguage = 'Bangla';
 
-  static const brandGreen = Color(0xFF009245);
+  static const brandGreen = Color(0xFF008536);
   static const textDark = Color(0xFF222222);
   static const textMuted = Color(0xFF777777);
   static const cardBg = Color(0xFFF8FAFC);

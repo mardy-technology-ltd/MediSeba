@@ -21,8 +21,8 @@ class RegisterView extends StatefulWidget {
 }
 
 class _RegisterViewState extends State<RegisterView> {
-  static const brandGreen = Color(0xFF0F9D58);
-  static const brandRed = Color(0xFFE53935);
+  static const brandGreen = Color(0xFF008536);
+  static const brandRed = Color(0xFFED1B24);
   
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();

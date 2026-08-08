@@ -19,8 +19,8 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
-  static const brandGreen = Color(0xFF0F9D58);
-  static const brandRed = Color(0xFFE53935);
+  static const brandGreen = Color(0xFF008536);
+  static const brandRed = Color(0xFFED1B24);
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isPasswordVisible = false;

@@ -9,7 +9,7 @@ class HospitalListView extends StatefulWidget {
 }
 
 class _HospitalListViewState extends State<HospitalListView> {
-  static const brandGreen = Color(0xFF0F9D58);
+  static const brandGreen = Color(0xFF008536);
   static const textDark = Color(0xFF1E293B);
   static const textMuted = Color(0xFF64748B);
 

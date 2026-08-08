@@ -16,10 +16,10 @@ class ProfileView extends StatelessWidget {
     this.showAppBarLeading = true,
   });
 
-  static const brandGreen = Color(0xFF0F9D58);
-  static const brandGreenDark = Color(0xFF0A7D44);
-  static const brandGreenLight = Color(0xFF34C97A);
-  static const brandRed = Color(0xFFE53935);
+  static const brandGreen = Color(0xFF008536);
+  static const brandGreenDark = Color(0xFF006428);
+  static const brandGreenLight = Color(0xFF02A946);
+  static const brandRed = Color(0xFFED1B24);
   static const textDark = Color(0xFF1E293B);
   static const textMuted = Color(0xFF64748B);
 
