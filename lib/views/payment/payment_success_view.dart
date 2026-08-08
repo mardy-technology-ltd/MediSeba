@@ -2,13 +2,36 @@ import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_text_styles.dart';
 import '../../models/doctor_model.dart';
-import '../appointments/appointment_history_view.dart';
 import '../shared_widgets/custom_button.dart';
 
 class PaymentSuccessView extends StatelessWidget {
   final DoctorModel doctor;
 
   const PaymentSuccessView({super.key, required this.doctor});
+
+  void _showUnderDevelopmentToast(BuildContext context, String featureName) {
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.info_outline_rounded, color: Colors.white, size: 20),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                '$featureName ফিচারটি বর্তমানে ডেভলপমেন্টের অধীনে রয়েছে (Under Development)।',
+                style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: AppColors.primary,
+        duration: const Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +41,10 @@ class PaymentSuccessView extends StatelessWidget {
         backgroundColor: AppColors.surface,
         elevation: 0,
         scrolledUnderElevation: 0,
-        automaticallyImplyLeading: false,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 20),
+          onPressed: () => Navigator.pop(context),
+        ),
         title: Text('পেমেন্ট স্ট্যাটাস', style: AppTextStyles.heading2),
         centerTitle: true,
       ),
@@ -145,12 +171,7 @@ class PaymentSuccessView extends StatelessWidget {
                         text: 'ভিডিও কলে যোগ দিন',
                         icon: Icons.videocam_rounded,
                         onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('${doctor.name}-এর লাইভ ভিডিও রুমে যুক্ত হচ্ছেন...'),
-                              backgroundColor: AppColors.primary,
-                            ),
-                          );
+                          _showUnderDevelopmentToast(context, 'ভিডিও কল');
                         },
                       ),
 
@@ -168,12 +189,7 @@ class PaymentSuccessView extends StatelessWidget {
                             ),
                           ),
                           onPressed: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const AppointmentHistoryView(),
-                              ),
-                            );
+                            _showUnderDevelopmentToast(context, 'পেশেন্ট ড্যাশবোর্ড');
                           },
                           child: const Text(
                             'পেশেন্ট ড্যাশবোর্ড',
