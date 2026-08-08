@@ -6,6 +6,7 @@ import '../../models/doctor_availability_model.dart';
 import '../../services/api_service.dart';
 import '../shared_widgets/custom_button.dart';
 import '../appointments/book_appointment_view.dart';
+import '../payment/payment_view.dart';
 
 class DoctorDetailView extends StatefulWidget {
   final DoctorModel doctor;
@@ -227,12 +228,21 @@ class _DoctorDetailViewState extends State<DoctorDetailView> {
               icon: _isAvailable ? Icons.medical_services_rounded : Icons.calendar_today_rounded,
               isLoading: _isLoading,
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => BookAppointmentView(doctor: widget.doctor),
-                  ),
-                );
+                if (_isAvailable) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PaymentView(doctor: widget.doctor),
+                    ),
+                  );
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => BookAppointmentView(doctor: widget.doctor),
+                    ),
+                  );
+                }
               },
             ),
           ],
