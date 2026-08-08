@@ -4,7 +4,7 @@ import '../../constants/app_text_styles.dart';
 import '../../models/doctor_model.dart';
 import '../shared_widgets/custom_button.dart';
 import '../shared_widgets/custom_textfield.dart';
-import '../appointments/appointment_history_view.dart';
+import 'payment_success_view.dart';
 
 class PaymentView extends StatefulWidget {
   final DoctorModel doctor;
@@ -56,7 +56,9 @@ class _PaymentViewState extends State<PaymentView> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const AppointmentHistoryView()),
+        MaterialPageRoute(
+          builder: (context) => PaymentSuccessView(doctor: widget.doctor),
+        ),
       );
     }
   }
