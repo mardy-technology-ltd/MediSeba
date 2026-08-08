@@ -2,13 +2,74 @@ import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_text_styles.dart';
 import '../../models/doctor_model.dart';
+import '../../models/doctor_availability_model.dart';
+import '../../services/api_service.dart';
 import '../shared_widgets/custom_button.dart';
 import '../appointments/book_appointment_view.dart';
 
-class DoctorDetailView extends StatelessWidget {
+class DoctorDetailView extends StatefulWidget {
   final DoctorModel doctor;
 
   const DoctorDetailView({super.key, required this.doctor});
+
+  @override
+  State<DoctorDetailView> createState() => _DoctorDetailViewState();
+}
+
+class _DoctorDetailViewState extends State<DoctorDetailView> {
+  bool _isAvailable = true;
+  DoctorAvailabilityModel? _availability;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAvailability();
+  }
+
+  Future<void> _checkAvailability() async {
+    try {
+      final availabilities = await ApiService.getDoctorAvailabilities();
+      final currentDocId = int.tryParse(widget.doctor.id);
+
+      final matchingAvailability = availabilities.firstWhere(
+        (item) {
+          if (currentDocId != null && item.doctorId == currentDocId) return true;
+          return item.uuid == widget.doctor.id;
+        },
+        orElse: () => DoctorAvailabilityModel(
+          id: 0,
+          uuid: '',
+          doctorId: 0,
+          availableDate: '',
+          startTime: '',
+          endTime: '',
+          slotDuration: 0,
+          maxPatients: 0,
+          isAvailable: widget.doctor.isAvailableToday,
+        ),
+      );
+
+      if (mounted) {
+        setState(() {
+          if (matchingAvailability.id != 0) {
+            _availability = matchingAvailability;
+            _isAvailable = matchingAvailability.isAvailable;
+          } else {
+            _isAvailable = widget.doctor.isAvailableToday;
+          }
+          _isLoading = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _isAvailable = widget.doctor.isAvailableToday;
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +111,7 @@ class DoctorDetailView extends StatelessWidget {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(16),
                         child: Image.network(
-                          doctor.imageUrl,
+                          widget.doctor.imageUrl,
                           width: 90,
                           height: 90,
                           fit: BoxFit.cover,
@@ -67,14 +128,14 @@ class DoctorDetailView extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(doctor.name, style: AppTextStyles.heading2),
+                            Text(widget.doctor.name, style: AppTextStyles.heading2),
                             const SizedBox(height: 4),
                             Text(
-                              doctor.degree,
+                              widget.doctor.degree,
                               style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primary),
                             ),
                             const SizedBox(height: 4),
-                            Text(doctor.hospital, style: AppTextStyles.caption),
+                            Text(widget.doctor.hospital, style: AppTextStyles.caption),
                           ],
                         ),
                       ),
@@ -88,9 +149,9 @@ class DoctorDetailView extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      _buildStatItem('অভিজ্ঞতা', '${doctor.experienceYears}+ বছর'),
-                      _buildStatItem('রেটিং', '⭐ ${doctor.rating}'),
-                      _buildStatItem('ফি', '৳${doctor.consultationFee.toInt()}'),
+                      _buildStatItem('অভিজ্ঞতা', '${widget.doctor.experienceYears}+ বছর'),
+                      _buildStatItem('রেটিং', '⭐ ${widget.doctor.rating}'),
+                      _buildStatItem('ফি', '৳${widget.doctor.consultationFee.toInt()}'),
                     ],
                   ),
                 ],
@@ -109,7 +170,7 @@ class DoctorDetailView extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Text(
-                '${doctor.name} একজন অভিজ্ঞ ${doctor.specialty} বিশেষজ্ঞ। তিনি ${doctor.hospital}-এ কর্মরত আছেন। রোগীর স্বাস্থ্য ও সঠিক চিকিৎসার জন্য তিনি সার্বক্ষণিক নিয়োজিত।',
+                '${widget.doctor.name} একজন অভিজ্ঞ ${widget.doctor.specialty} বিশেষজ্ঞ। তিনি ${widget.doctor.hospital}-এ কর্মরত আছেন। রোগীর স্বাস্থ্য ও সঠিক চিকিৎসার জন্য তিনি সার্বক্ষণিক নিয়োজিত।',
                 style: AppTextStyles.bodyLarge.copyWith(height: 1.5, color: AppColors.textSecondary),
               ),
             ),
@@ -136,12 +197,23 @@ class DoctorDetailView extends StatelessWidget {
                     child: const Icon(Icons.access_time_rounded, color: AppColors.primary, size: 24),
                   ),
                   const SizedBox(width: 14),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('প্রতিদিন বৈকালিক চেম্বার', style: AppTextStyles.heading3),
-                      Text('বিকাল ০৫:০০ - রাত ০৯:০০ (শনি - বৃহস্পতি)', style: AppTextStyles.bodyMedium),
-                    ],
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _availability?.note ?? 'প্রতিদিন বৈকালিক চেম্বার',
+                          style: AppTextStyles.heading3,
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          _availability != null
+                              ? '${_availability!.startTime} - ${_availability!.endTime} (${_availability!.availableDate})'
+                              : 'বিকাল ০৫:০০ - রাত ০৯:০০ (শনি - বৃহস্পতি)',
+                          style: AppTextStyles.bodyMedium,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -149,15 +221,16 @@ class DoctorDetailView extends StatelessWidget {
 
             const SizedBox(height: 30),
 
-            // Action Button
+            // Action Button based on is_available
             CustomButton(
-              text: 'সিরিয়াল / অ্যাপয়েন্টমেন্ট বুক করুন',
-              icon: Icons.calendar_today_rounded,
+              text: _isAvailable ? 'ডাক্তার দেখান' : 'সিরিয়াল / অ্যাপয়েন্টমেন্ট বুক করুন',
+              icon: _isAvailable ? Icons.medical_services_rounded : Icons.calendar_today_rounded,
+              isLoading: _isLoading,
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => BookAppointmentView(doctor: doctor),
+                    builder: (context) => BookAppointmentView(doctor: widget.doctor),
                   ),
                 );
               },

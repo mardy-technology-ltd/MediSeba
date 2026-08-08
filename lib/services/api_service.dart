@@ -2,13 +2,76 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../models/doctor_model.dart';
+import '../models/doctor_availability_model.dart';
 import '../models/appointment_model.dart';
 import 'cache_service.dart';
 
 class ApiService {
   static const String doctorsEndpoint = 'https://mediseba-web.vercel.app/api/v1/doctors';
+  static const String availabilitiesEndpoint = 'https://mediseba-web.vercel.app/api/v1/availabilities';
   static const String _doctorsCacheKey = 'doctors_list';
+  static const String _availabilitiesCacheKey = 'availabilities_list';
   static const Duration _cacheTTL = Duration(minutes: 15);
+
+  /// Fetch all doctor availabilities with Hive caching
+  static Future<List<DoctorAvailabilityModel>> getDoctorAvailabilities({bool forceRefresh = false}) async {
+    // 1. Check local Hive cache
+    if (!forceRefresh && !CacheService.isExpired(_availabilitiesCacheKey, _cacheTTL)) {
+      final cachedData = CacheService.get(_availabilitiesCacheKey);
+      if (cachedData is List && cachedData.isNotEmpty) {
+        try {
+          final items = cachedData
+              .map((item) => DoctorAvailabilityModel.fromJson(Map<String, dynamic>.from(item as Map)))
+              .toList();
+          debugPrint('Loaded ${items.length} availabilities from Hive cache.');
+          return items;
+        } catch (e) {
+          debugPrint('Error parsing Hive cached availabilities: $e');
+        }
+      }
+    }
+
+    // 2. Fetch from Network API
+    try {
+      debugPrint('Fetching availabilities from network API...');
+      final response = await http.get(
+        Uri.parse(availabilitiesEndpoint),
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'MediSebaApp/1.0',
+        },
+      ).timeout(const Duration(seconds: 15));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> body = jsonDecode(response.body);
+        if (body['success'] == true && body['data'] is List) {
+          final List<dynamic> list = body['data'];
+          final items = list.map((item) => DoctorAvailabilityModel.fromJson(item as Map<String, dynamic>)).toList();
+          if (items.isNotEmpty) {
+            await CacheService.put(_availabilitiesCacheKey, list);
+            debugPrint('Successfully fetched & cached ${items.length} availabilities to Hive.');
+            return items;
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('ApiService.getDoctorAvailabilities exception: $e');
+    }
+
+    // 3. Network failed: Fallback to existing Hive cache if available
+    final fallbackCache = CacheService.get(_availabilitiesCacheKey);
+    if (fallbackCache is List && fallbackCache.isNotEmpty) {
+      try {
+        final items = fallbackCache
+            .map((item) => DoctorAvailabilityModel.fromJson(Map<String, dynamic>.from(item as Map)))
+            .toList();
+        debugPrint('Fallback: Loaded ${items.length} availabilities from Hive cache.');
+        return items;
+      } catch (_) {}
+    }
+
+    return [];
+  }
 
   static Future<List<DoctorModel>> getDoctors({bool forceRefresh = false}) async {
     // 1. Check local Hive cache if forceRefresh is false
