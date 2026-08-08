@@ -40,7 +40,7 @@ class ApiService {
           'Accept': 'application/json',
           'User-Agent': 'MediSebaApp/1.0',
         },
-      ).timeout(const Duration(seconds: 15));
+      ).timeout(const Duration(seconds: 4));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
@@ -99,7 +99,7 @@ class ApiService {
           'Accept': 'application/json',
           'User-Agent': 'MediSebaApp/1.0',
         },
-      ).timeout(const Duration(seconds: 15));
+      ).timeout(const Duration(seconds: 4));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);

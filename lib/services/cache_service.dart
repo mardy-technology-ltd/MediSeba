@@ -65,13 +65,24 @@ class CacheService {
     try {
       if (!_getBox.containsKey(key)) return true;
       final payload = _getBox.get(key);
-      if (payload is Map && payload.containsKey('timestamp')) {
-        final int timestamp = payload['timestamp'] as int;
-        final savedTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
-        return DateTime.now().difference(savedTime) > ttl;
+      if (payload != null && payload is Map) {
+        final rawTimestamp = payload['timestamp'];
+        if (rawTimestamp != null) {
+          final int timestamp = rawTimestamp is int
+              ? rawTimestamp
+              : (int.tryParse(rawTimestamp.toString()) ?? 0);
+          if (timestamp > 0) {
+            final savedTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
+            final difference = DateTime.now().difference(savedTime);
+            final expired = difference > ttl;
+            debugPrint('Cache check for key "$key": age=${difference.inSeconds}s, isExpired=$expired');
+            return expired;
+          }
+        }
       }
       return true;
     } catch (e) {
+      debugPrint('CacheService.isExpired error for key $key: $e');
       return true;
     }
   }
