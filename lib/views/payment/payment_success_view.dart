@@ -137,29 +137,28 @@ class PaymentSuccessView extends StatelessWidget {
 
                   const SizedBox(height: 36),
 
-                  // Buttons
-                  Row(
+                  // Action Buttons (Stacked Vertically for Perfect Mobile Layout)
+                  Column(
                     children: [
                       // Video Call Join Button
-                      Expanded(
-                        child: CustomButton(
-                          text: 'ভিডিও কলে যোগ দিন',
-                          icon: Icons.videocam_rounded,
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('${doctor.name}-এর লাইভ ভিডিও রুমে যুক্ত হচ্ছেন...'),
-                                backgroundColor: AppColors.primary,
-                              ),
-                            );
-                          },
-                        ),
+                      CustomButton(
+                        text: 'ভিডিও কলে যোগ দিন',
+                        icon: Icons.videocam_rounded,
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('${doctor.name}-এর লাইভ ভিডিও রুমে যুক্ত হচ্ছেন...'),
+                              backgroundColor: AppColors.primary,
+                            ),
+                          );
+                        },
                       ),
 
-                      const SizedBox(width: 12),
+                      const SizedBox(height: 12),
 
                       // Patient Dashboard Button
-                      Expanded(
+                      SizedBox(
+                        width: double.infinity,
                         child: OutlinedButton(
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 14),
