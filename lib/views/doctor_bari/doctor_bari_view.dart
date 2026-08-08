@@ -272,18 +272,18 @@ class _DoctorBariViewState extends State<DoctorBariView> {
             Stack(
               children: [
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(14),
                   child: Image.network(
                     doctor.imageUrl,
-                    width: 80,
-                    height: 80,
+                    width: 90,
+                    height: 90,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
-                        width: 80,
-                        height: 80,
+                        width: 90,
+                        height: 90,
                         color: const Color(0xFFE2E8F0),
-                        child: const Icon(Icons.person, color: Color(0xFF94A3B8), size: 40),
+                        child: const Icon(Icons.person, color: Color(0xFF94A3B8), size: 45),
                       );
                     },
                   ),
@@ -292,12 +292,19 @@ class _DoctorBariViewState extends State<DoctorBariView> {
                   top: 4,
                   right: 4,
                   child: Container(
-                    width: 12,
-                    height: 12,
+                    width: 14,
+                    height: 14,
                     decoration: BoxDecoration(
                       color: doctor.isAvailableToday ? const Color(0xFF10B981) : const Color(0xFF94A3B8),
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
+                      border: Border.all(color: Colors.white, width: 2.5),
+                      boxShadow: [
+                        BoxShadow(
+                          color: (doctor.isAvailableToday ? const Color(0xFF10B981) : Colors.black)
+                              .withValues(alpha: 0.3),
+                          blurRadius: 4,
+                        ),
+                      ],
                     ),
                   ),
                 ),

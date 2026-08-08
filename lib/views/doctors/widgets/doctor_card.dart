@@ -16,7 +16,7 @@ class DoctorCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 14),
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
@@ -36,24 +36,25 @@ class DoctorCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.all(14.0),
+            padding: const EdgeInsets.all(12.0),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Doctor Image Avatar with Active Status Indicator
+                // Doctor Image Avatar with Active Status Indicator Dot
                 Stack(
                   children: [
                     ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(14),
                       child: Image.network(
                         doctor.imageUrl,
-                        width: 80,
-                        height: 80,
+                        width: 90,
+                        height: 90,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) => Container(
-                          width: 80,
-                          height: 80,
+                          width: 90,
+                          height: 90,
                           color: AppColors.primaryLight.withValues(alpha: 0.2),
-                          child: const Icon(Icons.person, color: AppColors.primary, size: 40),
+                          child: const Icon(Icons.person, color: AppColors.primary, size: 45),
                         ),
                       ),
                     ),
@@ -61,12 +62,19 @@ class DoctorCard extends StatelessWidget {
                       top: 4,
                       right: 4,
                       child: Container(
-                        width: 12,
-                        height: 12,
+                        width: 14,
+                        height: 14,
                         decoration: BoxDecoration(
                           color: doctor.isAvailableToday ? const Color(0xFF10B981) : const Color(0xFF94A3B8),
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2),
+                          border: Border.all(color: Colors.white, width: 2.5),
+                          boxShadow: [
+                            BoxShadow(
+                              color: (doctor.isAvailableToday ? const Color(0xFF10B981) : Colors.black)
+                                  .withValues(alpha: 0.3),
+                              blurRadius: 4,
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -78,54 +86,27 @@ class DoctorCard extends StatelessWidget {
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(doctor.name, style: AppTextStyles.heading3),
-                      const SizedBox(height: 2),
+                      Text(
+                        doctor.name,
+                        style: AppTextStyles.heading3,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 3),
                       Text(
                         doctor.degree,
                         style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 3),
                       Text(
                         doctor.hospital,
                         style: AppTextStyles.bodyMedium.copyWith(fontSize: 12),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 6),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: doctor.isAvailableToday
-                              ? const Color(0xFF10B981).withValues(alpha: 0.1)
-                              : const Color(0xFF94A3B8).withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(
-                            color: doctor.isAvailableToday ? const Color(0xFF10B981) : const Color(0xFF94A3B8),
-                            width: 0.8,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.circle,
-                              size: 6,
-                              color: doctor.isAvailableToday ? const Color(0xFF10B981) : const Color(0xFF94A3B8),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              doctor.isAvailableToday ? 'আজকে এভেলেবল' : 'চেম্বার বন্ধ',
-                              style: TextStyle(
-                                color: doctor.isAvailableToday ? const Color(0xFF059669) : const Color(0xFF64748B),
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
                       ),
                       const SizedBox(height: 8),
                       Row(
