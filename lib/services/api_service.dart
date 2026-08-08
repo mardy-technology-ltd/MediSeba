@@ -1,13 +1,35 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../models/doctor_model.dart';
 import '../models/appointment_model.dart';
+import 'cache_service.dart';
 
 class ApiService {
   static const String doctorsEndpoint = 'https://mediseba-web.vercel.app/api/v1/doctors';
+  static const String _doctorsCacheKey = 'doctors_list';
+  static const Duration _cacheTTL = Duration(minutes: 15);
 
-  static Future<List<DoctorModel>> getDoctors() async {
+  static Future<List<DoctorModel>> getDoctors({bool forceRefresh = false}) async {
+    // 1. Check local Hive cache if forceRefresh is false
+    if (!forceRefresh && !CacheService.isExpired(_doctorsCacheKey, _cacheTTL)) {
+      final cachedData = CacheService.get(_doctorsCacheKey);
+      if (cachedData is List && cachedData.isNotEmpty) {
+        try {
+          final doctors = cachedData
+              .map((item) => DoctorModel.fromJson(Map<String, dynamic>.from(item as Map)))
+              .toList();
+          debugPrint('Loaded ${doctors.length} doctors from Hive cache.');
+          return doctors;
+        } catch (e) {
+          debugPrint('Error parsing Hive cached doctors: $e');
+        }
+      }
+    }
+
+    // 2. Fetch fresh data from API
     try {
+      debugPrint('Fetching doctors from network API...');
       final response = await http.get(
         Uri.parse(doctorsEndpoint),
         headers: {
@@ -21,14 +43,32 @@ class ApiService {
         if (body['success'] == true && body['data'] is List) {
           final List<dynamic> list = body['data'];
           final doctors = list.map((item) => DoctorModel.fromJson(item as Map<String, dynamic>)).toList();
-          if (doctors.isNotEmpty) return doctors;
+          if (doctors.isNotEmpty) {
+            // Save to Hive cache
+            await CacheService.put(_doctorsCacheKey, list);
+            debugPrint('Successfully fetched & cached ${doctors.length} doctors to Hive.');
+            return doctors;
+          }
         }
       }
-      return getSampleDoctors();
     } catch (e) {
-      print('ApiService.getDoctors exception: $e. Falling back to sample doctors.');
-      return getSampleDoctors();
+      debugPrint('ApiService.getDoctors exception: $e.');
     }
+
+    // 3. Network failed: Fallback to existing Hive cache if available
+    final fallbackCache = CacheService.get(_doctorsCacheKey);
+    if (fallbackCache is List && fallbackCache.isNotEmpty) {
+      try {
+        final doctors = fallbackCache
+            .map((item) => DoctorModel.fromJson(Map<String, dynamic>.from(item as Map)))
+            .toList();
+        debugPrint('Fallback: Loaded ${doctors.length} doctors from Hive cache.');
+        return doctors;
+      } catch (_) {}
+    }
+
+    // 4. Default fallback sample doctors
+    return getSampleDoctors();
   }
 
   // Mock Data for Doctors

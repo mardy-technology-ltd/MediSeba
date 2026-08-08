@@ -20,13 +20,13 @@ class DoctorController extends ChangeNotifier {
     fetchDoctors();
   }
 
-  Future<void> fetchDoctors() async {
+  Future<void> fetchDoctors({bool forceRefresh = false}) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      _allDoctors = await ApiService.getDoctors();
+      _allDoctors = await ApiService.getDoctors(forceRefresh: forceRefresh);
       _applyFilters();
     } catch (e) {
       _errorMessage = 'নেটওয়ার্ক ত্রুটি: $e';
