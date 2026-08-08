@@ -14,6 +14,7 @@ import '../offers/offer_list_view.dart';
 import '../hospitals/hospital_list_view.dart';
 import '../more/more_menu_view.dart';
 import '../profile/profile_view.dart';
+import '../medishop/medishop_view.dart';
 
 class HomeView extends StatefulWidget {
   final HomeController homeController;
@@ -313,7 +314,10 @@ class _HomeViewState extends State<HomeView> {
         iconBg: const Color(0xFFFFEBEE),
         borderColor: const Color(0xFFFFCDD2),
         imagePath: 'assets/images/medishop.png',
-        onTap: () {},
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const MediShopView()),
+        ),
       ),
       _CategoryItem(
         label: 'রক্তসেবা',

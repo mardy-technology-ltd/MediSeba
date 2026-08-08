@@ -4,13 +4,16 @@ import 'package:http/http.dart' as http;
 import '../models/doctor_model.dart';
 import '../models/doctor_availability_model.dart';
 import '../models/appointment_model.dart';
+import '../models/medicine_model.dart';
 import 'cache_service.dart';
 
 class ApiService {
   static const String doctorsEndpoint = 'https://mediseba-web.vercel.app/api/v1/doctors';
   static const String availabilitiesEndpoint = 'https://mediseba-web.vercel.app/api/v1/availabilities';
+  static const String medicinesEndpoint = 'https://mediseba-web.vercel.app/api/v1/search-medicines?q=';
   static const String _doctorsCacheKey = 'doctors_list';
   static const String _availabilitiesCacheKey = 'availabilities_list';
+  static const String _medicinesCacheKey = 'medicines_list';
   static const Duration _cacheTTL = Duration(minutes: 15);
 
   /// Fetch all doctor availabilities with Hive caching
@@ -232,5 +235,70 @@ class ApiService {
         fee: 700,
       ),
     ];
+  }
+
+  /// Search or fetch database medicines with Hive caching
+  static Future<List<MedicineModel>> searchMedicines({String query = '', bool forceRefresh = false}) async {
+    final cleanQuery = query.trim();
+    final cacheKey = cleanQuery.isEmpty ? _medicinesCacheKey : '${_medicinesCacheKey}_$cleanQuery';
+
+    // 1. Check local Hive cache
+    if (!forceRefresh && !CacheService.isExpired(cacheKey, _cacheTTL)) {
+      final cachedData = CacheService.get(cacheKey);
+      if (cachedData is List && cachedData.isNotEmpty) {
+        try {
+          final items = cachedData
+              .map((item) => MedicineModel.fromJson(Map<String, dynamic>.from(item as Map)))
+              .toList();
+          debugPrint('Loaded ${items.length} medicines from Hive cache.');
+          return items;
+        } catch (e) {
+          debugPrint('Error parsing Hive cached medicines: $e');
+        }
+      }
+    }
+
+    // 2. Fetch fresh data from network API
+    try {
+      final encodedQuery = Uri.encodeComponent(cleanQuery);
+      final url = '$medicinesEndpoint$encodedQuery';
+      debugPrint('Fetching medicines from network API: $url');
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'MediSebaApp/1.0',
+        },
+      ).timeout(const Duration(seconds: 6));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> body = jsonDecode(response.body);
+        if (body['success'] == true && body['data'] is List) {
+          final List<dynamic> list = body['data'];
+          final items = list.map((item) => MedicineModel.fromJson(item as Map<String, dynamic>)).toList();
+          if (items.isNotEmpty) {
+            await CacheService.put(cacheKey, list);
+            debugPrint('Successfully fetched & cached ${items.length} medicines to Hive.');
+            return items;
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('ApiService.searchMedicines exception: $e');
+    }
+
+    // 3. Fallback to existing Hive cache if network fails
+    final fallbackCache = CacheService.get(cacheKey);
+    if (fallbackCache is List && fallbackCache.isNotEmpty) {
+      try {
+        final items = fallbackCache
+            .map((item) => MedicineModel.fromJson(Map<String, dynamic>.from(item as Map)))
+            .toList();
+        debugPrint('Fallback: Loaded ${items.length} medicines from Hive cache.');
+        return items;
+      } catch (_) {}
+    }
+
+    return [];
   }
 }
