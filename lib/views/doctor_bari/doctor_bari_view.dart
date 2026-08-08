@@ -268,23 +268,40 @@ class _DoctorBariViewState extends State<DoctorBariView> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Doctor Image
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                doctor.imageUrl,
-                width: 80,
-                height: 80,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
+            // Doctor Image with Active Status Indicator
+            Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.network(
+                    doctor.imageUrl,
                     width: 80,
                     height: 80,
-                    color: const Color(0xFFE2E8F0),
-                    child: const Icon(Icons.person, color: Color(0xFF94A3B8), size: 40),
-                  );
-                },
-              ),
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        width: 80,
+                        height: 80,
+                        color: const Color(0xFFE2E8F0),
+                        child: const Icon(Icons.person, color: Color(0xFF94A3B8), size: 40),
+                      );
+                    },
+                  ),
+                ),
+                Positioned(
+                  top: 4,
+                  right: 4,
+                  child: Container(
+                    width: 12,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: doctor.isAvailableToday ? const Color(0xFF10B981) : const Color(0xFF94A3B8),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2),
+                    ),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(width: 16),
             
