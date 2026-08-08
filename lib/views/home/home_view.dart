@@ -13,6 +13,7 @@ import '../blood_service/rokto_seba_view.dart';
 import '../offers/offer_list_view.dart';
 import '../hospitals/hospital_list_view.dart';
 import '../more/more_menu_view.dart';
+import '../profile/profile_view.dart';
 
 class HomeView extends StatefulWidget {
   final HomeController homeController;
@@ -81,7 +82,16 @@ class _HomeViewState extends State<HomeView> {
 
               return GestureDetector(
                 onTap: () {
-                  setState(() => _currentBottomNavIndex = 4);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProfileView(
+                        authController: widget.authController,
+                        homeController: widget.homeController,
+                        showAppBarLeading: true,
+                      ),
+                    ),
+                  );
                 },
                 child: Container(
                   height: 34,
