@@ -608,65 +608,65 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
                   Icon(icon, color: const Color(0xFF0F9D58), size: 22),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: Row(
-                      children: [
-                        Flexible(
-                          child: Text(
-                            title,
-                            style: const TextStyle(
-                              fontSize: 14.5,
-                              fontWeight: FontWeight.w800,
-                              color: Color(0xFF0F172A),
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-
-                        // Item Count Badge
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: isExpanded ? const Color(0xFFDCFCE7) : const Color(0xFFF1F5F9),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: isExpanded ? const Color(0xFF86EFAC) : const Color(0xFFCBD5E1),
-                            ),
-                          ),
-                          child: Text(
-                            '$itemCount',
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                              color: isExpanded ? const Color(0xFF16A34A) : const Color(0xFF475569),
-                            ),
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF0F172A),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   const SizedBox(width: 8),
 
-                  // Animated Down Arrow (▼ / ▲) Indicator Icon
-                  AnimatedRotation(
-                    turns: isExpanded ? 0.5 : 0.0,
-                    duration: const Duration(milliseconds: 220),
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: isExpanded ? const Color(0xFFE6F4EA) : const Color(0xFFF8FAFC),
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: isExpanded ? const Color(0xFF86EFAC) : const Color(0xFFE2E8F0),
+                  // Right-Aligned Trailing Group: Count Badge + Down Arrow
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Item Count Badge
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: isExpanded ? const Color(0xFFDCFCE7) : const Color(0xFFF1F5F9),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isExpanded ? const Color(0xFF86EFAC) : const Color(0xFFCBD5E1),
+                          ),
+                        ),
+                        child: Text(
+                          '$itemCount',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: isExpanded ? const Color(0xFF16A34A) : const Color(0xFF475569),
+                          ),
                         ),
                       ),
-                      child: Icon(
-                        Icons.keyboard_arrow_down_rounded,
-                        color: isExpanded ? const Color(0xFF0F9D58) : const Color(0xFF64748B),
-                        size: 20,
+                      const SizedBox(width: 8),
+
+                      // Animated Down Arrow (▼ / ▲) Indicator Icon
+                      AnimatedRotation(
+                        turns: isExpanded ? 0.5 : 0.0,
+                        duration: const Duration(milliseconds: 220),
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: isExpanded ? const Color(0xFFE6F4EA) : const Color(0xFFF8FAFC),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: isExpanded ? const Color(0xFF86EFAC) : const Color(0xFFE2E8F0),
+                            ),
+                          ),
+                          child: Icon(
+                            Icons.keyboard_arrow_down_rounded,
+                            color: isExpanded ? const Color(0xFF0F9D58) : const Color(0xFF64748B),
+                            size: 20,
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ],
               ),
