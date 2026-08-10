@@ -3,7 +3,7 @@ import '../../controllers/auth_controller.dart';
 import '../../controllers/home_controller.dart';
 import '../../controllers/language_controller.dart';
 import '../../services/cache_service.dart';
-import '../home/home_view.dart';
+import '../auth/login_view.dart';
 
 class OnboardingView extends StatefulWidget {
   final HomeController homeController;
@@ -30,10 +30,9 @@ class _OnboardingViewState extends State<OnboardingView> {
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => HomeView(
+        pageBuilder: (context, animation, secondaryAnimation) => LoginView(
           homeController: widget.homeController,
           authController: widget.authController,
-          languageController: widget.languageController,
         ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(opacity: animation, child: child);
