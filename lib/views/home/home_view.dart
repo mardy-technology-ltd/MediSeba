@@ -15,6 +15,7 @@ import '../hospitals/hospital_list_view.dart';
 import '../../controllers/language_controller.dart';
 import '../more/more_menu_view.dart';
 import '../profile/profile_view.dart';
+import '../patient_portal/patient_portal_view.dart';
 import '../medishop/medishop_view.dart';
 
 class HomeView extends StatefulWidget {
@@ -1061,9 +1062,19 @@ class _HomeViewState extends State<HomeView> {
                 padding: const EdgeInsets.symmetric(horizontal: 12.0),
                 children: [
                   _buildBkashMenuItem(
-                    icon: Icons.home_outlined,
-                    title: isBangla ? 'হোম' : 'Home',
-                    onTap: () => Navigator.pop(context),
+                    icon: Icons.assignment_ind_outlined,
+                    title: isBangla ? 'পেশেন্ট পোর্টাল' : 'Patient Portal',
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => PatientPortalView(
+                            languageController: _langController,
+                          ),
+                        ),
+                      );
+                    },
                   ),
                   _buildBkashMenuItem(
                     icon: Icons.video_call_outlined,
