@@ -107,29 +107,13 @@ class _LoginViewState extends State<LoginView> {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: Colors.white,
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 24.0),
-            child: Container(
-              padding: const EdgeInsets.all(20.0),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 20,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
                   const SizedBox(height: 8),
 
                   // MediSeba Logo Image
@@ -399,14 +383,12 @@ class _LoginViewState extends State<LoginView> {
                     ],
                   ),
 
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 12),
                 ],
               ),
             ),
           ),
-        ),
-      ),
-    );
+        );
   }
 
   // Web Style Segmented Role Selector Pill
