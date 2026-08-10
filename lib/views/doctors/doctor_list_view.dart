@@ -4,8 +4,9 @@ import '../../constants/app_text_styles.dart';
 import '../../constants/app_constants.dart';
 import '../../controllers/doctor_controller.dart';
 import '../../controllers/language_controller.dart';
+import '../appointments/book_appointment_view.dart';
+import '../payment/payment_view.dart';
 import 'widgets/doctor_card.dart';
-import 'doctor_detail_view.dart';
 
 class DoctorListView extends StatefulWidget {
   final bool showAppBar;
@@ -188,12 +189,21 @@ class _DoctorListViewState extends State<DoctorListView> {
                       return DoctorCard(
                         doctor: doctor,
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DoctorDetailView(doctor: doctor),
-                            ),
-                          );
+                          if (doctor.isAvailableToday) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PaymentView(doctor: doctor),
+                              ),
+                            );
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => BookAppointmentView(doctor: doctor),
+                              ),
+                            );
+                          }
                         },
                       );
                     },

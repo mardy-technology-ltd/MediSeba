@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../controllers/doctor_controller.dart';
-import '../../models/doctor_model.dart';
 import '../../controllers/language_controller.dart';
-import 'doctor_details_view.dart';
+import '../appointments/book_appointment_view.dart';
+import '../payment/payment_view.dart';
+import '../doctors/widgets/doctor_card.dart';
 
 class DoctorBariView extends StatefulWidget {
   final LanguageController? languageController;
@@ -194,7 +195,26 @@ class _DoctorBariViewState extends State<DoctorBariView> {
                         itemCount: _doctorController.doctors.length,
                         itemBuilder: (context, index) {
                           final doctor = _doctorController.doctors[index];
-                          return _buildDoctorCard(doctor);
+                          return DoctorCard(
+                            doctor: doctor,
+                            onTap: () {
+                              if (doctor.isAvailableToday) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PaymentView(doctor: doctor),
+                                  ),
+                                );
+                              } else {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => BookAppointmentView(doctor: doctor),
+                                  ),
+                                );
+                              }
+                            },
+                          );
                         },
                       ),
                     );
@@ -234,200 +254,6 @@ class _DoctorBariViewState extends State<DoctorBariView> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildDoctorCard(DoctorModel doctor) {
-    final bool isPremium = doctor.rating >= 4.8;
-    final bool isMediSeba = doctor.isAvailableToday;
-
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => DoctorDetailsView(
-              name: doctor.name,
-              specialty: doctor.degree.isNotEmpty ? '${doctor.degree} • ${doctor.specialty}' : doctor.specialty,
-              hospital: doctor.hospital,
-              rating: doctor.rating.toString(),
-              reviews: '(${doctor.totalReviews})',
-              price: '৳${doctor.consultationFee.toInt()}',
-              imageUrl: doctor.imageUrl,
-              isPremium: isPremium,
-              isMediSeba: isMediSeba,
-            ),
-          ),
-        );
-      },
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Doctor Image with Active Status Indicator
-            Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(14),
-                  child: Image.network(
-                    doctor.imageUrl,
-                    width: 90,
-                    height: 90,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        width: 90,
-                        height: 90,
-                        color: const Color(0xFFE2E8F0),
-                        child: const Icon(Icons.person, color: Color(0xFF94A3B8), size: 45),
-                      );
-                    },
-                  ),
-                ),
-                Positioned(
-                  top: 4,
-                  right: 4,
-                  child: Container(
-                    width: 14,
-                    height: 14,
-                    decoration: BoxDecoration(
-                      color: doctor.isAvailableToday ? const Color(0xFF10B981) : const Color(0xFF94A3B8),
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2.5),
-                      boxShadow: [
-                        BoxShadow(
-                          color: (doctor.isAvailableToday ? const Color(0xFF10B981) : Colors.black)
-                              .withValues(alpha: 0.3),
-                          blurRadius: 4,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(width: 16),
-            
-            // Doctor Details
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          doctor.name,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF1E293B),
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      if (isPremium || isMediSeba) ...[
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: isPremium ? const Color(0xFFFEF3C7) : const Color(0xFFD1FAE5),
-                            borderRadius: BorderRadius.circular(4),
-                            border: Border.all(
-                              color: isPremium ? const Color(0xFFF59E0B) : const Color(0xFF10B981),
-                            ),
-                          ),
-                          child: Text(
-                            isPremium ? 'Premium' : 'MediSeba',
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                              color: isPremium ? const Color(0xFFD97706) : const Color(0xFF047857),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    doctor.degree.isNotEmpty ? '${doctor.degree} • ${doctor.specialty}' : doctor.specialty,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFF64748B),
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    doctor.hospital,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFF94A3B8),
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.star_rounded, color: Color(0xFFF59E0B), size: 18),
-                          const SizedBox(width: 4),
-                          Text(
-                            doctor.rating.toString(),
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF1E293B),
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '(${doctor.totalReviews})',
-                            style: const TextStyle(
-                              fontSize: 13,
-                              color: Color(0xFF94A3B8),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Text(
-                        '৳${doctor.consultationFee.toInt()}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF0F9D58),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
