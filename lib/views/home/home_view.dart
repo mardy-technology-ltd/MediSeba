@@ -306,117 +306,175 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  // Category Grid — Modern Service Cards with Bilingual Labels
+  // Category Grid — Service Cards Matched to Reference Layout with Original Logos
   Widget _buildCategoryGrid() {
     final lang = _langController;
 
     final categories = [
       _CategoryItem(
-        label: lang.tr('ডাক্তার সিরিয়াল', 'Doctor Serial'),
-        icon: Icons.schedule_rounded,
-        iconColor: const Color(0xFFE53935),
-        iconBg: const Color(0xFFFFEBEE),
-        borderColor: const Color(0xFFFFCDD2),
-        imagePath: 'assets/images/dr_serial.png',
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => DoctorListView(languageController: _langController)),
+        title: lang.tr('ডাক্তার ঘর (টেলিমেডিসিন)', 'Doctor Bari (Telemedicine)'),
+        subtitle: lang.tr(
+          'অনলাইন ভিডিও কনসালটেশন ও সরাসরি ডাক্তারের পরামর্শ।',
+          'Online video consultation & direct doctor advice.',
         ),
-      ),
-      _CategoryItem(
-        label: lang.tr('ডাক্তার ঘর', 'Doctor Bari'),
-        icon: Icons.house_rounded,
+        actionText: lang.tr('সেবা গ্রহণ করুন', 'Get Service'),
+        icon: Icons.monitor_heart_outlined,
         iconColor: const Color(0xFF0F9D58),
         iconBg: const Color(0xFFE8F5E9),
         borderColor: const Color(0xFFC8E6C9),
         imagePath: 'assets/images/dr_ghor.png',
         onTap: () => Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => DoctorBariView(languageController: _langController)),
+          MaterialPageRoute(
+            builder: (_) => DoctorBariView(languageController: _langController),
+          ),
         ),
       ),
       _CategoryItem(
-        label: lang.tr('মেডিশপ', 'MediShop'),
-        icon: Icons.local_pharmacy_rounded,
-        iconColor: const Color(0xFFE53935),
-        iconBg: const Color(0xFFFFEBEE),
-        borderColor: const Color(0xFFFFCDD2),
+        title: lang.tr(
+          'ডাক্তার সিরিয়াল (চেম্বার সিরিয়াল)',
+          'Doctor Serial (Chamber Serial)',
+        ),
+        subtitle: lang.tr(
+          'দেশের প্রখ্যাত প্রফেশনাল বিশেষজ্ঞদের চেম্বার সিরিয়াল বুকিং।',
+          'Chamber serial booking of renowned professional specialists.',
+        ),
+        actionText: lang.tr('সেবা গ্রহণ করুন', 'Get Service'),
+        icon: Icons.calendar_month_outlined,
+        iconColor: const Color(0xFF0288D1),
+        iconBg: const Color(0xFFE1F5FE),
+        borderColor: const Color(0xFF81D4FA),
+        imagePath: 'assets/images/dr_serial.png',
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => DoctorListView(languageController: _langController),
+          ),
+        ),
+      ),
+      _CategoryItem(
+        title: lang.tr('মেডিশপ', 'MediShop'),
+        subtitle: lang.tr(
+          'ঘরে বসেই ৮২,০০০+ অরিজিনাল ওষুধ অর্ডার করুন।',
+          'Order 82,000+ original medicines sitting at home.',
+        ),
+        actionText: lang.tr('সেবা গ্রহণ করুন', 'Get Service'),
+        icon: Icons.medication_outlined,
+        iconColor: const Color(0xFF00796B),
+        iconBg: const Color(0xFFE0F2F1),
+        borderColor: const Color(0xFF80CBC4),
         imagePath: 'assets/images/medishop.png',
         onTap: () => Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => MediShopView(languageController: _langController)),
+          MaterialPageRoute(
+            builder: (_) => MediShopView(languageController: _langController),
+          ),
         ),
       ),
       _CategoryItem(
-        label: lang.tr('রক্তসেবা', 'Blood Service'),
-        icon: Icons.bloodtype_rounded,
-        iconColor: const Color(0xFFE53935),
+        title: lang.tr('রক্তসেবা', 'Blood Service'),
+        subtitle: lang.tr(
+          'জরুরি রক্তদাতা ও রক্তসেবা দ্রুত খুঁজে নিন।',
+          'Find emergency blood donors & blood services quickly.',
+        ),
+        actionText: lang.tr('সেবা গ্রহণ করুন', 'Get Service'),
+        icon: Icons.water_drop_outlined,
+        iconColor: const Color(0xFFED1C24),
         iconBg: const Color(0xFFFFEBEE),
         borderColor: const Color(0xFFFFCDD2),
         imagePath: 'assets/images/roktoseba.png',
         onTap: () => Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => RoktoSebaView(languageController: _langController)),
+          MaterialPageRoute(
+            builder: (_) => RoktoSebaView(languageController: _langController),
+          ),
         ),
       ),
       _CategoryItem(
-        label: lang.tr('ডিসকাউন্ট অফার', 'Discount Offers'),
-        icon: Icons.local_offer_rounded,
+        title: lang.tr('অ্যাম্বুলেন্স', 'Ambulance'),
+        subtitle: lang.tr(
+          '২৪/৭ জরুরি অ্যাম্বুলেন্স সেবা এখন এক কলেই।',
+          '24/7 emergency ambulance service now in one call.',
+        ),
+        actionText: lang.tr('সেবা গ্রহণ করুন', 'Get Service'),
+        icon: Icons.airport_shuttle_outlined,
         iconColor: const Color(0xFF1565C0),
         iconBg: const Color(0xFFE3F2FD),
-        borderColor: const Color(0xFFBBDEFB),
-        imagePath: 'assets/images/discount_offer.png',
-        onTap: () {},
-      ),
-      _CategoryItem(
-        label: lang.tr('অ্যাম্বুলেন্স সেবা', 'Ambulance Service'),
-        icon: Icons.airport_shuttle_rounded,
-        iconColor: const Color(0xFF0F9D58),
-        iconBg: const Color(0xFFE8F5E9),
-        borderColor: const Color(0xFFC8E6C9),
+        borderColor: const Color(0xFF90CAF9),
         imagePath: 'assets/images/ambulance_seba.png',
-        onTap: () {},
+        onTap: () => showHelplineBottomSheet(context),
       ),
       _CategoryItem(
-        label: lang.tr('মাতৃসেবা', 'Maternal Care'),
-        icon: Icons.pregnant_woman_rounded,
-        iconColor: const Color(0xFFAD1457),
+        title: lang.tr('মাতৃসেবা', 'Maternal Care'),
+        subtitle: lang.tr(
+          'মা ও শিশুর জন্য বিশেষ স্বাস্থ্যসেবা ও পরামর্শ।',
+          'Special healthcare & consultation for mother and child.',
+        ),
+        actionText: lang.tr('সেবা গ্রহণ করুন', 'Get Service'),
+        icon: Icons.child_care_outlined,
+        iconColor: const Color(0xFFE91E63),
         iconBg: const Color(0xFFFCE4EC),
-        borderColor: const Color(0xFFF8BBD0),
+        borderColor: const Color(0xFFF48FB1),
         imagePath: 'assets/images/matriseba.png',
-        onTap: () {},
+        onTap: () => showHelplineBottomSheet(context),
       ),
       _CategoryItem(
-        label: lang.tr('কাস্টমার সাপোর্ট', 'Customer Support'),
-        icon: Icons.headset_mic_rounded,
-        iconColor: const Color(0xFF1565C0),
-        iconBg: const Color(0xFFE3F2FD),
-        borderColor: const Color(0xFFBBDEFB),
+        title: lang.tr('ডিসকাউন্ট অফার', 'Discount Offers'),
+        subtitle: lang.tr(
+          'হাসপাতাল ও ডায়াগনস্টিক টেস্টে ৪০% পর্যন্ত ছাড়।',
+          'Up to 40% discount on hospital & diagnostic tests.',
+        ),
+        actionText: lang.tr('সেবা গ্রহণ করুন', 'Get Service'),
+        icon: Icons.percent_rounded,
+        iconColor: const Color(0xFFEF6C00),
+        iconBg: const Color(0xFFFFE0B2),
+        borderColor: const Color(0xFFFFCC80),
+        imagePath: 'assets/images/discount_offer.png',
+        onTap: () {
+          setState(() {
+            _currentBottomNavIndex = 1;
+          });
+        },
+      ),
+      _CategoryItem(
+        title: lang.tr('কাস্টমার সাপোর্ট', 'Customer Support'),
+        subtitle: lang.tr(
+          '২৪/৭ কাস্টমার সাপোর্ট টিম আপনার পাশে রয়েছে।',
+          '24/7 customer support team is by your side.',
+        ),
+        actionText: lang.tr('সেবা গ্রহণ করুন', 'Get Service'),
+        icon: Icons.headset_mic_outlined,
+        iconColor: const Color(0xFF5E35B1),
+        iconBg: const Color(0xFFEDE7F6),
+        borderColor: const Color(0xFFB39DDB),
         imagePath: 'assets/images/customer_support.png',
-        onTap: () {},
+        onTap: () => showHelplineBottomSheet(context),
       ),
     ];
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Grid
-        GridView.builder(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final screenWidth = constraints.maxWidth;
+        final crossAxisCount = screenWidth > 600 ? 4 : 2;
+
+        return GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            childAspectRatio: 1.6,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            childAspectRatio: screenWidth > 600
+                ? 1.1
+                : (screenWidth < 360 ? 0.76 : 0.84),
           ),
           itemCount: categories.length,
           itemBuilder: (context, index) {
             final item = categories[index];
             return _buildServiceCard(item);
           },
-        ),
-      ],
+        );
+      },
     );
   }
 
@@ -424,61 +482,118 @@ class _HomeViewState extends State<HomeView> {
     return GestureDetector(
       onTap: item.onTap,
       child: Container(
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(color: item.borderColor, width: 1.2),
           boxShadow: [
             BoxShadow(
-              color: item.iconColor.withValues(alpha: 0.08),
+              color: item.iconColor.withValues(alpha: 0.06),
               blurRadius: 10,
               offset: const Offset(0, 3),
             ),
           ],
         ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Image or Icon placeholder
-            item.imagePath != null
-                ? SizedBox(
-                    width: 64,
-                    height: 64,
-                    child: Image.asset(
-                      item.imagePath!,
-                      fit: BoxFit.contain,
-                    ),
-                  )
-                : Container(
-                    width: 54,
-                    height: 54,
-                    decoration: BoxDecoration(
-                      color: item.iconBg,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Icon(
-                      item.icon,
-                      color: item.iconColor,
-                      size: 30,
-                    ),
-                  ),
-            const SizedBox(height: 2),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Top Icon / Image Box
+                item.imagePath != null
+                    ? SizedBox(
+                        width: 44,
+                        height: 44,
+                        child: Image.asset(
+                          item.imagePath!,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) => Container(
+                            width: 44,
+                            height: 44,
+                            decoration: BoxDecoration(
+                              color: item.iconColor,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(
+                              item.icon,
+                              color: Colors.white,
+                              size: 24,
+                            ),
+                          ),
+                        ),
+                      )
+                    : Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: item.iconColor,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: item.iconColor.withValues(alpha: 0.25),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          item.icon,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                      ),
+                const SizedBox(height: 10),
 
-            // Bengali Label
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 6),
-              child: Text(
-                item.label,
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: textDark,
-                  height: 1.3,
+                // Card Title
+                Text(
+                  item.title,
+                  style: const TextStyle(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF1E293B),
+                    height: 1.2,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
+                const SizedBox(height: 4),
+
+                // Subtitle / Description Text
+                Text(
+                  item.subtitle,
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFF64748B),
+                    height: 1.3,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+
+            // Bottom Action Link "সেবা গ্রহণ করুন ->"
+            Row(
+              children: [
+                Text(
+                  item.actionText,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF0F9D58),
+                  ),
+                ),
+                const SizedBox(width: 4),
+                const Icon(
+                  Icons.arrow_forward_rounded,
+                  color: Color(0xFF0F9D58),
+                  size: 14,
+                ),
+              ],
             ),
           ],
         ),
@@ -1110,7 +1225,9 @@ class _HomeViewState extends State<HomeView> {
 
 // Data class for service category items
 class _CategoryItem {
-  final String label;
+  final String title;
+  final String subtitle;
+  final String actionText;
   final IconData icon;
   final Color iconColor;
   final Color iconBg;
@@ -1119,7 +1236,9 @@ class _CategoryItem {
   final VoidCallback onTap;
 
   const _CategoryItem({
-    required this.label,
+    required this.title,
+    required this.subtitle,
+    required this.actionText,
     required this.icon,
     required this.iconColor,
     required this.iconBg,
