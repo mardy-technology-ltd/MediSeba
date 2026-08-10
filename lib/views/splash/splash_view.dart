@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import '../../controllers/home_controller.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/language_controller.dart';
-import '../../services/cache_service.dart';
-import '../auth/login_view.dart';
 import '../onboarding/onboarding_view.dart';
 
 class SplashView extends StatefulWidget {
@@ -46,21 +44,14 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
 
     _animationController.forward();
 
-    // Check if user has already seen onboarding
+    // Always show OnboardingView on app startup after splash
     Future.delayed(const Duration(milliseconds: 2500), () {
       if (mounted) {
-        final bool hasSeenOnboarding = CacheService.get('has_seen_onboarding') == true;
-
-        final Widget destinationView = hasSeenOnboarding
-            ? LoginView(
-                homeController: widget.homeController,
-                authController: widget.authController,
-              )
-            : OnboardingView(
-                homeController: widget.homeController,
-                authController: widget.authController,
-                languageController: widget.languageController,
-              );
+        final Widget destinationView = OnboardingView(
+          homeController: widget.homeController,
+          authController: widget.authController,
+          languageController: widget.languageController,
+        );
 
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
