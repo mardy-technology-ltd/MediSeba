@@ -15,12 +15,12 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
   late LanguageController _langController;
   int _selectedVitalTab = 0; // 0: BP, 1: Glucose, 2: Pulse
 
-  // Expand / Collapse state toggles for 3-item cap limit
-  bool _showAllAppointments = false;
-  bool _showAllPrescriptions = false;
-  bool _showAllReports = false;
-  bool _showAllPayments = false;
-  bool _showAllLogs = false;
+  // Expand / Collapse state toggles for Accordion Sections (All collapsed by default)
+  bool _isAppointmentsExpanded = false;
+  bool _isPrescriptionsExpanded = false;
+  bool _isReportsExpanded = false;
+  bool _isPaymentsExpanded = false;
+  bool _isLogsExpanded = false;
 
   @override
   void initState() {
@@ -109,35 +109,35 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
             // 1. Patient Profile Header Card
             _buildPatientHeaderCard(isBangla),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
 
             // 2. Live Health Vitals Tracker Card
             _buildHealthVitalsCard(isBangla),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
 
-            // 3. My Serials & Appointments Section
-            _buildSerialsAndAppointmentsSection(isBangla),
+            // 3. My Serials & Appointments Section (Collapsible Accordion)
+            _buildSerialsAndAppointmentsAccordion(isBangla),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
 
-            // 4. Digital Prescriptions Section
-            _buildDigitalPrescriptionsSection(isBangla),
+            // 4. Digital Prescriptions Section (Collapsible Accordion)
+            _buildDigitalPrescriptionsAccordion(isBangla),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
 
-            // 5. Medical Records & Lab Reports Section
-            _buildMedicalRecordsSection(isBangla),
+            // 5. Medical Records & Lab Reports Section (Collapsible Accordion)
+            _buildMedicalRecordsAccordion(isBangla),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
 
-            // 6. Payment History & Receipts Section
-            _buildPaymentHistorySection(isBangla),
+            // 6. Payment History & Receipts Section (Collapsible Accordion)
+            _buildPaymentHistoryAccordion(isBangla),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
 
-            // 7. Activity History Log Section
-            _buildActivityLogSection(isBangla),
+            // 7. Activity History Log Section (Collapsible Accordion)
+            _buildActivityLogAccordion(isBangla),
 
             const SizedBox(height: 30),
           ],
@@ -573,10 +573,130 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
     );
   }
 
-  // 3. My Serials & Appointments Section (Max 3 items cap with View All button)
-  Widget _buildSerialsAndAppointmentsSection(bool isBangla) {
-    final List<Widget> allAppointmentCards = [
-      // Card 1
+  // Generic Reusable Collapsible Accordion Section Shell
+  Widget _buildAccordionSection({
+    required IconData icon,
+    required String title,
+    required int itemCount,
+    required bool isExpanded,
+    required VoidCallback onToggle,
+    required List<Widget> children,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Header Bar (Tapping anywhere toggles collapse/expand)
+          InkWell(
+            onTap: onToggle,
+            borderRadius: BorderRadius.circular(16),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 14.0),
+              child: Row(
+                children: [
+                  Icon(icon, color: const Color(0xFF0F9D58), size: 22),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            title,
+                            style: const TextStyle(
+                              fontSize: 14.5,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF0F172A),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+
+                        // Item Count Badge
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: isExpanded ? const Color(0xFFDCFCE7) : const Color(0xFFF1F5F9),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isExpanded ? const Color(0xFF86EFAC) : const Color(0xFFCBD5E1),
+                            ),
+                          ),
+                          child: Text(
+                            '$itemCount',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              color: isExpanded ? const Color(0xFF16A34A) : const Color(0xFF475569),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+
+                  // Animated Down Arrow (▼ / ▲) Indicator Icon
+                  AnimatedRotation(
+                    turns: isExpanded ? 0.5 : 0.0,
+                    duration: const Duration(milliseconds: 220),
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: isExpanded ? const Color(0xFFE6F4EA) : const Color(0xFFF8FAFC),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: isExpanded ? const Color(0xFF86EFAC) : const Color(0xFFE2E8F0),
+                        ),
+                      ),
+                      child: Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        color: isExpanded ? const Color(0xFF0F9D58) : const Color(0xFF64748B),
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Collapsible Items List Container
+          AnimatedCrossFade(
+            firstChild: const SizedBox(width: double.infinity),
+            secondChild: Padding(
+              padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+              child: Column(
+                children: [
+                  const Divider(color: Color(0xFFF1F5F9), height: 1),
+                  const SizedBox(height: 12),
+                  ...children,
+                ],
+              ),
+            ),
+            crossFadeState: isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+            duration: const Duration(milliseconds: 250),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 3. My Serials & Appointments Accordion (Default Collapsed)
+  Widget _buildSerialsAndAppointmentsAccordion(bool isBangla) {
+    final List<Widget> items = [
       _buildAppointmentCardItem(
         serialNo: 'SERIAL-20260804-99812',
         status: 'কনফার্মড',
@@ -590,7 +710,7 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
         buttonColor: const Color(0xFF0F9D58),
         icon: Icons.confirmation_number_outlined,
       ),
-      // Card 2
+      const SizedBox(height: 10),
       _buildAppointmentCardItem(
         serialNo: 'APT-20260804-88192',
         status: 'ডাক্তার প্রস্তুত আছেন (সিরিয়াল: #১)',
@@ -602,7 +722,7 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
         buttonColor: const Color(0xFFED1C24),
         icon: Icons.videocam_rounded,
       ),
-      // Card 3
+      const SizedBox(height: 10),
       _buildAppointmentCardItem(
         serialNo: 'SERIAL-20260802-77123',
         status: 'কনফার্মড',
@@ -616,7 +736,7 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
         buttonColor: const Color(0xFF0F9D58),
         icon: Icons.confirmation_number_outlined,
       ),
-      // Card 4 (Extra item to test max 3 limit)
+      const SizedBox(height: 10),
       _buildAppointmentCardItem(
         serialNo: 'APT-20260801-66512',
         status: 'সম্পন্ন',
@@ -630,56 +750,17 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
       ),
     ];
 
-    final int totalCount = allAppointmentCards.length;
-    final displayedCards = _showAllAppointments
-        ? allAppointmentCards
-        : allAppointmentCards.take(3).toList();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Header with dynamic count
-        Row(
-          children: [
-            const Icon(Icons.calendar_month_rounded, color: Color(0xFF0F9D58), size: 20),
-            const SizedBox(width: 6),
-            Expanded(
-              child: Text(
-                isBangla
-                    ? 'আমার সিরিয়াল ও অ্যাপয়েন্টমেন্ট ($totalCount)'
-                    : 'My Serials & Appointments ($totalCount)',
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w800,
-                  color: Color(0xFF0F172A),
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-
-        // List items
-        ...displayedCards.map((card) => Padding(
-              padding: const EdgeInsets.only(bottom: 10.0),
-              child: card,
-            )),
-
-        // View All / Show Less Button if > 3 items
-        if (totalCount > 3)
-          _buildViewAllButton(
-            isBangla: isBangla,
-            isExpanded: _showAllAppointments,
-            totalItems: totalCount,
-            onTap: () {
-              setState(() {
-                _showAllAppointments = !_showAllAppointments;
-              });
-            },
-          ),
-      ],
+    return _buildAccordionSection(
+      icon: Icons.calendar_month_rounded,
+      title: isBangla ? 'আমার সিরিয়াল ও অ্যাপয়েন্টমেন্ট' : 'My Serials & Appointments',
+      itemCount: 4,
+      isExpanded: _isAppointmentsExpanded,
+      onToggle: () {
+        setState(() {
+          _isAppointmentsExpanded = !_isAppointmentsExpanded;
+        });
+      },
+      children: items,
     );
   }
 
@@ -697,18 +778,11 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
     required IconData icon,
   }) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFF1F5F9)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -757,27 +831,27 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
           const SizedBox(height: 8),
           Text(
             doctorName,
-            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
+            style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
           ),
           const SizedBox(height: 3),
           Text(
             specialty,
-            style: const TextStyle(fontSize: 12, color: Color(0xFF475569)),
+            style: const TextStyle(fontSize: 11.5, color: Color(0xFF475569)),
           ),
           if (time != null) ...[
             const SizedBox(height: 6),
             Row(
               children: [
-                const Icon(Icons.access_time_rounded, size: 14, color: Color(0xFF0F9D58)),
+                const Icon(Icons.access_time_rounded, size: 13, color: Color(0xFF0F9D58)),
                 const SizedBox(width: 4),
                 Text(
                   time,
-                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF0F9D58)),
+                  style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: Color(0xFF0F9D58)),
                 ),
               ],
             ),
           ],
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
@@ -785,12 +859,12 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
               style: ElevatedButton.styleFrom(
                 backgroundColor: buttonColor,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                padding: const EdgeInsets.symmetric(vertical: 9),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
                 elevation: 0,
               ),
-              icon: Icon(icon, size: 16),
-              label: Text(buttonText, style: const TextStyle(fontWeight: FontWeight.bold)),
+              icon: Icon(icon, size: 15),
+              label: Text(buttonText, style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold)),
             ),
           ),
         ],
@@ -798,27 +872,30 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
     );
   }
 
-  // 4. Digital Prescriptions Section (Max 3 items cap)
-  Widget _buildDigitalPrescriptionsSection(bool isBangla) {
-    final List<Widget> allPrescriptionItems = [
+  // 4. Digital Prescriptions Accordion (Default Collapsed)
+  Widget _buildDigitalPrescriptionsAccordion(bool isBangla) {
+    final List<Widget> items = [
       _buildPrescriptionItemCard(
         rxId: 'RX-20260804-8819',
         doctorName: 'Dr. Tanvir Hasan',
         disease: 'Acute Knee Joint Inflammation',
         date: '04 Aug 2026',
       ),
+      const SizedBox(height: 8),
       _buildPrescriptionItemCard(
         rxId: 'RX-20260728-4412',
         doctorName: 'অধ্যাপক ড. এ. কে. এম. ফজলে রাব্বি',
         disease: 'Hypertension & Cardiac Care Routine',
         date: '28 Jul 2026',
       ),
+      const SizedBox(height: 8),
       _buildPrescriptionItemCard(
         rxId: 'RX-20260715-3398',
         doctorName: 'ডা. শারমিন আক্তার',
         disease: 'Antenatal Routine Medication',
         date: '15 Jul 2026',
       ),
+      const SizedBox(height: 8),
       _buildPrescriptionItemCard(
         rxId: 'RX-20260630-1102',
         doctorName: 'ডা. মোঃ আরিফুল ইসলাম',
@@ -827,55 +904,17 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
       ),
     ];
 
-    final int totalCount = allPrescriptionItems.length;
-    final displayedItems = _showAllPrescriptions
-        ? allPrescriptionItems
-        : allPrescriptionItems.take(3).toList();
-
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.description_outlined, color: Color(0xFF0F9D58), size: 20),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  isBangla ? 'ডিজিটাল প্রেসক্রিপশন ($totalCount)' : 'Digital Prescriptions ($totalCount)',
-                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-
-          ...displayedItems.map((item) => Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: item,
-              )),
-
-          if (totalCount > 3)
-            _buildViewAllButton(
-              isBangla: isBangla,
-              isExpanded: _showAllPrescriptions,
-              totalItems: totalCount,
-              onTap: () {
-                setState(() {
-                  _showAllPrescriptions = !_showAllPrescriptions;
-                });
-              },
-            ),
-        ],
-      ),
+    return _buildAccordionSection(
+      icon: Icons.description_outlined,
+      title: isBangla ? 'ডিজিটাল প্রেসক্রিপশন' : 'Digital Prescriptions',
+      itemCount: 4,
+      isExpanded: _isPrescriptionsExpanded,
+      onToggle: () {
+        setState(() {
+          _isPrescriptionsExpanded = !_isPrescriptionsExpanded;
+        });
+      },
+      children: items,
     );
   }
 
@@ -952,9 +991,9 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
     );
   }
 
-  // 5. Medical Records & Lab Reports Section (Max 3 items cap)
-  Widget _buildMedicalRecordsSection(bool isBangla) {
-    final List<Widget> allReports = [
+  // 5. Medical Records Accordion (Default Collapsed)
+  Widget _buildMedicalRecordsAccordion(bool isBangla) {
+    final List<Widget> items = [
       _buildLabReportItem(
         category: 'Blood Test',
         title: 'CBC & Blood Sugar Lab Report',
@@ -963,6 +1002,7 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
         bgColor: const Color(0xFFE0F2FE),
         textColor: const Color(0xFF0284C7),
       ),
+      const SizedBox(height: 8),
       _buildLabReportItem(
         category: 'X-Ray',
         title: 'Chest X-Ray Digital Scan',
@@ -971,6 +1011,7 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
         bgColor: const Color(0xFFF3E8FF),
         textColor: const Color(0xFF7E22CE),
       ),
+      const SizedBox(height: 8),
       _buildLabReportItem(
         category: 'ECG Test',
         title: 'Cardiac Rhythm & ECG Report',
@@ -979,6 +1020,7 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
         bgColor: const Color(0xFFDCFCE7),
         textColor: const Color(0xFF16A34A),
       ),
+      const SizedBox(height: 8),
       _buildLabReportItem(
         category: 'Ultrasound',
         title: 'USG Abdomen Scan Report',
@@ -989,55 +1031,17 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
       ),
     ];
 
-    final int totalCount = allReports.length;
-    final displayedReports = _showAllReports
-        ? allReports
-        : allReports.take(3).toList();
-
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.folder_shared_outlined, color: Color(0xFF0F9D58), size: 20),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  isBangla ? 'মেডিকেল রেকর্ডস & ল্যাব রিপোর্টস ($totalCount)' : 'Lab Reports ($totalCount)',
-                  style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-
-          ...displayedReports.map((report) => Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: report,
-              )),
-
-          if (totalCount > 3)
-            _buildViewAllButton(
-              isBangla: isBangla,
-              isExpanded: _showAllReports,
-              totalItems: totalCount,
-              onTap: () {
-                setState(() {
-                  _showAllReports = !_showAllReports;
-                });
-              },
-            ),
-        ],
-      ),
+    return _buildAccordionSection(
+      icon: Icons.folder_shared_outlined,
+      title: isBangla ? 'মেডিকেল রেকর্ডস & ল্যাব রিপোর্টস' : 'Medical Records & Reports',
+      itemCount: 4,
+      isExpanded: _isReportsExpanded,
+      onToggle: () {
+        setState(() {
+          _isReportsExpanded = !_isReportsExpanded;
+        });
+      },
+      children: items,
     );
   }
 
@@ -1086,27 +1090,30 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
     );
   }
 
-  // 6. Payment History Section (Max 3 items cap)
-  Widget _buildPaymentHistorySection(bool isBangla) {
-    final List<Widget> allPayments = [
+  // 6. Payment History Accordion (Default Collapsed)
+  Widget _buildPaymentHistoryAccordion(bool isBangla) {
+    final List<Widget> items = [
       _buildPaymentItem(
         txnId: 'BKASH-99120491',
         title: 'চেম্বার সিরিয়াল ফি (ডা. ফজলে রাব্বি)',
         amount: '৳ 1500 • bKash Merchant',
         isPaid: true,
       ),
+      const SizedBox(height: 8),
       _buildPaymentItem(
         txnId: 'NAGAD-88492019',
         title: 'ভিডিও কনসালটেশন ফি (Dr. Tanvir)',
         amount: '৳ 1000 • Nagad Online',
         isPaid: true,
       ),
+      const SizedBox(height: 8),
       _buildPaymentItem(
         txnId: 'BKASH-77129034',
         title: 'মেডিসিন শপ ও প্রেসক্রিপশন অর্ডার',
         amount: '৳ 850 • MediShop Express',
         isPaid: true,
       ),
+      const SizedBox(height: 8),
       _buildPaymentItem(
         txnId: 'BKASH-66364798',
         title: 'ল্যাব টেস্ট হোম কালেকশন',
@@ -1115,55 +1122,17 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
       ),
     ];
 
-    final int totalCount = allPayments.length;
-    final displayedPayments = _showAllPayments
-        ? allPayments
-        : allPayments.take(3).toList();
-
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.receipt_long_outlined, color: Color(0xFF0F9D58), size: 20),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  isBangla ? 'পেমেন্ট হিস্ট্রি ও রিসিট ($totalCount)' : 'Payment History & Receipts ($totalCount)',
-                  style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-
-          ...displayedPayments.map((payment) => Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: payment,
-              )),
-
-          if (totalCount > 3)
-            _buildViewAllButton(
-              isBangla: isBangla,
-              isExpanded: _showAllPayments,
-              totalItems: totalCount,
-              onTap: () {
-                setState(() {
-                  _showAllPayments = !_showAllPayments;
-                });
-              },
-            ),
-        ],
-      ),
+    return _buildAccordionSection(
+      icon: Icons.receipt_long_outlined,
+      title: isBangla ? 'পেমেন্ট হিস্ট্রি ও রিসিট' : 'Payment History & Receipts',
+      itemCount: 4,
+      isExpanded: _isPaymentsExpanded,
+      onToggle: () {
+        setState(() {
+          _isPaymentsExpanded = !_isPaymentsExpanded;
+        });
+      },
+      children: items,
     );
   }
 
@@ -1218,9 +1187,9 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
     );
   }
 
-  // 7. Activity History Log Section (Max 3 items cap)
-  Widget _buildActivityLogSection(bool isBangla) {
-    final List<Widget> allLogs = [
+  // 7. Activity History Log Accordion (Default Collapsed)
+  Widget _buildActivityLogAccordion(bool isBangla) {
+    final List<Widget> items = [
       _buildActivityLogTile(
         icon: Icons.check_circle_outline,
         iconColor: const Color(0xFF10B981),
@@ -1228,6 +1197,7 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
         subtitle: '৳ 1000 (TxnID: BKASH-66364798)',
         time: '০৭:৫২ PM',
       ),
+      const Divider(height: 12, color: Color(0xFFF1F5F9)),
       _buildActivityLogTile(
         icon: Icons.calendar_today_outlined,
         iconColor: const Color(0xFF0284C7),
@@ -1235,6 +1205,7 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
         subtitle: 'অধ্যাপক ড. এ. কে. এম. ফজলে রাব্বি (ধানমন্ডি)',
         time: '০৪:৫০ PM',
       ),
+      const Divider(height: 12, color: Color(0xFFF1F5F9)),
       _buildActivityLogTile(
         icon: Icons.payment_rounded,
         iconColor: const Color(0xFF6366F1),
@@ -1242,6 +1213,7 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
         subtitle: '৳ ১,৫০০ (TxnID: BKASH-99120491)',
         time: '০৭:১৮ PM',
       ),
+      const Divider(height: 12, color: Color(0xFFF1F5F9)),
       _buildActivityLogTile(
         icon: Icons.upload_file_rounded,
         iconColor: const Color(0xFF8B5CF6),
@@ -1249,6 +1221,7 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
         subtitle: 'CBC & Blood Sugar Lab Report.pdf',
         time: 'সকাল ১১:৪৫ AM',
       ),
+      const Divider(height: 12, color: Color(0xFFF1F5F9)),
       _buildActivityLogTile(
         icon: Icons.assignment_outlined,
         iconColor: const Color(0xFFEC4899),
@@ -1258,62 +1231,17 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
       ),
     ];
 
-    final int totalCount = allLogs.length;
-    final displayedLogs = _showAllLogs
-        ? allLogs
-        : allLogs.take(3).toList();
-
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.history_rounded, color: Color(0xFF0F9D58), size: 20),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  isBangla ? 'অ্যাক্টিভিটি ও একশন হিস্ট্রি লগ ($totalCount)' : 'Activity Log ($totalCount)',
-                  style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-
-          ...List.generate(displayedLogs.length, (index) {
-            final isLast = index == displayedLogs.length - 1;
-            return Column(
-              children: [
-                displayedLogs[index],
-                if (!isLast) const Divider(height: 12, color: Color(0xFFF1F5F9)),
-              ],
-            );
-          }),
-
-          if (totalCount > 3) ...[
-            const SizedBox(height: 6),
-            _buildViewAllButton(
-              isBangla: isBangla,
-              isExpanded: _showAllLogs,
-              totalItems: totalCount,
-              onTap: () {
-                setState(() {
-                  _showAllLogs = !_showAllLogs;
-                });
-              },
-            ),
-          ],
-        ],
-      ),
+    return _buildAccordionSection(
+      icon: Icons.history_rounded,
+      title: isBangla ? 'অ্যাক্টিভিটি ও একশন হিস্ট্রি লগ' : 'Activity History Log',
+      itemCount: 5,
+      isExpanded: _isLogsExpanded,
+      onToggle: () {
+        setState(() {
+          _isLogsExpanded = !_isLogsExpanded;
+        });
+      },
+      children: items,
     );
   }
 
@@ -1346,48 +1274,6 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
         ),
         Text(time, style: const TextStyle(fontSize: 10, color: Color(0xFF94A3B8))),
       ],
-    );
-  }
-
-  // Reusable View All / Show Less Button Widget
-  Widget _buildViewAllButton({
-    required bool isBangla,
-    required bool isExpanded,
-    required int totalItems,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        decoration: BoxDecoration(
-          color: const Color(0xFFF8FAFC),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: const Color(0xFFE2E8F0)),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              isExpanded
-                  ? (isBangla ? 'সংক্ষিপ্ত করুন' : 'Show Less')
-                  : (isBangla ? 'সব দেখুন ($totalItems টি)' : 'View All ($totalItems Items)'),
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF0F9D58),
-              ),
-            ),
-            const SizedBox(width: 4),
-            Icon(
-              isExpanded ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
-              color: const Color(0xFF0F9D58),
-              size: 18,
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
