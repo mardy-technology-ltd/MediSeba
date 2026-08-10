@@ -12,6 +12,7 @@ import '../../widgets/modern_glow_navbar.dart';
 import '../blood_service/rokto_seba_view.dart';
 import '../offers/offer_list_view.dart';
 import '../hospitals/hospital_list_view.dart';
+import '../../controllers/language_controller.dart';
 import '../more/more_menu_view.dart';
 import '../profile/profile_view.dart';
 import '../medishop/medishop_view.dart';
@@ -19,11 +20,13 @@ import '../medishop/medishop_view.dart';
 class HomeView extends StatefulWidget {
   final HomeController homeController;
   final AuthController authController;
+  final LanguageController? languageController;
 
   const HomeView({
     super.key,
     required this.homeController,
     required this.authController,
+    this.languageController,
   });
 
   @override
@@ -36,7 +39,13 @@ class _HomeViewState extends State<HomeView> {
   int _currentBannerIndex = 0;
   final PageController _bannerPageController = PageController();
 
-  String _selectedLanguage = 'Bangla';
+  late final LanguageController _langController;
+
+  @override
+  void initState() {
+    super.initState();
+    _langController = widget.languageController ?? LanguageController();
+  }
 
   static const brandGreen = Color(0xFF008536);
   static const textDark = Color(0xFF222222);
@@ -90,6 +99,7 @@ class _HomeViewState extends State<HomeView> {
                         authController: widget.authController,
                         homeController: widget.homeController,
                         showAppBarLeading: true,
+                        languageController: _langController,
                       ),
                     ),
                   );
@@ -128,15 +138,16 @@ class _HomeViewState extends State<HomeView> {
           // Tab 0: Home Content
           _buildHomeBodyContent(),
           // Tab 1: Offer List View
-          const OfferListView(),
+          OfferListView(languageController: _langController),
           // Tab 2: Hospital List View
-          const HospitalListView(),
+          HospitalListView(languageController: _langController),
           // Tab 3: Doctor List View
-          const DoctorListView(showAppBar: false),
+          DoctorListView(showAppBar: false, languageController: _langController),
           // Tab 4: More Menu View
           MoreMenuView(
             authController: widget.authController,
             homeController: widget.homeController,
+            languageController: _langController,
           ),
         ],
       ),
@@ -145,12 +156,27 @@ class _HomeViewState extends State<HomeView> {
         onTap: (index) {
           setState(() => _currentBottomNavIndex = index);
         },
-        items: const [
-          ModernGlowNavBarItem(icon: Icons.home_rounded, label: 'হোম'),
-          ModernGlowNavBarItem(icon: Icons.local_offer_rounded, label: 'অফার'),
-          ModernGlowNavBarItem(icon: Icons.local_hospital_rounded, label: 'হাসপাতাল'),
-          ModernGlowNavBarItem(icon: Icons.medical_services_rounded, label: 'ডাক্তার'),
-          ModernGlowNavBarItem(icon: Icons.grid_view_rounded, label: 'আরও'),
+        items: [
+          ModernGlowNavBarItem(
+            icon: Icons.home_rounded,
+            label: _langController.tr('হোম', 'Home'),
+          ),
+          ModernGlowNavBarItem(
+            icon: Icons.local_offer_rounded,
+            label: _langController.tr('অফার', 'Offers'),
+          ),
+          ModernGlowNavBarItem(
+            icon: Icons.local_hospital_rounded,
+            label: _langController.tr('হাসপাতাল', 'Hospitals'),
+          ),
+          ModernGlowNavBarItem(
+            icon: Icons.medical_services_rounded,
+            label: _langController.tr('ডাক্তার', 'Doctors'),
+          ),
+          ModernGlowNavBarItem(
+            icon: Icons.grid_view_rounded,
+            label: _langController.tr('আরও', 'More'),
+          ),
         ],
       ),
     );
@@ -280,11 +306,13 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  // Category Grid — Modern Service Cards with Bengali Labels
+  // Category Grid — Modern Service Cards with Bilingual Labels
   Widget _buildCategoryGrid() {
+    final lang = _langController;
+
     final categories = [
       _CategoryItem(
-        label: 'ডাক্তার সিরিয়াল',
+        label: lang.tr('ডাক্তার সিরিয়াল', 'Doctor Serial'),
         icon: Icons.schedule_rounded,
         iconColor: const Color(0xFFE53935),
         iconBg: const Color(0xFFFFEBEE),
@@ -292,11 +320,11 @@ class _HomeViewState extends State<HomeView> {
         imagePath: 'assets/images/dr_serial.png',
         onTap: () => Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => const DoctorListView()),
+          MaterialPageRoute(builder: (_) => DoctorListView(languageController: _langController)),
         ),
       ),
       _CategoryItem(
-        label: 'ডাক্তার ঘর',
+        label: lang.tr('ডাক্তার ঘর', 'Doctor Bari'),
         icon: Icons.house_rounded,
         iconColor: const Color(0xFF0F9D58),
         iconBg: const Color(0xFFE8F5E9),
@@ -304,11 +332,11 @@ class _HomeViewState extends State<HomeView> {
         imagePath: 'assets/images/dr_ghor.png',
         onTap: () => Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => const DoctorBariView()),
+          MaterialPageRoute(builder: (_) => DoctorBariView(languageController: _langController)),
         ),
       ),
       _CategoryItem(
-        label: 'মেডিশপ',
+        label: lang.tr('মেডিশপ', 'MediShop'),
         icon: Icons.local_pharmacy_rounded,
         iconColor: const Color(0xFFE53935),
         iconBg: const Color(0xFFFFEBEE),
@@ -316,11 +344,11 @@ class _HomeViewState extends State<HomeView> {
         imagePath: 'assets/images/medishop.png',
         onTap: () => Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => const MediShopView()),
+          MaterialPageRoute(builder: (_) => MediShopView(languageController: _langController)),
         ),
       ),
       _CategoryItem(
-        label: 'রক্তসেবা',
+        label: lang.tr('রক্তসেবা', 'Blood Service'),
         icon: Icons.bloodtype_rounded,
         iconColor: const Color(0xFFE53935),
         iconBg: const Color(0xFFFFEBEE),
@@ -328,11 +356,11 @@ class _HomeViewState extends State<HomeView> {
         imagePath: 'assets/images/roktoseba.png',
         onTap: () => Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => const RoktoSebaView()),
+          MaterialPageRoute(builder: (_) => RoktoSebaView(languageController: _langController)),
         ),
       ),
       _CategoryItem(
-        label: 'ডিসকাউন্ট অফার',
+        label: lang.tr('ডিসকাউন্ট অফার', 'Discount Offers'),
         icon: Icons.local_offer_rounded,
         iconColor: const Color(0xFF1565C0),
         iconBg: const Color(0xFFE3F2FD),
@@ -341,7 +369,7 @@ class _HomeViewState extends State<HomeView> {
         onTap: () {},
       ),
       _CategoryItem(
-        label: 'অ্যাম্বুলেন্স সেবা',
+        label: lang.tr('অ্যাম্বুলেন্স সেবা', 'Ambulance Service'),
         icon: Icons.airport_shuttle_rounded,
         iconColor: const Color(0xFF0F9D58),
         iconBg: const Color(0xFFE8F5E9),
@@ -350,7 +378,7 @@ class _HomeViewState extends State<HomeView> {
         onTap: () {},
       ),
       _CategoryItem(
-        label: 'মাতৃসেবা',
+        label: lang.tr('মাতৃসেবা', 'Maternal Care'),
         icon: Icons.pregnant_woman_rounded,
         iconColor: const Color(0xFFAD1457),
         iconBg: const Color(0xFFFCE4EC),
@@ -359,7 +387,7 @@ class _HomeViewState extends State<HomeView> {
         onTap: () {},
       ),
       _CategoryItem(
-        label: 'কাস্টমার সাপোর্ট',
+        label: lang.tr('কাস্টমার সাপোর্ট', 'Customer Support'),
         icon: Icons.headset_mic_rounded,
         iconColor: const Color(0xFF1565C0),
         iconBg: const Color(0xFFE3F2FD),
@@ -742,7 +770,7 @@ class _HomeViewState extends State<HomeView> {
 
   // Sidebar Drawer (bKash Menu Inspired Design)
   Widget _buildSidebarDrawer(BuildContext context) {
-    final isBangla = _selectedLanguage == 'Bangla';
+    final isBangla = _langController.isBangla;
 
     return Drawer(
       width: MediaQuery.of(context).size.width * 0.82,
@@ -782,9 +810,7 @@ class _HomeViewState extends State<HomeView> {
                         // Eng Segment
                         GestureDetector(
                           onTap: () {
-                            setState(() {
-                              _selectedLanguage = 'English';
-                            });
+                            _langController.setLanguage(AppLanguage.english);
                           },
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 200),
@@ -807,9 +833,7 @@ class _HomeViewState extends State<HomeView> {
                         // বাং Segment
                         GestureDetector(
                           onTap: () {
-                            setState(() {
-                              _selectedLanguage = 'Bangla';
-                            });
+                            _langController.setLanguage(AppLanguage.bangla);
                           },
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 200),
@@ -930,7 +954,7 @@ class _HomeViewState extends State<HomeView> {
                       Navigator.pop(context);
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const DoctorBariView()),
+                        MaterialPageRoute(builder: (_) => DoctorBariView(languageController: _langController)),
                       );
                     },
                   ),
@@ -941,7 +965,7 @@ class _HomeViewState extends State<HomeView> {
                       Navigator.pop(context);
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const RoktoSebaView()),
+                        MaterialPageRoute(builder: (_) => RoktoSebaView(languageController: _langController)),
                       );
                     },
                   ),
@@ -959,7 +983,7 @@ class _HomeViewState extends State<HomeView> {
                       Navigator.pop(context);
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const HospitalListView()),
+                        MaterialPageRoute(builder: (_) => HospitalListView(languageController: _langController)),
                       );
                     },
                   ),
@@ -970,7 +994,7 @@ class _HomeViewState extends State<HomeView> {
                       Navigator.pop(context);
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const OfferListView()),
+                        MaterialPageRoute(builder: (_) => OfferListView(languageController: _langController)),
                       );
                     },
                   ),
@@ -1000,7 +1024,7 @@ class _HomeViewState extends State<HomeView> {
                       Navigator.pop(context);
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const AboutUsView()),
+                        MaterialPageRoute(builder: (_) => AboutUsView(languageController: _langController)),
                       );
                     },
                   ),

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import '../../controllers/language_controller.dart';
 
 class NotificationView extends StatelessWidget {
-  const NotificationView({super.key});
+  final LanguageController? languageController;
+
+  const NotificationView({super.key, this.languageController});
 
   static const brandGreen = Color(0xFF008536);
   static const textDark = Color(0xFF1E293B);

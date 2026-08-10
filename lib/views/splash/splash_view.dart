@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import '../../controllers/home_controller.dart';
 import '../../controllers/auth_controller.dart';
+import '../../controllers/language_controller.dart';
 import '../home/home_view.dart';
 
 class SplashView extends StatefulWidget {
   final HomeController homeController;
   final AuthController authController;
+  final LanguageController languageController;
 
   const SplashView({
     super.key,
     required this.homeController,
     required this.authController,
+    required this.languageController,
   });
 
   @override
@@ -46,13 +49,10 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
       if (mounted) {
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
-            // pageBuilder: (context, animation, secondaryAnimation) => LoginView(
-            //   homeController: widget.homeController,
-            //   authController: widget.authController,
-            // ),
             pageBuilder: (context, animation, secondaryAnimation) => HomeView(
               homeController: widget.homeController,
               authController: widget.authController,
+              languageController: widget.languageController,
             ),
             transitionsBuilder: (context, animation, secondaryAnimation, child) {
               return FadeTransition(opacity: animation, child: child);

@@ -3,12 +3,19 @@ import '../../constants/app_colors.dart';
 import '../../constants/app_text_styles.dart';
 import '../../constants/app_constants.dart';
 import '../../controllers/doctor_controller.dart';
+import '../../controllers/language_controller.dart';
 import 'widgets/doctor_card.dart';
 import 'doctor_detail_view.dart';
 
 class DoctorListView extends StatefulWidget {
   final bool showAppBar;
-  const DoctorListView({super.key, this.showAppBar = true});
+  final LanguageController? languageController;
+
+  const DoctorListView({
+    super.key,
+    this.showAppBar = true,
+    this.languageController,
+  });
 
   @override
   State<DoctorListView> createState() => _DoctorListViewState();
@@ -17,6 +24,13 @@ class DoctorListView extends StatefulWidget {
 class _DoctorListViewState extends State<DoctorListView> {
   final DoctorController _doctorController = DoctorController();
   final TextEditingController _searchController = TextEditingController();
+  late final LanguageController _langController;
+
+  @override
+  void initState() {
+    super.initState();
+    _langController = widget.languageController ?? LanguageController();
+  }
 
   @override
   void dispose() {
@@ -34,7 +48,7 @@ class _DoctorListViewState extends State<DoctorListView> {
               backgroundColor: AppColors.surface,
               elevation: 0,
               scrolledUnderElevation: 0,
-              title: Text('ডাক্তার খুঁজুন', style: AppTextStyles.heading2),
+              title: Text(_langController.tr('ডাক্তার খুঁজুন', 'Find Doctors'), style: AppTextStyles.heading2),
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 20),
                 onPressed: () => Navigator.pop(context),

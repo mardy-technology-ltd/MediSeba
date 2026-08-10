@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
+import '../../controllers/language_controller.dart';
 
 class OfferListView extends StatelessWidget {
   final bool showAppBar;
-  const OfferListView({super.key, this.showAppBar = false});
+  final LanguageController? languageController;
+
+  const OfferListView({
+    super.key,
+    this.showAppBar = false,
+    this.languageController,
+  });
 
   static const brandGreen = Color(0xFF008536);
   static const textDark = Color(0xFF1E293B);

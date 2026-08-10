@@ -2,18 +2,21 @@ import 'package:flutter/material.dart';
 import '../../controllers/auth_controller.dart';
 import '../auth/login_view.dart';
 import '../../controllers/home_controller.dart';
+import '../../controllers/language_controller.dart';
 import 'edit_profile_view.dart';
 
 class ProfileView extends StatelessWidget {
   final AuthController authController;
   final HomeController homeController;
   final bool showAppBarLeading;
+  final LanguageController? languageController;
 
   const ProfileView({
     super.key,
     required this.authController,
     required this.homeController,
     this.showAppBarLeading = true,
+    this.languageController,
   });
 
   static const brandGreen = Color(0xFF008536);

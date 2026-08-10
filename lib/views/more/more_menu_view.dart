@@ -6,6 +6,7 @@ import '../../controllers/home_controller.dart';
 import '../health_consultation/health_consultation_view.dart';
 import '../about/about_us_view.dart';
 import '../social/social_media_view.dart';
+import '../../controllers/language_controller.dart';
 import '../../widgets/share_app_dialog.dart';
 import '../../widgets/helpline_bottom_sheet.dart';
 import '../profile/profile_view.dart';
@@ -13,11 +14,13 @@ import '../profile/profile_view.dart';
 class MoreMenuView extends StatelessWidget {
   final AuthController authController;
   final HomeController homeController;
+  final LanguageController? languageController;
 
   const MoreMenuView({
     super.key,
     required this.authController,
     required this.homeController,
+    this.languageController,
   });
 
   static const brandGreen = Color(0xFF008536);

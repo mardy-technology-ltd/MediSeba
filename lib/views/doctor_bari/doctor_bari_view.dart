@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import '../../controllers/doctor_controller.dart';
 import '../../models/doctor_model.dart';
+import '../../controllers/language_controller.dart';
 import 'doctor_details_view.dart';
 
 class DoctorBariView extends StatefulWidget {
-  const DoctorBariView({super.key});
+  final LanguageController? languageController;
+
+  const DoctorBariView({super.key, this.languageController});
 
   @override
   State<DoctorBariView> createState() => _DoctorBariViewState();
@@ -14,6 +17,13 @@ class _DoctorBariViewState extends State<DoctorBariView> {
   static const textDark = Color(0xFF222222);
   final DoctorController _doctorController = DoctorController();
   final TextEditingController _searchController = TextEditingController();
+  late final LanguageController _langController;
+
+  @override
+  void initState() {
+    super.initState();
+    _langController = widget.languageController ?? LanguageController();
+  }
 
   final List<String> _categories = [
     'সকল (All)',
@@ -66,9 +76,9 @@ class _DoctorBariViewState extends State<DoctorBariView> {
             ),
           ),
         ),
-        title: const Text(
-          'ডাক্তার ঘর',
-          style: TextStyle(
+        title: Text(
+          _langController.tr('ডাক্তার ঘর', 'Doctor Bari'),
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,
             color: textDark,

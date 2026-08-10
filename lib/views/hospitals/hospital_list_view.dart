@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
+import '../../controllers/language_controller.dart';
 
 class HospitalListView extends StatefulWidget {
   final bool showAppBar;
-  const HospitalListView({super.key, this.showAppBar = false});
+  final LanguageController? languageController;
+
+  const HospitalListView({
+    super.key,
+    this.showAppBar = false,
+    this.languageController,
+  });
 
   @override
   State<HospitalListView> createState() => _HospitalListViewState();
@@ -14,6 +21,13 @@ class _HospitalListViewState extends State<HospitalListView> {
   static const textMuted = Color(0xFF64748B);
 
   final TextEditingController _searchController = TextEditingController();
+  late final LanguageController _langController;
+
+  @override
+  void initState() {
+    super.initState();
+    _langController = widget.languageController ?? LanguageController();
+  }
 
   final List<Map<String, String>> hospitals = [
     {
@@ -60,9 +74,9 @@ class _HospitalListViewState extends State<HospitalListView> {
           ? AppBar(
               backgroundColor: Colors.white,
               elevation: 0,
-              title: const Text(
-                'হাসপাতাল ও ডায়াগনস্টিক',
-                style: TextStyle(
+              title: Text(
+                _langController.tr('হাসপাতাল ও ডায়াগনস্টিক', 'Hospitals & Diagnostics'),
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: textDark,
@@ -79,7 +93,7 @@ class _HospitalListViewState extends State<HospitalListView> {
               child: TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
-                  hintText: 'হাসপাতাল বা ডায়াগনস্টিক সেন্টার খুঁজুন...',
+                  hintText: _langController.tr('হাসপাতাল বা ডায়াগনস্টিক সেন্টার খুঁজুন...', 'Search hospitals or diagnostic centers...'),
                   hintStyle: const TextStyle(fontSize: 13, color: textMuted),
                   prefixIcon: const Icon(Icons.search_rounded, color: brandGreen),
                   filled: true,

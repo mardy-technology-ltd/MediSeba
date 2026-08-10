@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import '../../controllers/language_controller.dart';
 import 'request_blood_view.dart';
 import 'donor_list_view.dart';
 import 'donate_blood_view.dart';
 
 class RoktoSebaView extends StatelessWidget {
-  const RoktoSebaView({super.key});
+  final LanguageController? languageController;
+
+  const RoktoSebaView({super.key, this.languageController});
 
   static const List<_BloodServiceOption> _options = [
     _BloodServiceOption(

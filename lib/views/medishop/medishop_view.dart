@@ -2,11 +2,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_text_styles.dart';
+import '../../controllers/language_controller.dart';
 import '../../models/medicine_model.dart';
 import '../../services/api_service.dart';
 
 class MediShopView extends StatefulWidget {
-  const MediShopView({super.key});
+  final LanguageController? languageController;
+
+  const MediShopView({super.key, this.languageController});
 
   @override
   State<MediShopView> createState() => _MediShopViewState();
@@ -15,6 +18,7 @@ class MediShopView extends StatefulWidget {
 class _MediShopViewState extends State<MediShopView> {
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounceTimer;
+  late final LanguageController _langController;
 
   List<MedicineModel> _allMedicines = [];
   List<MedicineModel> _filteredMedicines = [];
@@ -33,6 +37,7 @@ class _MediShopViewState extends State<MediShopView> {
   @override
   void initState() {
     super.initState();
+    _langController = widget.languageController ?? LanguageController();
     _fetchMedicines();
   }
 
@@ -143,10 +148,10 @@ class _MediShopViewState extends State<MediShopView> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('মেডিশপ (MediShop)', style: AppTextStyles.heading2.copyWith(fontSize: 18)),
-            const Text(
-              '১১,৯৯৯+ অরিজিনাল ওষুধ ক্যাটালগ',
-              style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+            Text(_langController.tr('মেডিশপ (MediShop)', 'MediShop Pharmacy'), style: AppTextStyles.heading2.copyWith(fontSize: 18)),
+            Text(
+              _langController.tr('১১,৯৯৯+ অরিজিনাল ওষুধ ক্যাটালগ', '11,999+ Genuine Medicine Catalog'),
+              style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
             ),
           ],
         ),
