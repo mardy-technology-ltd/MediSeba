@@ -15,6 +15,44 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
   late LanguageController _langController;
   int _selectedVitalTab = 0; // 0: BP, 1: Glucose, 2: Pulse
 
+  // Dynamic Vital Records State
+  int _systolic = 123;
+  int _diastolic = 83;
+  double _glucose = 5.8;
+  int _pulse = 74;
+
+  Map<String, dynamic> get _bpStatusInfo {
+    if (_systolic < 120 && _diastolic < 80) {
+      return {'status': 'সুস্থ (Normal)', 'color': const Color(0xFF10B981), 'bg': const Color(0xFFECFDF5), 'border': const Color(0xFFA7F3D0)};
+    } else if (_systolic <= 129 && _diastolic < 80) {
+      return {'status': 'পর্যবেক্ষণ (Good)', 'color': const Color(0xFF10B981), 'bg': const Color(0xFFECFDF5), 'border': const Color(0xFFA7F3D0)};
+    } else if (_systolic <= 139 || _diastolic <= 89) {
+      return {'status': 'উচ্চ চাপ (Stage 1)', 'color': const Color(0xFFD97706), 'bg': const Color(0xFFFEF3C7), 'border': const Color(0xFFFDE68A)};
+    } else {
+      return {'status': 'উচ্চ চাপ (High)', 'color': const Color(0xFFEF4444), 'bg': const Color(0xFFFEF2F2), 'border': const Color(0xFFFECACA)};
+    }
+  }
+
+  Map<String, dynamic> get _glucoseStatusInfo {
+    if (_glucose < 5.6) {
+      return {'status': 'নিয়ন্ত্রণ (Good)', 'color': const Color(0xFF0284C7), 'bg': const Color(0xFFF0F9FF), 'border': const Color(0xFFBAE6FD)};
+    } else if (_glucose <= 6.9) {
+      return {'status': 'সতর্কতা (Pre-diabetes)', 'color': const Color(0xFFD97706), 'bg': const Color(0xFFFEF3C7), 'border': const Color(0xFFFDE68A)};
+    } else {
+      return {'status': 'উচ্চ সুগার (High)', 'color': const Color(0xFFEF4444), 'bg': const Color(0xFFFEF2F2), 'border': const Color(0xFFFECACA)};
+    }
+  }
+
+  Map<String, dynamic> get _pulseStatusInfo {
+    if (_pulse >= 60 && _pulse <= 100) {
+      return {'status': 'সুস্থ (Normal)', 'color': const Color(0xFFE11D48), 'bg': const Color(0xFFFFF1F2), 'border': const Color(0xFFFECDD3)};
+    } else if (_pulse < 60) {
+      return {'status': 'কম (Low)', 'color': const Color(0xFFD97706), 'bg': const Color(0xFFFEF3C7), 'border': const Color(0xFFFDE68A)};
+    } else {
+      return {'status': 'বেশি (High)', 'color': const Color(0xFFEF4444), 'bg': const Color(0xFFFEF2F2), 'border': const Color(0xFFFECACA)};
+    }
+  }
+
   // Expand / Collapse state toggles for Accordion Sections (All collapsed by default)
   bool _isAppointmentsExpanded = false;
   bool _isPrescriptionsExpanded = false;
@@ -355,28 +393,31 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
               ),
               const SizedBox(width: 6),
 
-              // Entry Button
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: const Color(0xFFCBD5E1)),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.add, size: 13, color: Color(0xFF0F9D58)),
-                    const SizedBox(width: 2),
-                    Text(
-                      isBangla ? 'এন্ট্রি দিন' : 'Add Entry',
-                      style: const TextStyle(
-                        fontSize: 10.5,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF0F9D58),
+              // Entry Button (Tapping opens Add Vital Record Dialog)
+              GestureDetector(
+                onTap: () => _showAddVitalDialog(isBangla),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFFCBD5E1)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.add, size: 13, color: Color(0xFF0F9D58)),
+                      const SizedBox(width: 2),
+                      Text(
+                        isBangla ? 'এন্ট্রি দিন' : 'Add Entry',
+                        style: const TextStyle(
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF0F9D58),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -400,42 +441,42 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
 
           const SizedBox(height: 14),
 
-          // 3 Metric Cards Row
+          // 3 Metric Cards Row (Reactive to calculated state)
           Row(
             children: [
               Expanded(
                 child: _buildMetricMiniCard(
                   title: 'রক্তচাপ (BP)',
-                  value: '123/83',
+                  value: '$_systolic/$_diastolic',
                   unit: 'mmHg',
-                  status: 'পর্যবেক্ষণ (Good)',
-                  statusColor: const Color(0xFF10B981),
-                  bgColor: const Color(0xFFECFDF5),
-                  borderColor: const Color(0xFFA7F3D0),
+                  status: _bpStatusInfo['status'] as String,
+                  statusColor: _bpStatusInfo['color'] as Color,
+                  bgColor: _bpStatusInfo['bg'] as Color,
+                  borderColor: _bpStatusInfo['border'] as Color,
                 ),
               ),
               const SizedBox(width: 6),
               Expanded(
                 child: _buildMetricMiniCard(
                   title: 'ডায়াবেটিস',
-                  value: '5.8',
+                  value: _glucose.toStringAsFixed(1),
                   unit: 'mmol/L',
-                  status: 'নিয়ন্ত্রণ (Good)',
-                  statusColor: const Color(0xFF0284C7),
-                  bgColor: const Color(0xFFF0F9FF),
-                  borderColor: const Color(0xFFBAE6FD),
+                  status: _glucoseStatusInfo['status'] as String,
+                  statusColor: _glucoseStatusInfo['color'] as Color,
+                  bgColor: _glucoseStatusInfo['bg'] as Color,
+                  borderColor: _glucoseStatusInfo['border'] as Color,
                 ),
               ),
               const SizedBox(width: 6),
               Expanded(
                 child: _buildMetricMiniCard(
                   title: 'হার্ট রেট',
-                  value: '74',
+                  value: '$_pulse',
                   unit: 'BPM',
-                  status: 'সুস্থ (Normal)',
-                  statusColor: const Color(0xFFE11D48),
-                  bgColor: const Color(0xFFFFF1F2),
-                  borderColor: const Color(0xFFFECDD3),
+                  status: _pulseStatusInfo['status'] as String,
+                  statusColor: _pulseStatusInfo['color'] as Color,
+                  bgColor: _pulseStatusInfo['bg'] as Color,
+                  borderColor: _pulseStatusInfo['border'] as Color,
                 ),
               ),
             ],
@@ -443,7 +484,7 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
 
           const SizedBox(height: 16),
 
-          // Visual Vitals Trend Chart Representation
+          // Visual Vitals Trend Chart Representation (Dynamic wave flow based on BP, Glucose, Pulse)
           Container(
             height: 120,
             width: double.infinity,
@@ -454,7 +495,13 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
               border: Border.all(color: const Color(0xFFF1F5F9)),
             ),
             child: CustomPaint(
-              painter: VitalsChartPainter(),
+              painter: VitalsChartPainter(
+                selectedTab: _selectedVitalTab,
+                systolic: _systolic,
+                diastolic: _diastolic,
+                glucose: _glucose,
+                pulse: _pulse,
+              ),
               child: Container(),
             ),
           ),
@@ -503,6 +550,201 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
             fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
             color: isSelected ? Colors.white : const Color(0xFF475569),
           ),
+        ),
+      ),
+    );
+  }
+
+  // Add New Health Vital Record Dialog Popup (Web Matching UI)
+  void _showAddVitalDialog(bool isBangla) {
+    final TextEditingController systolicController = TextEditingController(text: '120');
+    final TextEditingController diastolicController = TextEditingController(text: '80');
+    final TextEditingController glucoseController = TextEditingController(text: '5.8');
+    final TextEditingController pulseController = TextEditingController(text: '72');
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          backgroundColor: Colors.white,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Title Row: Icon + Title
+                  Row(
+                    children: [
+                      const Icon(Icons.show_chart_rounded, color: Color(0xFF0F9D58), size: 24),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          isBangla ? 'নতুন হেলথ ভাইটাল রেকর্ড যুক্ত করুন' : 'Add New Health Vital Record',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w900,
+                            color: Color(0xFF0F172A),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // 1. Blood Pressure: Systolic / Diastolic (mmHg)
+                  Text(
+                    isBangla ? 'রক্তচাপ Systolic / Diastolic (mmHg)' : 'Blood Pressure Systolic / Diastolic (mmHg)',
+                    style: const TextStyle(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF334155),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildDialogInput(controller: systolicController, hint: '120'),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildDialogInput(controller: diastolicController, hint: '80'),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // 2. Diabetes / Sugar Level (mmol/L)
+                  Text(
+                    isBangla ? 'ডায়াবেটিস / সুগার লেভেল (mmol/L)' : 'Diabetes / Sugar Level (mmol/L)',
+                    style: const TextStyle(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF334155),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  _buildDialogInput(controller: glucoseController, hint: '5.8'),
+
+                  const SizedBox(height: 16),
+
+                  // 3. Heart Rate / Pulse (BPM)
+                  Text(
+                    isBangla ? 'হার্ট রেট / পালস (BPM)' : 'Heart Rate / Pulse (BPM)',
+                    style: const TextStyle(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF334155),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  _buildDialogInput(controller: pulseController, hint: '72'),
+
+                  const SizedBox(height: 24),
+
+                  // Bottom Action Buttons: Cancel (বাতিল) & Save (সেভ করুন)
+                  Row(
+                    children: [
+                      // Cancel Button
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.pop(context),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            side: const BorderSide(color: Color(0xFFCBD5E1), width: 1.2),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          child: Text(
+                            isBangla ? 'বাতিল' : 'Cancel',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF475569),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+
+                      // Save Button
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            final int newSystolic = int.tryParse(systolicController.text.trim()) ?? _systolic;
+                            final int newDiastolic = int.tryParse(diastolicController.text.trim()) ?? _diastolic;
+                            final double newGlucose = double.tryParse(glucoseController.text.trim()) ?? _glucose;
+                            final int newPulse = int.tryParse(pulseController.text.trim()) ?? _pulse;
+
+                            setState(() {
+                              _systolic = newSystolic;
+                              _diastolic = newDiastolic;
+                              _glucose = newGlucose;
+                              _pulse = newPulse;
+                            });
+
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  isBangla ? 'নতুন হেলথ ভাইটাল রেকর্ড সংরক্ষিত ও চার্ট আপডেট হয়েছে!' : 'Health Vitals record saved and chart updated!',
+                                ),
+                                backgroundColor: const Color(0xFF0F9D58),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF0F9D58),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          child: Text(
+                            isBangla ? 'সেভ করুন' : 'Save Record',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildDialogInput({required TextEditingController controller, required String hint}) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: TextField(
+        controller: controller,
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF0F172A),
+        ),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: const TextStyle(color: Color(0xFF94A3B8), fontWeight: FontWeight.normal),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         ),
       ),
     );
@@ -1278,52 +1520,160 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
   }
 }
 
-// Custom Vitals Trend Wave Line Chart Painter
+// Custom Dynamic Vitals Trend Wave Line Chart Painter
 class VitalsChartPainter extends CustomPainter {
+  final int selectedTab;
+  final int systolic;
+  final int diastolic;
+  final double glucose;
+  final int pulse;
+
+  VitalsChartPainter({
+    required this.selectedTab,
+    required this.systolic,
+    required this.diastolic,
+    required this.glucose,
+    required this.pulse,
+  });
+
   @override
   void paint(Canvas canvas, Size size) {
-    final paintFill = Paint()
-      ..shader = LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [
-          const Color(0xFF10B981).withValues(alpha: 0.25),
-          const Color(0xFF10B981).withValues(alpha: 0.0),
-        ],
-      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
-      ..style = PaintingStyle.fill;
+    if (selectedTab == 0) {
+      // 0. BP Trend: Dual wave (Systolic Green + Diastolic Blue)
+      final double sysNorm = ((systolic - 90) / (180 - 90)).clamp(0.1, 0.9);
+      final double diaNorm = ((diastolic - 50) / (120 - 50)).clamp(0.1, 0.9);
 
-    final paintLine = Paint()
-      ..color = const Color(0xFF10B981)
-      ..strokeWidth = 2.5
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
+      // Primary Systolic Green Gradient Wave
+      final paintFill = Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            const Color(0xFF10B981).withValues(alpha: 0.3),
+            const Color(0xFF10B981).withValues(alpha: 0.0),
+          ],
+        ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
+        ..style = PaintingStyle.fill;
 
-    final path = Path();
-    path.moveTo(0, size.height * 0.4);
-    path.cubicTo(size.width * 0.2, size.height * 0.2, size.width * 0.4, size.height * 0.6, size.width * 0.6, size.height * 0.3);
-    path.cubicTo(size.width * 0.8, size.height * 0.1, size.width * 0.9, size.height * 0.5, size.width, size.height * 0.35);
+      final paintLine = Paint()
+        ..color = const Color(0xFF10B981)
+        ..strokeWidth = 2.8
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round;
 
-    final pathFill = Path.from(path);
-    pathFill.lineTo(size.width, size.height);
-    pathFill.lineTo(0, size.height);
-    pathFill.close();
+      final path = Path();
+      final h1 = size.height * (1.0 - (sysNorm * 0.65 + 0.15));
+      path.moveTo(0, h1 + 10);
+      path.cubicTo(size.width * 0.2, h1 - 15, size.width * 0.4, h1 + 20, size.width * 0.6, h1 - 10);
+      path.cubicTo(size.width * 0.8, h1 - 25, size.width * 0.9, h1 + 15, size.width, h1);
 
-    canvas.drawPath(pathFill, paintFill);
-    canvas.drawPath(path, paintLine);
+      final pathFill = Path.from(path);
+      pathFill.lineTo(size.width, size.height);
+      pathFill.lineTo(0, size.height);
+      pathFill.close();
 
-    // Baseline Line
-    final paintBase = Paint()
-      ..color = const Color(0xFF0284C7)
-      ..strokeWidth = 1.8
-      ..style = PaintingStyle.stroke;
+      canvas.drawPath(pathFill, paintFill);
+      canvas.drawPath(path, paintLine);
 
-    final basePath = Path();
-    basePath.moveTo(0, size.height * 0.75);
-    basePath.cubicTo(size.width * 0.25, size.height * 0.7, size.width * 0.6, size.height * 0.85, size.width, size.height * 0.78);
-    canvas.drawPath(basePath, paintBase);
+      // Secondary Diastolic Blue Wave
+      final paintBase = Paint()
+        ..color = const Color(0xFF0284C7)
+        ..strokeWidth = 2.0
+        ..style = PaintingStyle.stroke;
+
+      final h2 = size.height * (1.0 - (diaNorm * 0.45 + 0.1));
+      final basePath = Path();
+      basePath.moveTo(0, h2 + 8);
+      basePath.cubicTo(size.width * 0.25, h2 - 10, size.width * 0.6, h2 + 12, size.width, h2 - 5);
+      canvas.drawPath(basePath, paintBase);
+
+    } else if (selectedTab == 1) {
+      // 1. Glucose Trend: Smooth Sky Blue Wave
+      final double glucNorm = ((glucose - 3.0) / (12.0 - 3.0)).clamp(0.1, 0.9);
+
+      final paintFill = Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            const Color(0xFF0284C7).withValues(alpha: 0.3),
+            const Color(0xFF0284C7).withValues(alpha: 0.0),
+          ],
+        ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
+        ..style = PaintingStyle.fill;
+
+      final paintLine = Paint()
+        ..color = const Color(0xFF0284C7)
+        ..strokeWidth = 2.8
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round;
+
+      final h = size.height * (1.0 - (glucNorm * 0.65 + 0.15));
+      final path = Path();
+      path.moveTo(0, h + 15);
+      path.cubicTo(size.width * 0.25, h - 20, size.width * 0.5, h + 25, size.width * 0.75, h - 15);
+      path.lineTo(size.width, h);
+
+      final pathFill = Path.from(path);
+      pathFill.lineTo(size.width, size.height);
+      pathFill.lineTo(0, size.height);
+      pathFill.close();
+
+      canvas.drawPath(pathFill, paintFill);
+      canvas.drawPath(path, paintLine);
+
+    } else {
+      // 2. Pulse / Heart Rate Trend: Dynamic Rose ECG Heartbeat Wave
+      final double pulseNorm = ((pulse - 40) / (130 - 40)).clamp(0.1, 0.9);
+
+      final paintFill = Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            const Color(0xFFE11D48).withValues(alpha: 0.3),
+            const Color(0xFFE11D48).withValues(alpha: 0.0),
+          ],
+        ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
+        ..style = PaintingStyle.fill;
+
+      final paintLine = Paint()
+        ..color = const Color(0xFFE11D48)
+        ..strokeWidth = 2.6
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round;
+
+      final h = size.height * (1.0 - (pulseNorm * 0.55 + 0.2));
+      final path = Path();
+      path.moveTo(0, h);
+      path.lineTo(size.width * 0.15, h);
+      path.lineTo(size.width * 0.2, h - 35 * pulseNorm);
+      path.lineTo(size.width * 0.25, h + 20 * pulseNorm);
+      path.lineTo(size.width * 0.3, h);
+      path.lineTo(size.width * 0.5, h);
+      path.lineTo(size.width * 0.55, h - 40 * pulseNorm);
+      path.lineTo(size.width * 0.6, h + 25 * pulseNorm);
+      path.lineTo(size.width * 0.65, h);
+      path.lineTo(size.width * 0.85, h);
+      path.lineTo(size.width * 0.9, h - 30 * pulseNorm);
+      path.lineTo(size.width, h);
+
+      final pathFill = Path.from(path);
+      pathFill.lineTo(size.width, size.height);
+      pathFill.lineTo(0, size.height);
+      pathFill.close();
+
+      canvas.drawPath(pathFill, paintFill);
+      canvas.drawPath(path, paintLine);
+    }
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant VitalsChartPainter oldDelegate) {
+    return oldDelegate.selectedTab != selectedTab ||
+        oldDelegate.systolic != systolic ||
+        oldDelegate.diastolic != diastolic ||
+        oldDelegate.glucose != glucose ||
+        oldDelegate.pulse != pulse;
+  }
 }
