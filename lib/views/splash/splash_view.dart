@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import '../../controllers/home_controller.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/language_controller.dart';
+import '../../services/cache_service.dart';
 import '../home/home_view.dart';
+import '../onboarding/onboarding_view.dart';
 
 class SplashView extends StatefulWidget {
   final HomeController homeController;
@@ -44,16 +46,26 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
 
     _animationController.forward();
 
-    // Login bypassed: Navigate directly to HomeView after 2.5 seconds delay
+    // Check if user has already seen onboarding
     Future.delayed(const Duration(milliseconds: 2500), () {
       if (mounted) {
+        final bool hasSeenOnboarding = CacheService.get('has_seen_onboarding') == true;
+
+        final Widget destinationView = hasSeenOnboarding
+            ? HomeView(
+                homeController: widget.homeController,
+                authController: widget.authController,
+                languageController: widget.languageController,
+              )
+            : OnboardingView(
+                homeController: widget.homeController,
+                authController: widget.authController,
+                languageController: widget.languageController,
+              );
+
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) => HomeView(
-              homeController: widget.homeController,
-              authController: widget.authController,
-              languageController: widget.languageController,
-            ),
+            pageBuilder: (context, animation, secondaryAnimation) => destinationView,
             transitionsBuilder: (context, animation, secondaryAnimation, child) {
               return FadeTransition(opacity: animation, child: child);
             },
