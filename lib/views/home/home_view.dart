@@ -312,25 +312,6 @@ class _HomeViewState extends State<HomeView> {
 
     final categories = [
       _CategoryItem(
-        title: lang.tr('ডাক্তার ঘর (টেলিমেডিসিন)', 'Doctor Bari (Telemedicine)'),
-        subtitle: lang.tr(
-          'অনলাইন ভিডিও কনসালটেশন ও সরাসরি ডাক্তারের পরামর্শ।',
-          'Online video consultation & direct doctor advice.',
-        ),
-        actionText: lang.tr('সেবা গ্রহণ করুন', 'Get Service'),
-        icon: Icons.monitor_heart_outlined,
-        iconColor: const Color(0xFF0F9D58),
-        iconBg: const Color(0xFFE8F5E9),
-        borderColor: const Color(0xFFC8E6C9),
-        imagePath: 'assets/images/dr_ghor.png',
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => DoctorBariView(languageController: _langController),
-          ),
-        ),
-      ),
-      _CategoryItem(
         title: lang.tr(
           'ডাক্তার সিরিয়াল (চেম্বার সিরিয়াল)',
           'Doctor Serial (Chamber Serial)',
@@ -345,6 +326,25 @@ class _HomeViewState extends State<HomeView> {
         iconBg: const Color(0xFFE1F5FE),
         borderColor: const Color(0xFF81D4FA),
         imagePath: 'assets/images/dr_serial.png',
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => DoctorBariView(languageController: _langController),
+          ),
+        ),
+      ),
+      _CategoryItem(
+        title: lang.tr('ডাক্তার ঘর (টেলিমেডিসিন)', 'Doctor Bari (Telemedicine)'),
+        subtitle: lang.tr(
+          'অনলাইন ভিডিও কনসালটেশন ও সরাসরি ডাক্তারের পরামর্শ।',
+          'Online video consultation & direct doctor advice.',
+        ),
+        actionText: lang.tr('সেবা গ্রহণ করুন', 'Get Service'),
+        icon: Icons.monitor_heart_outlined,
+        iconColor: const Color(0xFF0F9D58),
+        iconBg: const Color(0xFFE8F5E9),
+        borderColor: const Color(0xFFC8E6C9),
+        imagePath: 'assets/images/dr_ghor.png',
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(
