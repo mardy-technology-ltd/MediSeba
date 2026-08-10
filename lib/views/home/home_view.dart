@@ -465,8 +465,8 @@ class _HomeViewState extends State<HomeView> {
             crossAxisSpacing: 12,
             mainAxisSpacing: 12,
             childAspectRatio: screenWidth > 600
-                ? 1.1
-                : (screenWidth < 360 ? 0.76 : 0.84),
+                ? 1.05
+                : (screenWidth < 360 ? 0.74 : 0.81),
           ),
           itemCount: categories.length,
           itemBuilder: (context, index) {
@@ -482,7 +482,7 @@ class _HomeViewState extends State<HomeView> {
     return GestureDetector(
       onTap: item.onTap,
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -496,41 +496,41 @@ class _HomeViewState extends State<HomeView> {
           ],
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Top Icon / Image Box
+                // Top Icon / Image Box (Enlarged & Centered)
                 item.imagePath != null
                     ? SizedBox(
-                        width: 44,
-                        height: 44,
+                        width: 58,
+                        height: 58,
                         child: Image.asset(
                           item.imagePath!,
                           fit: BoxFit.contain,
                           errorBuilder: (context, error, stackTrace) => Container(
-                            width: 44,
-                            height: 44,
+                            width: 58,
+                            height: 58,
                             decoration: BoxDecoration(
                               color: item.iconColor,
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(16),
                             ),
                             child: Icon(
                               item.icon,
                               color: Colors.white,
-                              size: 24,
+                              size: 30,
                             ),
                           ),
                         ),
                       )
                     : Container(
-                        width: 44,
-                        height: 44,
+                        width: 58,
+                        height: 58,
                         decoration: BoxDecoration(
                           color: item.iconColor,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
                               color: item.iconColor.withValues(alpha: 0.25),
@@ -542,16 +542,17 @@ class _HomeViewState extends State<HomeView> {
                         child: Icon(
                           item.icon,
                           color: Colors.white,
-                          size: 24,
+                          size: 30,
                         ),
                       ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 8),
 
-                // Card Title
+                // Card Title (Centered)
                 Text(
                   item.title,
+                  textAlign: TextAlign.center,
                   style: const TextStyle(
-                    fontSize: 14.5,
+                    fontSize: 14,
                     fontWeight: FontWeight.w800,
                     color: Color(0xFF1E293B),
                     height: 1.2,
@@ -561,11 +562,12 @@ class _HomeViewState extends State<HomeView> {
                 ),
                 const SizedBox(height: 4),
 
-                // Subtitle / Description Text
+                // Subtitle / Description Text (Centered)
                 Text(
                   item.subtitle,
+                  textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 11.5,
+                    fontSize: 11,
                     fontWeight: FontWeight.w500,
                     color: const Color(0xFF64748B),
                     height: 1.3,
@@ -576,13 +578,14 @@ class _HomeViewState extends State<HomeView> {
               ],
             ),
 
-            // Bottom Action Link "সেবা গ্রহণ করুন ->"
+            // Bottom Action Link "সেবা গ্রহণ করুন ->" (Centered)
             Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   item.actionText,
                   style: const TextStyle(
-                    fontSize: 12,
+                    fontSize: 11.5,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF0F9D58),
                   ),
