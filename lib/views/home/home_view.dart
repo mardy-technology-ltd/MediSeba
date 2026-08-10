@@ -467,7 +467,7 @@ class _HomeViewState extends State<HomeView> {
             mainAxisSpacing: 12,
             childAspectRatio: screenWidth > 600
                 ? 1.05
-                : (screenWidth < 360 ? 0.74 : 0.81),
+                : (screenWidth < 360 ? 0.84 : 0.90),
           ),
           itemCount: categories.length,
           itemBuilder: (context, index) {
@@ -483,7 +483,7 @@ class _HomeViewState extends State<HomeView> {
     return GestureDetector(
       onTap: item.onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
