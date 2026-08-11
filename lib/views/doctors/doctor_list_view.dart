@@ -11,11 +11,13 @@ import 'widgets/doctor_card.dart';
 class DoctorListView extends StatefulWidget {
   final bool showAppBar;
   final LanguageController? languageController;
+  final String? initialSearchQuery;
 
   const DoctorListView({
     super.key,
     this.showAppBar = true,
     this.languageController,
+    this.initialSearchQuery,
   });
 
   @override
@@ -31,6 +33,10 @@ class _DoctorListViewState extends State<DoctorListView> {
   void initState() {
     super.initState();
     _langController = widget.languageController ?? LanguageController();
+    if (widget.initialSearchQuery != null && widget.initialSearchQuery!.isNotEmpty) {
+      _searchController.text = widget.initialSearchQuery!;
+      _doctorController.searchDoctors(widget.initialSearchQuery!);
+    }
   }
 
   @override

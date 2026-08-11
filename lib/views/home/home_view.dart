@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../controllers/home_controller.dart';
 import '../../controllers/auth_controller.dart';
@@ -45,12 +46,31 @@ class _HomeViewState extends State<HomeView> {
   int _currentBannerIndex = 0;
   final PageController _bannerPageController = PageController();
 
+  final TextEditingController _homeSearchController = TextEditingController();
+  Timer? _bannerTimer;
   late final LanguageController _langController;
 
   @override
   void initState() {
     super.initState();
     _langController = widget.languageController ?? LanguageController();
+    _startBannerAutoSlide();
+  }
+
+  void _startBannerAutoSlide() {
+    _bannerTimer?.cancel();
+    _bannerTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      if (!mounted) return;
+      if (_bannerPageController.hasClients) {
+        int currentPage = _bannerPageController.page?.round() ?? _currentBannerIndex;
+        int nextPage = (currentPage + 1) % 3;
+        _bannerPageController.animateToPage(
+          nextPage,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
   }
 
   static const brandGreen = Color(0xFF008536);
@@ -60,8 +80,25 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   void dispose() {
+    _bannerTimer?.cancel();
+    _homeSearchController.dispose();
     _bannerPageController.dispose();
     super.dispose();
+  }
+
+  void _performHomeSearch() {
+    final query = _homeSearchController.text.trim();
+    FocusScope.of(context).unfocus();
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DoctorListView(
+          showAppBar: true,
+          languageController: _langController,
+          initialSearchQuery: query,
+        ),
+      ),
+    );
   }
 
   @override
@@ -188,73 +225,77 @@ class _HomeViewState extends State<HomeView> {
               ),
             ],
           ),
+          floatingActionButton: FloatingActionButton.extended(
+            onPressed: () => showHelplineBottomSheet(context),
+            backgroundColor: const Color(0xFFDC2626),
+            elevation: 6,
+            icon: const Icon(Icons.phone_in_talk_rounded, color: Colors.white, size: 20),
+            label: Text(
+              _langController.tr('হেল্পলাইন 24/7', 'Helpline 24/7'),
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 12.5,
+              ),
+            ),
+          ),
         );
       },
     );
   }
 
-  // Home Screen Center Scroll Body
+  // Home Screen Center Scroll Body (Redesigned UI/UX)
   Widget _buildHomeBodyContent() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. Category 2x3 Grid Section
-          _buildCategoryGrid(),
-
-          const SizedBox(height: 20),
-
-          // 2. Banner Slider Carousel
-          _buildHeroBanner(),
+          // 1. Personalized Greeting & Universal Search Header Card
+          _buildUserGreetingAndSearchBar(),
 
           const SizedBox(height: 16),
 
-          // 3. Health Query Banner
+          // 2. 24/7 Red Emergency Call Bar
+          _buildEmergencyHotlineBar(),
+
+          const SizedBox(height: 20),
+
+          // 3. Category Service Grid Section
+          _buildSectionHeader(
+            title: _langController.tr('আমাদের সেবাসমূহ', 'Our Healthcare Services'),
+            onSeeAllTap: null,
+          ),
+          const SizedBox(height: 12),
+          _buildCategoryGrid(),
+
+          const SizedBox(height: 22),
+
+          // 4. Banner Slider Carousel
+          _buildHeroBanner(),
+
+          const SizedBox(height: 18),
+
+          // 5. Health Query Banner
           _buildQueryBanner(),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 22),
 
-          // 4. Top Doctors Section Header
+          // 5. Top Doctors Section (Horizontal Scroll Carousel)
           _buildSectionHeader(
-            title: 'Top Doctors In Your Area',
+            title: _langController.tr('বিশেষজ্ঞ ডাক্তারগণ', 'Top Doctors In Your Area'),
             onSeeAllTap: () {
               setState(() => _currentBottomNavIndex = 3);
             },
           ),
           const SizedBox(height: 12),
-
-          // Doctor List
-          _buildDoctorItem(
-            name: 'Dr. Billy',
-            specialty: 'GP-general practitioner',
-            time: '07:00 am - 09:30 pm',
-            isSponsor: true,
-            imageUrl:
-                'https://img.freepik.com/free-photo/doctor-offering-medical-teleconsultation_23-2149329007.jpg',
-          ),
-          _buildDoctorItem(
-            name: 'Dr. Billy',
-            specialty: 'GP-general practitioner',
-            time: '07:00 am - 09:30 pm',
-            isSponsor: true,
-            imageUrl:
-                'https://img.freepik.com/free-photo/female-doctor-hospital-with-stethoscope_23-2148827766.jpg',
-          ),
-          _buildDoctorItem(
-            name: 'Dr. Billy',
-            specialty: 'GP-general practitioner',
-            time: '07:00 am - 09:30 pm',
-            isSponsor: false,
-            imageUrl:
-                'https://img.freepik.com/free-photo/woman-doctor-wearing-stethoscope_23-2148827768.jpg',
-          ),
+          _buildHorizontalDoctorsList(),
 
           const SizedBox(height: 24),
 
-          // 5. Nearby Hospitals Section Header
+          // 6. Nearby Hospitals Section Header
           _buildSectionHeader(
-            title: 'Nearby Hospitals',
+            title: _langController.tr('নিকটস্থ হাসপাতাল ও ডায়াগনস্টিক', 'Nearby Hospitals'),
             onSeeAllTap: () {
               setState(() => _currentBottomNavIndex = 2);
             },
@@ -279,30 +320,30 @@ class _HomeViewState extends State<HomeView> {
                 childAspectRatio: aspectRatio,
                 children: [
                   _buildHospitalCard(
-                    name: 'Popular Diagonistic',
-                    address: 'Street Address',
-                    time: '07:00 am - 15:30 pm',
+                    name: 'Popular Diagnostic',
+                    address: 'Uttara Branch, Dhaka',
+                    time: '07:00 am - 11:30 pm',
                     imageUrl:
                         'https://img.freepik.com/free-photo/empty-emergency-room-with-medical-equipment_23-2149138092.jpg',
                   ),
                   _buildHospitalCard(
-                    name: 'Popular Diagonistic',
-                    address: 'Street Address',
-                    time: '07:00 am - 15:30 pm',
+                    name: 'Ibn Sina Hospital',
+                    address: 'Dhanmondi, Dhaka',
+                    time: '24 Hours Open',
                     imageUrl:
                         'https://img.freepik.com/free-photo/modern-operating-room-hospital_23-2148942918.jpg',
                   ),
                   _buildHospitalCard(
-                    name: 'Popular Diagonistic',
-                    address: 'Street Address',
-                    time: '07:00 am - 15:30 pm',
+                    name: 'Labaid Hospital',
+                    address: 'Gulshan, Dhaka',
+                    time: '24 Hours Open',
                     imageUrl:
                         'https://img.freepik.com/free-photo/interior-view-operating-room_1170-2254.jpg',
                   ),
                   _buildHospitalCard(
-                    name: 'Popular Diagonistic',
-                    address: 'Street Address',
-                    time: '07:00 am - 15:30 pm',
+                    name: 'Square Hospital',
+                    address: 'Panthapath, Dhaka',
+                    time: '24 Hours Open',
                     imageUrl:
                         'https://img.freepik.com/free-photo/medical-clinic-reception-counter-registration_482257-26804.jpg',
                   ),
@@ -311,8 +352,430 @@ class _HomeViewState extends State<HomeView> {
             },
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
         ],
+      ),
+    );
+  }
+
+  // 1. User Greeting & Universal Search Bar Header Card
+  Widget _buildUserGreetingAndSearchBar() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFFE8F5E9), Color(0xFFF1F8E9)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFC8E6C9), width: 1.2),
+        boxShadow: [
+          BoxShadow(
+            color: brandGreen.withValues(alpha: 0.06),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: brandGreen.withValues(alpha: 0.3)),
+                ),
+                child: const Icon(Icons.waving_hand_rounded, color: Color(0xFFF59E0B), size: 20),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _langController.tr('👋 শুভ দিন, সুস্থ থাকুন', '👋 Good Day, Stay Healthy'),
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w900,
+                        color: textDark,
+                      ),
+                    ),
+                    Text(
+                      _langController.tr(
+                        'আজ আপনার কী ধরনের স্বাস্থ্যসেবা প্রয়োজন?',
+                        'What healthcare service do you need today?',
+                      ),
+                      style: const TextStyle(
+                        fontSize: 11.5,
+                        color: Color(0xFF475569),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 14),
+
+          // Interactive Universal Search Bar Field
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 6,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+            child: TextFormField(
+              controller: _homeSearchController,
+              textInputAction: TextInputAction.search,
+              onFieldSubmitted: (_) => _performHomeSearch(),
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: textDark,
+              ),
+              decoration: InputDecoration(
+                hintText: _langController.tr(
+                  'ডাক্তার, বিশেষত্ব, হাসপাতাল বা ওষুধ খুঁজুন...',
+                  'Search doctor, specialty, hospital or medicine...',
+                ),
+                hintStyle: const TextStyle(
+                  fontSize: 12,
+                  color: Color(0xFF94A3B8),
+                  fontWeight: FontWeight.w400,
+                ),
+                prefixIcon: const Icon(Icons.search_rounded, color: brandGreen, size: 22),
+                suffixIcon: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (_homeSearchController.text.isNotEmpty)
+                      IconButton(
+                        icon: const Icon(Icons.clear_rounded, color: Colors.grey, size: 18),
+                        onPressed: () {
+                          setState(() {
+                            _homeSearchController.clear();
+                          });
+                        },
+                      ),
+                    InkWell(
+                      onTap: _performHomeSearch,
+                      borderRadius: BorderRadius.circular(10),
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 8),
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: brandGreen,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 16),
+                      ),
+                    ),
+                  ],
+                ),
+                filled: true,
+                fillColor: Colors.white,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: const BorderSide(color: Color(0xFFCBD5E1), width: 1),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: const BorderSide(color: brandGreen, width: 1.8),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 2. 24/7 Red Emergency Call Bar
+  Widget _buildEmergencyHotlineBar() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFFDC2626), Color(0xFFEF4444)],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.red.withValues(alpha: 0.35),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.phone_in_talk_rounded, color: Color(0xFFDC2626), size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _langController.tr('২৪/৭ জরুরি হেল্পলাইন হটলাইন', '24/7 Emergency Helpline Hotline'),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                const Text(
+                  '📞 09647111666',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => showHelplineBottomSheet(context),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: const Color(0xFFDC2626),
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: Text(
+              _langController.tr('কল করুন', 'Call Now'),
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 5. Horizontal Top Doctors List Carousel
+  Widget _buildHorizontalDoctorsList() {
+    final doctors = [
+      {
+        'name': 'Dr. Nusrat Jahan',
+        'specialty': 'Gynecologist & Obstetrics',
+        'degree': 'MBBS, FCPS (Gynae)',
+        'rating': '4.9',
+        'reviews': '142',
+        'time': '07:00 pm - 09:30 pm',
+        'image': 'https://img.freepik.com/free-photo/female-doctor-hospital-with-stethoscope_23-2148827766.jpg',
+      },
+      {
+        'name': 'Dr. Billy Edwards',
+        'specialty': 'GP - General Practitioner',
+        'degree': 'MBBS, MD (Medicine)',
+        'rating': '4.8',
+        'reviews': '98',
+        'time': '05:00 pm - 09:00 pm',
+        'image': 'https://img.freepik.com/free-photo/doctor-offering-medical-teleconsultation_23-2149329007.jpg',
+      },
+      {
+        'name': 'Dr. Mahbub Hasan',
+        'specialty': 'Cardiologist & Specialist',
+        'degree': 'MBBS, MD (Cardiology)',
+        'rating': '5.0',
+        'reviews': '210',
+        'time': '06:00 pm - 10:00 pm',
+        'image': 'https://img.freepik.com/free-photo/woman-doctor-wearing-stethoscope_23-2148827768.jpg',
+      },
+    ];
+
+    return SizedBox(
+      height: 195,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        itemCount: doctors.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 12),
+        itemBuilder: (context, index) {
+          final doc = doctors[index];
+          return GestureDetector(
+            onTap: () {
+              setState(() => _currentBottomNavIndex = 3);
+            },
+            child: Container(
+              width: 250,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Stack(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.network(
+                              doc['image']!,
+                              width: 54,
+                              height: 54,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          Positioned(
+                            right: 2,
+                            bottom: 2,
+                            child: Container(
+                              width: 11,
+                              height: 11,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF10B981),
+                                shape: BoxShape.circle,
+                                border: Border.all(color: Colors.white, width: 1.5),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(Icons.star_rounded, color: Color(0xFFF59E0B), size: 15),
+                                const SizedBox(width: 3),
+                                Text(
+                                  '${doc['rating']} (${doc['reviews']})',
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                    color: textDark,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              doc['name']!,
+                              style: const TextStyle(
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.bold,
+                                color: textDark,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              doc['degree']!,
+                              style: const TextStyle(
+                                fontSize: 10.5,
+                                color: brandGreen,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF1F5F9),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.access_time_rounded, color: Color(0xFF64748B), size: 13),
+                        const SizedBox(width: 5),
+                        Expanded(
+                          child: Text(
+                            doc['time']!,
+                            style: const TextStyle(
+                              fontSize: 10.5,
+                              color: Color(0xFF475569),
+                              fontWeight: FontWeight.w500,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Spacer(),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 32,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() => _currentBottomNavIndex = 3);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: brandGreen,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(
+                        _langController.tr('সিরিয়াল নিন', 'Book Serial'),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -323,13 +786,10 @@ class _HomeViewState extends State<HomeView> {
 
     final categories = [
       _CategoryItem(
-        title: lang.tr(
-          'ডাক্তার সিরিয়াল (চেম্বার সিরিয়াল)',
-          'Doctor Serial (Chamber Serial)',
-        ),
+        title: lang.tr('ডাক্তার সিরিয়াল', 'Doctor Serial'),
         subtitle: lang.tr(
-          'দেশের প্রখ্যাত প্রফেশনাল বিশেষজ্ঞদের চেম্বার সিরিয়াল বুকিং।',
-          'Chamber serial booking of renowned professional specialists.',
+          'বিশেষজ্ঞদের চেম্বার সিরিয়াল বুকিং।',
+          'Chamber serial booking of specialists.',
         ),
         actionText: lang.tr('সেবা গ্রহণ করুন', 'Get Service'),
         icon: Icons.calendar_month_outlined,
@@ -345,10 +805,10 @@ class _HomeViewState extends State<HomeView> {
         ),
       ),
       _CategoryItem(
-        title: lang.tr('ডাক্তার ঘর (টেলিমেডিসিন)', 'Doctor Bari (Telemedicine)'),
+        title: lang.tr('ডাক্তার ঘর', 'Doctor Bari'),
         subtitle: lang.tr(
-          'অনলাইন ভিডিও কনসালটেশন ও সরাসরি ডাক্তারের পরামর্শ।',
-          'Online video consultation & direct doctor advice.',
+          'ভিডিও কনসালটেশন ও ডাক্তারের পরামর্শ।',
+          'Online video doctor consultation.',
         ),
         actionText: lang.tr('সেবা গ্রহণ করুন', 'Get Service'),
         icon: Icons.monitor_heart_outlined,
@@ -366,8 +826,8 @@ class _HomeViewState extends State<HomeView> {
       _CategoryItem(
         title: lang.tr('মেডিশপ', 'MediShop'),
         subtitle: lang.tr(
-          'ঘরে বসেই ৮২,০০০+ অরিজিনাল ওষুধ অর্ডার করুন।',
-          'Order 82,000+ original medicines sitting at home.',
+          'ঘরে বসেই অরিজিনাল ওষুধ অর্ডার করুন।',
+          'Order original medicines sitting at home.',
         ),
         actionText: lang.tr('সেবা গ্রহণ করুন', 'Get Service'),
         icon: Icons.medication_outlined,
@@ -386,7 +846,7 @@ class _HomeViewState extends State<HomeView> {
         title: lang.tr('রক্তসেবা', 'Blood Service'),
         subtitle: lang.tr(
           'জরুরি রক্তদাতা ও রক্তসেবা দ্রুত খুঁজে নিন।',
-          'Find emergency blood donors & blood services quickly.',
+          'Find emergency blood donors quickly.',
         ),
         actionText: lang.tr('সেবা গ্রহণ করুন', 'Get Service'),
         icon: Icons.water_drop_outlined,
@@ -404,8 +864,8 @@ class _HomeViewState extends State<HomeView> {
       _CategoryItem(
         title: lang.tr('অ্যাম্বুলেন্স', 'Ambulance'),
         subtitle: lang.tr(
-          '২৪/৭ জরুরি অ্যাম্বুলেন্স সেবা এখন এক কলেই।',
-          '24/7 emergency ambulance service now in one call.',
+          '২৪/৭ জরুরি অ্যাম্বুলেন্স সেবা এক কলেই।',
+          '24/7 emergency ambulance in one call.',
         ),
         actionText: lang.tr('সেবা গ্রহণ করুন', 'Get Service'),
         icon: Icons.airport_shuttle_outlined,
@@ -423,8 +883,8 @@ class _HomeViewState extends State<HomeView> {
       _CategoryItem(
         title: lang.tr('মাতৃসেবা', 'Maternal Care'),
         subtitle: lang.tr(
-          'মা ও শিশুর জন্য বিশেষ স্বাস্থ্যসেবা ও পরামর্শ।',
-          'Special healthcare & consultation for mother and child.',
+          'মা ও শিশুর বিশেষ স্বাস্থ্যসেবা ও পরামর্শ।',
+          'Special care for mother and child.',
         ),
         actionText: lang.tr('সেবা গ্রহণ করুন', 'Get Service'),
         icon: Icons.child_care_outlined,
@@ -437,8 +897,8 @@ class _HomeViewState extends State<HomeView> {
       _CategoryItem(
         title: lang.tr('ডিসকাউন্ট অফার', 'Discount Offers'),
         subtitle: lang.tr(
-          'হাসপাতাল ও ডায়াগনস্টিক টেস্টে ৪০% পর্যন্ত ছাড়।',
-          'Up to 40% discount on hospital & diagnostic tests.',
+          'হাসপাতাল ও টেস্টে ৪০% পর্যন্ত ছাড়।',
+          'Up to 40% discount on tests.',
         ),
         actionText: lang.tr('সেবা গ্রহণ করুন', 'Get Service'),
         icon: Icons.percent_rounded,
@@ -455,8 +915,8 @@ class _HomeViewState extends State<HomeView> {
       _CategoryItem(
         title: lang.tr('কাস্টমার সাপোর্ট', 'Customer Support'),
         subtitle: lang.tr(
-          '২৪/৭ কাস্টমার সাপোর্ট টিম আপনার পাশে রয়েছে।',
-          '24/7 customer support team is by your side.',
+          '২৪/৭ সাপোর্ট টিম আপনার পাশে রয়েছে।',
+          '24/7 customer support team.',
         ),
         actionText: lang.tr('সেবা গ্রহণ করুন', 'Get Service'),
         icon: Icons.headset_mic_outlined,
@@ -478,11 +938,11 @@ class _HomeViewState extends State<HomeView> {
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: crossAxisCount,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
             childAspectRatio: screenWidth > 600
-                ? 1.05
-                : (screenWidth < 360 ? 0.84 : 0.90),
+                ? 1.30
+                : (screenWidth < 360 ? 1.02 : 1.14),
           ),
           itemCount: categories.length,
           itemBuilder: (context, index) {
@@ -498,16 +958,16 @@ class _HomeViewState extends State<HomeView> {
     return GestureDetector(
       onTap: item.onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+        padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: item.borderColor, width: 1.2),
           boxShadow: [
             BoxShadow(
-              color: item.iconColor.withValues(alpha: 0.06),
-              blurRadius: 10,
-              offset: const Offset(0, 3),
+              color: item.iconColor.withValues(alpha: 0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
@@ -518,39 +978,39 @@ class _HomeViewState extends State<HomeView> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Top Icon / Image Box (Enlarged & Centered)
+                // Top Icon / Image Box (Compact Size)
                 item.imagePath != null
                     ? SizedBox(
-                        width: 58,
-                        height: 58,
+                        width: 48,
+                        height: 48,
                         child: Image.asset(
                           item.imagePath!,
                           fit: BoxFit.contain,
                           errorBuilder: (context, error, stackTrace) => Container(
-                            width: 58,
-                            height: 58,
+                            width: 48,
+                            height: 48,
                             decoration: BoxDecoration(
                               color: item.iconColor,
-                              borderRadius: BorderRadius.circular(16),
+                              borderRadius: BorderRadius.circular(12),
                             ),
                             child: Icon(
                               item.icon,
                               color: Colors.white,
-                              size: 30,
+                              size: 24,
                             ),
                           ),
                         ),
                       )
                     : Container(
-                        width: 58,
-                        height: 58,
+                        width: 48,
+                        height: 48,
                         decoration: BoxDecoration(
                           color: item.iconColor,
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
                               color: item.iconColor.withValues(alpha: 0.25),
-                              blurRadius: 6,
+                              blurRadius: 5,
                               offset: const Offset(0, 2),
                             ),
                           ],
@@ -558,35 +1018,35 @@ class _HomeViewState extends State<HomeView> {
                         child: Icon(
                           item.icon,
                           color: Colors.white,
-                          size: 30,
+                          size: 24,
                         ),
                       ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
 
                 // Card Title (Centered)
                 Text(
                   item.title,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    fontSize: 14,
+                    fontSize: 13,
                     fontWeight: FontWeight.w800,
                     color: Color(0xFF1E293B),
-                    height: 1.2,
+                    height: 1.15,
                   ),
-                  maxLines: 2,
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 2),
 
                 // Subtitle / Description Text (Centered)
                 Text(
                   item.subtitle,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 11,
+                  style: const TextStyle(
+                    fontSize: 10.5,
                     fontWeight: FontWeight.w500,
-                    color: const Color(0xFF64748B),
-                    height: 1.3,
+                    color: Color(0xFF64748B),
+                    height: 1.2,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -601,16 +1061,16 @@ class _HomeViewState extends State<HomeView> {
                 Text(
                   item.actionText,
                   style: const TextStyle(
-                    fontSize: 11.5,
+                    fontSize: 11,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF0F9D58),
                   ),
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: 3),
                 const Icon(
                   Icons.arrow_forward_rounded,
                   color: Color(0xFF0F9D58),
-                  size: 14,
+                  size: 13,
                 ),
               ],
             ),
@@ -621,45 +1081,173 @@ class _HomeViewState extends State<HomeView> {
   }
 
 
-  // Hero Banner Slider Card (5 sliding banner pages 100% pixel-matched)
+  // Hero Banner Slider Card (Exactly 3 unique medical-related banner slides)
   Widget _buildHeroBanner() {
+    final List<Map<String, dynamic>> banners = [
+      {
+        'title': _langController.tr('আপনার স্বাস্থ্যের সুরক্ষাই আমাদের প্রথম অগ্রাধিকার', 'Your Health Is Our Top Priority'),
+        'subtitle': _langController.tr('২৪/৭ অভিজ্ঞ প্রফেশনাল ডাক্তারের সেবা বুকিং করুন', 'Book 24/7 experienced doctor consultation'),
+        'badge': 'OPEN 24/7',
+        'assetImage': null,
+        'color1': const Color(0xFF008536),
+        'color2': const Color(0xFF0F9D58),
+        'icon': Icons.medical_services_rounded,
+      },
+      {
+        'title': _langController.tr('মেডিশপ: ৮২,০০০+ অরিজিনাল ওষুধ ডিসকাউন্টে অর্ডার করুন', 'MediShop: Order 82,000+ Original Medicines'),
+        'subtitle': _langController.tr('ঘরে বসেই জেনুইন ওষুধ ও হেলথ প্রোডাক্টের হোম ডেলিভারি', 'Fast home delivery of genuine medicines & health care'),
+        'badge': '20% OFF',
+        'assetImage': null,
+        'color1': const Color(0xFF0288D1),
+        'color2': const Color(0xFF00A8E8),
+        'icon': Icons.medication_rounded,
+      },
+      {
+        'title': _langController.tr('২৪/৭ ইমার্জেন্সি আইসিইউ ও এসি অ্যাম্বুলেন্স সেবা', '24/7 Emergency ICU & AC Ambulance Service'),
+        'subtitle': _langController.tr('এক কলেই দ্রুত জরুরি স্থানান্তরের জন্য কল করুন', 'Call now for quick emergency medical transport'),
+        'badge': 'HOTLINE',
+        'assetImage': null,
+        'color1': const Color(0xFFDC2626),
+        'color2': const Color(0xFFEF4444),
+        'icon': Icons.airport_shuttle_rounded,
+      },
+    ];
+
     return Column(
       children: [
         SizedBox(
           height: 155,
           child: PageView.builder(
             controller: _bannerPageController,
-            itemCount: 5,
+            itemCount: 3,
             onPageChanged: (index) {
               setState(() => _currentBannerIndex = index);
             },
             itemBuilder: (context, index) {
+              final banner = banners[index];
+              final String? assetImg = banner['assetImage'];
+
+              if (assetImg != null) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.asset(
+                      assetImg,
+                      fit: BoxFit.contain,
+                      width: double.infinity,
+                    ),
+                  ),
+                );
+              }
+
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                child: Image.asset(
-                  'assets/images/perfect_hero_banner.png',
-                  fit: BoxFit.contain,
-                  width: double.infinity,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [banner['color1'] as Color, banner['color2'] as Color],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: (banner['color1'] as Color).withValues(alpha: 0.25),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.25),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Text(
+                                  banner['badge'],
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                banner['title'],
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  height: 1.2,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                banner['subtitle'],
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.9),
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Container(
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.2),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white30, width: 1.5),
+                          ),
+                          child: Icon(
+                            banner['icon'] as IconData,
+                            color: Colors.white,
+                            size: 34,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               );
             },
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 10),
 
-        // Indicator Dots
+        // Indicator Dots (3 Dots for 3 Banners)
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(5, (index) {
+          children: List.generate(3, (index) {
             final isSelected = _currentBannerIndex == index;
             return AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               margin: const EdgeInsets.symmetric(horizontal: 3),
-              width: isSelected ? 16 : 8,
+              width: isSelected ? 18 : 8,
               height: 8,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(4),
-                color: isSelected ? brandGreen : const Color(0xFFDDDDDD),
+                color: isSelected ? brandGreen : const Color(0xFFCBD5E1),
               ),
             );
           }),
@@ -676,7 +1264,7 @@ class _HomeViewState extends State<HomeView> {
   // Section Header Component
   Widget _buildSectionHeader({
     required String title,
-    required VoidCallback onSeeAllTap,
+    VoidCallback? onSeeAllTap,
   }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -689,116 +1277,19 @@ class _HomeViewState extends State<HomeView> {
             color: textDark,
           ),
         ),
-        GestureDetector(
-          onTap: onSeeAllTap,
-          child: const Text(
-            'See All',
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
-              color: brandGreen,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // Doctor List Item Card
-  Widget _buildDoctorItem({
-    required String name,
-    required String specialty,
-    required String time,
-    required bool isSponsor,
-    required String imageUrl,
-  }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
-      ),
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.network(
-              imageUrl,
-              width: 70,
-              height: 70,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => Container(
-                width: 70,
-                height: 70,
-                color: const Color(0xFFE2E8F0),
-                child: const Icon(Icons.person, color: textMuted),
+        if (onSeeAllTap != null)
+          GestureDetector(
+            onTap: onSeeAllTap,
+            child: Text(
+              _langController.tr('সব দেখুন >', 'See All >'),
+              style: const TextStyle(
+                fontSize: 12.5,
+                fontWeight: FontWeight.bold,
+                color: brandGreen,
               ),
             ),
           ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      name,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: textDark,
-                      ),
-                    ),
-                    if (isSponsor)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: brandGreen,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Text(
-                          'Sponsor',
-                          style: TextStyle(
-                            fontSize: 9,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  specialty,
-                  style: const TextStyle(fontSize: 11.5, color: textMuted),
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.access_time_rounded,
-                      size: 13,
-                      color: brandGreen,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      time,
-                      style: const TextStyle(fontSize: 11, color: textMuted),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+      ],
     );
   }
 
