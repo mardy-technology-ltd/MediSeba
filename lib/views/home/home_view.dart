@@ -20,6 +20,7 @@ import '../patient_portal/patient_portal_view.dart';
 import '../medishop/medishop_view.dart';
 import '../ambulance/ambulance_seba_view.dart';
 import '../career/career_view.dart';
+import '../blog/blog_view.dart';
 
 class HomeView extends StatefulWidget {
   final HomeController homeController;
@@ -1109,17 +1110,6 @@ class _HomeViewState extends State<HomeView> {
                     },
                   ),
                   _buildBkashMenuItem(
-                    icon: Icons.local_hospital_outlined,
-                    title: isBangla ? 'হাসপাতাল সেবা' : 'Hospitals',
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => HospitalListView(languageController: _langController)),
-                      );
-                    },
-                  ),
-                  _buildBkashMenuItem(
                     icon: Icons.work_outline_rounded,
                     title: isBangla ? 'ক্যারিয়ার' : 'Career',
                     onTap: () {
@@ -1127,6 +1117,17 @@ class _HomeViewState extends State<HomeView> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (_) => CareerView(languageController: _langController)),
+                      );
+                    },
+                  ),
+                  _buildBkashMenuItem(
+                    icon: Icons.article_outlined,
+                    title: isBangla ? 'ব্লগ' : 'Blog',
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => BlogView(languageController: _langController)),
                       );
                     },
                   ),
