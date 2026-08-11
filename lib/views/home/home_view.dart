@@ -1108,17 +1108,6 @@ class _HomeViewState extends State<HomeView> {
                     },
                   ),
                   _buildBkashMenuItem(
-                    icon: Icons.airport_shuttle_outlined,
-                    title: isBangla ? 'অ্যাম্বুলেন্স সেবা' : 'Ambulance Service',
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => AmbulanceSebaView(languageController: _langController)),
-                      );
-                    },
-                  ),
-                  _buildBkashMenuItem(
                     icon: Icons.local_hospital_outlined,
                     title: isBangla ? 'হাসপাতাল সেবা' : 'Hospitals',
                     onTap: () {
