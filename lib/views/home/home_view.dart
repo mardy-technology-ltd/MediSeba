@@ -19,6 +19,7 @@ import '../profile/profile_view.dart';
 import '../patient_portal/patient_portal_view.dart';
 import '../medishop/medishop_view.dart';
 import '../ambulance/ambulance_seba_view.dart';
+import '../career/career_view.dart';
 
 class HomeView extends StatefulWidget {
   final HomeController homeController;
@@ -1119,13 +1120,13 @@ class _HomeViewState extends State<HomeView> {
                     },
                   ),
                   _buildBkashMenuItem(
-                    icon: Icons.local_offer_outlined,
-                    title: isBangla ? 'ডিসকাউন্ট অফার' : 'Discount Offers',
+                    icon: Icons.work_outline_rounded,
+                    title: isBangla ? 'ক্যারিয়ার' : 'Career',
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => OfferListView(languageController: _langController)),
+                        MaterialPageRoute(builder: (_) => CareerView(languageController: _langController)),
                       );
                     },
                   ),
