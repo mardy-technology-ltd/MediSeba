@@ -589,7 +589,7 @@ class _HomeViewState extends State<HomeView> {
     final doctors = [
       {
         'name': 'Dr. Nusrat Jahan',
-        'specialty': 'Gynecologist & Obstetrics',
+        'specialty': 'Gynecologist & FCPS Specialist',
         'degree': 'MBBS, FCPS (Gynae)',
         'rating': '4.9',
         'reviews': '142',
@@ -598,7 +598,7 @@ class _HomeViewState extends State<HomeView> {
       },
       {
         'name': 'Dr. Billy Edwards',
-        'specialty': 'GP - General Practitioner',
+        'specialty': 'Medicine Specialist & GP',
         'degree': 'MBBS, MD (Medicine)',
         'rating': '4.8',
         'reviews': '98',
@@ -607,7 +607,7 @@ class _HomeViewState extends State<HomeView> {
       },
       {
         'name': 'Dr. Mahbub Hasan',
-        'specialty': 'Cardiologist & Specialist',
+        'specialty': 'Cardiologist & Heart Specialist',
         'degree': 'MBBS, MD (Cardiology)',
         'rating': '5.0',
         'reviews': '210',
@@ -617,7 +617,7 @@ class _HomeViewState extends State<HomeView> {
     ];
 
     return SizedBox(
-      height: 195,
+      height: 168,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
@@ -630,7 +630,7 @@ class _HomeViewState extends State<HomeView> {
               setState(() => _currentBottomNavIndex = 3);
             },
             child: Container(
-              width: 250,
+              width: 265,
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -638,34 +638,40 @@ class _HomeViewState extends State<HomeView> {
                 border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
+                    color: brandGreen.withValues(alpha: 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 3),
                   ),
                 ],
               ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
                     children: [
                       Stack(
                         children: [
                           ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(14),
                             child: Image.network(
                               doc['image']!,
-                              width: 54,
-                              height: 54,
+                              width: 52,
+                              height: 52,
                               fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) => Container(
+                                width: 52,
+                                height: 52,
+                                color: const Color(0xFFE2E8F0),
+                                child: const Icon(Icons.person, color: textMuted),
+                              ),
                             ),
                           ),
                           Positioned(
                             right: 2,
                             bottom: 2,
                             child: Container(
-                              width: 11,
-                              height: 11,
+                              width: 10,
+                              height: 10,
                               decoration: BoxDecoration(
                                 color: const Color(0xFF10B981),
                                 shape: BoxShape.circle,
@@ -682,7 +688,7 @@ class _HomeViewState extends State<HomeView> {
                           children: [
                             Row(
                               children: [
-                                const Icon(Icons.star_rounded, color: Color(0xFFF59E0B), size: 15),
+                                const Icon(Icons.star_rounded, color: Color(0xFFF59E0B), size: 14),
                                 const SizedBox(width: 3),
                                 Text(
                                   '${doc['rating']} (${doc['reviews']})',
@@ -720,24 +726,24 @@ class _HomeViewState extends State<HomeView> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 10),
+
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
                       color: const Color(0xFFF1F5F9),
-                      borderRadius: BorderRadius.circular(6),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
                       children: [
                         const Icon(Icons.access_time_rounded, color: Color(0xFF64748B), size: 13),
-                        const SizedBox(width: 5),
+                        const SizedBox(width: 6),
                         Expanded(
                           child: Text(
                             doc['time']!,
                             style: const TextStyle(
-                              fontSize: 10.5,
+                              fontSize: 11,
                               color: Color(0xFF475569),
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.w600,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -746,10 +752,10 @@ class _HomeViewState extends State<HomeView> {
                       ],
                     ),
                   ),
-                  const Spacer(),
+
                   SizedBox(
                     width: double.infinity,
-                    height: 32,
+                    height: 34,
                     child: ElevatedButton(
                       onPressed: () {
                         setState(() => _currentBottomNavIndex = 3);
@@ -758,14 +764,14 @@ class _HomeViewState extends State<HomeView> {
                         backgroundColor: brandGreen,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
                       child: Text(
-                        _langController.tr('সিরিয়াল নিন', 'Book Serial'),
+                        _langController.tr('সিরিয়াল বুক করুন', 'Book Serial'),
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 11.5,
+                          fontSize: 12,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -1758,7 +1764,7 @@ class _CategoryItem {
   });
 }
 
-// Health Query Banner Card with Larger Interactive Animated Proceed Button
+// Health Query Banner Card (Redesigned Modern Glassmorphism & Emerald Theme)
 class _QueryBannerCard extends StatefulWidget {
   const _QueryBannerCard();
 
@@ -1770,7 +1776,7 @@ class _QueryBannerCardState extends State<_QueryBannerCard> {
   double _scale = 1.0;
 
   void _onTapDown(TapDownDetails details) {
-    setState(() => _scale = 0.94);
+    setState(() => _scale = 0.96);
   }
 
   void _onTapUp(TapUpDetails details) {
@@ -1795,121 +1801,142 @@ class _QueryBannerCardState extends State<_QueryBannerCard> {
     return Container(
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF9FF7E8), Color(0xFF85E6D4)],
+          colors: [Color(0xFF064E3B), Color(0xFF047857)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF009245).withValues(alpha: 0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
+            color: const Color(0xFF047857).withValues(alpha: 0.3),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(20),
         child: InkWell(
           onTap: _navigateToHealthConsultation,
-          borderRadius: BorderRadius.circular(18),
-          splashColor: Colors.white.withValues(alpha: 0.2),
-          highlightColor: Colors.white.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(20),
+          splashColor: Colors.white.withValues(alpha: 0.15),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+            padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                // Illustration
-                SizedBox(
-                  width: 125,
-                  height: 105,
-                  child: Image.asset(
-                    'assets/images/query_people.png',
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) => Image.asset(
-                      'assets/images/perfect_query_banner.png',
-                      fit: BoxFit.contain,
-                    ),
+                // Left Icon Graphic Container
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.white24, width: 1.5),
+                  ),
+                  child: const Icon(
+                    Icons.psychology_rounded,
+                    color: Colors.white,
+                    size: 34,
                   ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 14),
 
-                // Text & Button Column
+                // Content Column
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF10B981),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: const Text(
+                              'ফ্রি কনসালটেশন',
+                              style: TextStyle(
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 5),
                       const Text(
                         'স্বাস্থ্য বিষয়ক জিজ্ঞাসা',
                         style: TextStyle(
-                          fontSize: 16.5,
-                          fontWeight: FontWeight.w800,
-                          color: Color(0xFF1E293B),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.white,
                           height: 1.2,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 3),
                       Text(
-                        'We will answer you in 48 hours',
+                        'অভিজ্ঞ ডাক্তারগণ ৪৮ ঘণ্টার মধ্যে উত্তর দিবেন',
                         style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xFF334155).withValues(alpha: 0.75),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white.withValues(alpha: 0.88),
                         ),
-                      ),
-                      const SizedBox(height: 12),
-
-                      // Interactive Larger Proceed Button
-                      GestureDetector(
-                        onTapDown: _onTapDown,
-                        onTapUp: (d) {
-                          _onTapUp(d);
-                          _navigateToHealthConsultation();
-                        },
-                        onTapCancel: _onTapCancel,
-                        child: AnimatedScale(
-                          scale: _scale,
-                          duration: const Duration(milliseconds: 100),
-                          curve: Curves.easeInOut,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF0F9D58),
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(0xFF0F9D58).withValues(alpha: 0.35),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            child: const Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  'Proceed',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                                SizedBox(width: 6),
-                                Icon(
-                                  Icons.arrow_forward_rounded,
-                                  color: Colors.white,
-                                  size: 17,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+
+                // Interactive Proceed Button
+                GestureDetector(
+                  onTapDown: _onTapDown,
+                  onTapUp: (d) {
+                    _onTapUp(d);
+                    _navigateToHealthConsultation();
+                  },
+                  onTapCancel: _onTapCancel,
+                  child: AnimatedScale(
+                    scale: _scale,
+                    duration: const Duration(milliseconds: 100),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 6,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'প্রশ্ন করুন',
+                            style: TextStyle(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF064E3B),
+                            ),
+                          ),
+                          SizedBox(width: 4),
+                          Icon(
+                            Icons.arrow_forward_rounded,
+                            color: Color(0xFF064E3B),
+                            size: 15,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ],
