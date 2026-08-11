@@ -30,6 +30,20 @@ class _ContactUsViewState extends State<ContactUsView> {
   void initState() {
     super.initState();
     _langController = widget.languageController ?? LanguageController();
+
+    // Pre-cache real Satellite Map imagery into RAM so tab switching is 100% instant with 0ms delay!
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        precacheImage(
+          const NetworkImage('https://static-maps.yandex.ru/1.x/?l=sat&ll=90.3845,23.8718&z=16&size=650,320'),
+          context,
+        );
+        precacheImage(
+          const NetworkImage('https://static-maps.yandex.ru/1.x/?l=sat&ll=88.6249481800218,24.360968474850758&z=16&size=650,320'),
+          context,
+        );
+      }
+    });
   }
 
   @override
@@ -444,6 +458,13 @@ class _ContactUsViewState extends State<ContactUsView> {
     );
   }
 
+  Future<void> _openGoogleMap(double lat, double lng) async {
+    final Uri uri = Uri.parse('https://www.google.com/maps/search/?api=1&query=$lat,$lng');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
   // 4. GOOGLE MAP OFFICE LOCATION CARD
   Widget _buildMapLocationCard() {
     final dhakaAddress = _langController.tr(
@@ -454,6 +475,9 @@ class _ContactUsViewState extends State<ContactUsView> {
       'রাজশাহী অফিস: তালাইমারী বাজার মসজিদের বিপরীতে পাশে, বোয়ালিয়া, রাজশাহী',
       'Rajshahi Office: Opposite Talaimari Market Mosque, Boalia, Rajshahi',
     );
+
+    final double lat = _selectedMapIndex == 0 ? 23.8759 : 24.360968474850758;
+    final double lng = _selectedMapIndex == 0 ? 90.3795 : 88.6249481800218;
 
     return Container(
       width: double.infinity,
@@ -578,55 +602,150 @@ class _ContactUsViewState extends State<ContactUsView> {
 
           const SizedBox(height: 14),
 
-          // Map Preview Container
-          Container(
-            width: double.infinity,
-            height: 180,
-            decoration: BoxDecoration(
-              color: const Color(0xFFE2E8F0),
-              borderRadius: BorderRadius.circular(14),
-              image: const DecorationImage(
-                image: NetworkImage('https://maps.googleapis.com/maps/api/staticmap?center=23.8759,90.3795&zoom=15&size=600x300&sensor=false'),
-                fit: BoxFit.cover,
-              ),
-            ),
-            child: Stack(
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
+          // Map Preview Container (Satellite Imagery Mode + Clickable to open Google Maps)
+          InkWell(
+            onTap: () => _openGoogleMap(lat, lng),
+            borderRadius: BorderRadius.circular(16),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                width: double.infinity,
+                height: 220,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFFCBD5E1), width: 1),
                 ),
-                Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 10)],
-                        ),
-                        child: const Icon(Icons.pin_drop_rounded, color: Colors.redAccent, size: 28),
+                child: Stack(
+                  children: [
+                    // Real Pre-cached Satellite Map Image (Natural Green Uttara Lake & Park View)
+                    Positioned.fill(
+                      child: Image.network(
+                        _selectedMapIndex == 0
+                            ? 'https://static-maps.yandex.ru/1.x/?l=sat&ll=90.3845,23.8718&z=16&size=650,320'
+                            : 'https://static-maps.yandex.ru/1.x/?l=sat&ll=88.6249481800218,24.360968474850758&z=16&size=650,320',
+                        fit: BoxFit.cover,
+                        gaplessPlayback: true,
+                        errorBuilder: (context, error, stackTrace) {
+                          return CustomPaint(
+                            painter: _SatellitePainter(isRajshahi: _selectedMapIndex == 1),
+                          );
+                        },
                       ),
-                      const SizedBox(height: 6),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    ),
+
+                    // Map Overlay Dark Vignette
+                    Positioned.fill(
+                      child: Container(
                         decoration: BoxDecoration(
-                          color: Colors.black87,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          _selectedMapIndex == 0 ? 'MediSeba Dhaka Office' : 'MediSeba Rajshahi Office',
-                          style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.black.withValues(alpha: 0.05),
+                              Colors.black.withValues(alpha: 0.25),
+                            ],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+
+                    // Centered Pin Drop (Compact & Clean)
+                    Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.redAccent.withValues(alpha: 0.4),
+                                  blurRadius: 14,
+                                  spreadRadius: 3,
+                                ),
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.location_on_rounded,
+                              color: Color(0xFFEF4444),
+                              size: 24,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF0F172A),
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.black38,
+                                  blurRadius: 6,
+                                ),
+                              ],
+                            ),
+                            child: Text(
+                              _selectedMapIndex == 0
+                                  ? '📍 MediSeba Uttara Office'
+                                  : '📍 MediSeba Rajshahi Office',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Bottom Action Button Overlay (Overflow Safe with Flexible text)
+                    Positioned(
+                      bottom: 10,
+                      left: 12,
+                      right: 12,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: brandGreen,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 6,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.directions_rounded, color: Colors.white, size: 16),
+                            const SizedBox(width: 6),
+                            Flexible(
+                              child: Text(
+                                _langController.tr(
+                                  'গুগল ম্যাপে সরাসরি দেখুন',
+                                  'Open in Google Maps',
+                                ),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ],
@@ -672,4 +791,182 @@ class _ContactUsViewState extends State<ContactUsView> {
       ),
     );
   }
+}
+
+class _SatellitePainter extends CustomPainter {
+  final bool isRajshahi;
+  _SatellitePainter({required this.isRajshahi});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (isRajshahi) {
+      _paintRajshahiSatellite(canvas, size);
+    } else {
+      _paintDhakaSatellite(canvas, size);
+    }
+  }
+
+  void _paintRajshahiSatellite(Canvas canvas, Size size) {
+    // 1. Base Dense Urban Satellite Aerial Background (Rooftops & Trees)
+    final bgPaint = Paint()..color = const Color(0xFF333D4C);
+    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), bgPaint);
+
+    // Green Vegetation & Tree Canopies Patches
+    final vegPaint = Paint()..color = const Color(0xFF1E3A29);
+    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(size.width * 0.45, 0, size.width * 0.25, size.height * 0.5), const Radius.circular(10)), vegPaint);
+    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(0, 10, size.width * 0.2, size.height * 0.4), const Radius.circular(10)), vegPaint);
+    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(size.width * 0.75, 40, size.width * 0.25, size.height * 0.4), const Radius.circular(10)), vegPaint);
+
+    // 2. Padma River Sandbank & Water (Bottom Area)
+    final sandPaint = Paint()..color = const Color(0xFFD4C8B8);
+    final sandPath = Path()
+      ..moveTo(0, size.height * 0.76)
+      ..quadraticBezierTo(size.width * 0.5, size.height * 0.72, size.width, size.height * 0.78)
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
+    canvas.drawPath(sandPath, sandPaint);
+
+    final waterLinePaint = Paint()
+      ..color = const Color(0xFF818CF8).withValues(alpha: 0.5)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3;
+    final waterEdgePath = Path()
+      ..moveTo(0, size.height * 0.76)
+      ..quadraticBezierTo(size.width * 0.5, size.height * 0.72, size.width, size.height * 0.78);
+    canvas.drawPath(waterEdgePath, waterLinePaint);
+
+    // 3. Dense Residential Street Grid Lines (Gray Mesh)
+    final streetPaint = Paint()
+      ..color = const Color(0xFF64748B).withValues(alpha: 0.6)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3.5;
+
+    final gridPath = Path();
+    // Horizontal curves
+    for (double y = 30; y < size.height * 0.7; y += 22) {
+      gridPath.moveTo(0, y);
+      gridPath.quadraticBezierTo(size.width * 0.5, y + 8, size.width, y - 5);
+    }
+    // Vertical wavy lanes
+    for (double x = 15; x < size.width; x += 26) {
+      gridPath.moveTo(x, 0);
+      gridPath.cubicTo(x + 10, size.height * 0.25, x - 10, size.height * 0.5, x + 5, size.height * 0.72);
+    }
+    canvas.drawPath(gridPath, streetPaint);
+
+    // 4. Riverside Rd (Parallel to River)
+    final riversideRdPaint = Paint()
+      ..color = const Color(0xFF94A3B8)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 6;
+    final riverRdPath = Path()
+      ..moveTo(0, size.height * 0.72)
+      ..quadraticBezierTo(size.width * 0.5, size.height * 0.68, size.width, size.height * 0.74);
+    canvas.drawPath(riverRdPath, riversideRdPaint);
+
+    // 5. Yellow N6 Main Highway Curve (Golden Yellow Accent)
+    final n6BorderPaint = Paint()
+      ..color = const Color(0xFF475569)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 13;
+    final n6RoadPaint = Paint()
+      ..color = const Color(0xFFF59E0B)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 10;
+
+    final n6Path = Path()
+      ..moveTo(0, size.height * 0.45)
+      ..cubicTo(size.width * 0.35, size.height * 0.62, size.width * 0.65, size.height * 0.58, size.width, size.height * 0.22);
+
+    canvas.drawPath(n6Path, n6BorderPaint);
+    canvas.drawPath(n6Path, n6RoadPaint);
+
+    // Highway Right Branch
+    final branchPath = Path()
+      ..moveTo(size.width * 0.82, size.height * 0.36)
+      ..lineTo(size.width, 0);
+    canvas.drawPath(branchPath, n6BorderPaint);
+    canvas.drawPath(branchPath, n6RoadPaint);
+
+    // 6. Landmark Badges & Labels (Matching User Screenshot)
+    _drawLandmarkPill(canvas, Offset(size.width * 0.15, size.height * 0.38), 'Khademul Islam Jame Masjid', Icons.mosque_rounded);
+    _drawLandmarkPill(canvas, Offset(size.width * 0.35, size.height * 0.18), 'Rajshahi City Hospital', Icons.local_hospital_rounded, isRed: true);
+    _drawLandmarkPill(canvas, Offset(size.width * 0.68, size.height * 0.44), 'Talaimari Balur Ghat Masjid', Icons.mosque_rounded);
+
+    // Padma River Text
+    final TextPainter tp = TextPainter(
+      text: const TextSpan(
+        text: 'Padma River',
+        style: TextStyle(color: Color(0xFF64748B), fontSize: 13, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    tp.paint(canvas, Offset(size.width * 0.4, size.height * 0.84));
+  }
+
+  void _paintDhakaSatellite(Canvas canvas, Size size) {
+    final bgPaint = Paint()..color = const Color(0xFF2C3545);
+    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), bgPaint);
+
+    final vegPaint = Paint()..color = const Color(0xFF14532D);
+    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(20, 20, size.width * 0.3, 60), const Radius.circular(8)), vegPaint);
+    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(size.width * 0.6, 120, size.width * 0.35, 70), const Radius.circular(8)), vegPaint);
+
+    final streetPaint = Paint()
+      ..color = const Color(0xFF64748B).withValues(alpha: 0.6)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3.5;
+
+    final gridPath = Path();
+    for (double x = 20; x < size.width; x += 30) {
+      gridPath.moveTo(x, 0);
+      gridPath.lineTo(x, size.height);
+    }
+    for (double y = 20; y < size.height; y += 28) {
+      gridPath.moveTo(0, y);
+      gridPath.lineTo(size.width, y);
+    }
+    canvas.drawPath(gridPath, streetPaint);
+
+    // Sonargaon Janapath Avenue (Uttara Highway)
+    final hwyPaint = Paint()
+      ..color = const Color(0xFFF59E0B)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 11;
+    final hwyPath = Path()
+      ..moveTo(size.width * 0.5, 0)
+      ..lineTo(size.width * 0.5, size.height);
+    canvas.drawPath(hwyPath, hwyPaint);
+
+    _drawLandmarkPill(canvas, Offset(size.width * 0.2, size.height * 0.3), 'Uttara Sector 11 Park', Icons.park_rounded);
+    _drawLandmarkPill(canvas, Offset(size.width * 0.6, size.height * 0.6), 'Uttara Modern Hospital', Icons.local_hospital_rounded, isRed: true);
+  }
+
+  void _drawLandmarkPill(Canvas canvas, Offset offset, String title, IconData icon, {bool isRed = false}) {
+    final bgPaint = Paint()..color = Colors.black87;
+    final rect = RRect.fromRectAndRadius(
+      Rect.fromLTWH(offset.dx, offset.dy, 135, 20),
+      const Radius.circular(10),
+    );
+    canvas.drawRRect(rect, bgPaint);
+
+    final TextPainter tp = TextPainter(
+      text: TextSpan(
+        text: title,
+        style: TextStyle(
+          color: isRed ? const Color(0xFFF87171) : Colors.white,
+          fontSize: 8.5,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+      maxLines: 1,
+      ellipsis: '...',
+    )..layout(maxWidth: 120);
+    tp.paint(canvas, Offset(offset.dx + 8, offset.dy + 4));
+  }
+
+  @override
+  bool shouldRepaint(covariant _SatellitePainter oldDelegate) => oldDelegate.isRajshahi != isRajshahi;
 }
