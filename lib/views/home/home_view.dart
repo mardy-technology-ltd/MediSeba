@@ -21,6 +21,7 @@ import '../medishop/medishop_view.dart';
 import '../ambulance/ambulance_seba_view.dart';
 import '../career/career_view.dart';
 import '../blog/blog_view.dart';
+import '../contact/contact_us_view.dart';
 
 class HomeView extends StatefulWidget {
   final HomeController homeController;
@@ -1091,17 +1092,6 @@ class _HomeViewState extends State<HomeView> {
                     },
                   ),
                   _buildBkashMenuItem(
-                    icon: Icons.video_call_outlined,
-                    title: isBangla ? 'ডাক্তার ঘর' : 'Doctor Ghor',
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => DoctorBariView(languageController: _langController)),
-                      );
-                    },
-                  ),
-                  _buildBkashMenuItem(
                     icon: Icons.handshake_outlined,
                     title: isBangla ? 'পার্টনার' : 'Partner',
                     onTap: () {
@@ -1128,6 +1118,17 @@ class _HomeViewState extends State<HomeView> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (_) => BlogView(languageController: _langController)),
+                      );
+                    },
+                  ),
+                  _buildBkashMenuItem(
+                    icon: Icons.call_outlined,
+                    title: isBangla ? 'যোগাযোগ' : 'Contact Us',
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => ContactUsView(languageController: _langController)),
                       );
                     },
                   ),
