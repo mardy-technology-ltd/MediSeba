@@ -225,20 +225,6 @@ class _HomeViewState extends State<HomeView> {
               ),
             ],
           ),
-          floatingActionButton: FloatingActionButton.extended(
-            onPressed: () => showHelplineBottomSheet(context),
-            backgroundColor: const Color(0xFFDC2626),
-            elevation: 6,
-            icon: const Icon(Icons.phone_in_talk_rounded, color: Colors.white, size: 20),
-            label: Text(
-              _langController.tr('হেল্পলাইন 24/7', 'Helpline 24/7'),
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 12.5,
-              ),
-            ),
-          ),
         );
       },
     );
@@ -254,14 +240,9 @@ class _HomeViewState extends State<HomeView> {
           // 1. Personalized Greeting & Universal Search Header Card
           _buildUserGreetingAndSearchBar(),
 
-          const SizedBox(height: 16),
-
-          // 2. 24/7 Red Emergency Call Bar
-          _buildEmergencyHotlineBar(),
-
           const SizedBox(height: 20),
 
-          // 3. Category Service Grid Section
+          // 2. Category Service Grid Section
           _buildSectionHeader(
             title: _langController.tr('আমাদের সেবাসমূহ', 'Our Healthcare Services'),
             onSeeAllTap: null,
@@ -293,57 +274,61 @@ class _HomeViewState extends State<HomeView> {
 
           const SizedBox(height: 24),
 
-          // 6. Nearby Hospitals Section Header
+          // 6. Nearby Hospitals Section
           _buildSectionHeader(
-            title: _langController.tr('নিকটস্থ হাসপাতাল ও ডায়াগনস্টিক', 'Nearby Hospitals'),
+            title: _langController.tr('নিকটস্থ হাসপাতাল ও ডায়াগনস্টিক', 'Nearby Hospitals & Diagnostics'),
             onSeeAllTap: () {
               setState(() => _currentBottomNavIndex = 2);
             },
           ),
           const SizedBox(height: 12),
 
-          // Hospitals Grid (Responsive Grid)
+          // Hospitals Grid (Responsive Compact Grid)
           LayoutBuilder(
             builder: (context, constraints) {
               final screenWidth = constraints.maxWidth;
-              final crossAxisCount = screenWidth > 600 ? 3 : 2;
+              final crossAxisCount = screenWidth > 600 ? 4 : 2;
               final aspectRatio = screenWidth > 600
-                  ? 0.95
-                  : (screenWidth < 360 ? 0.82 : 0.92);
+                  ? 1.15
+                  : (screenWidth < 360 ? 0.88 : 0.96);
 
               return GridView.count(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 crossAxisCount: crossAxisCount,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
+                mainAxisSpacing: 10,
+                crossAxisSpacing: 10,
                 childAspectRatio: aspectRatio,
                 children: [
                   _buildHospitalCard(
-                    name: 'Popular Diagnostic',
-                    address: 'Uttara Branch, Dhaka',
+                    name: 'পপুলার ডায়াগনস্টিক',
+                    address: 'উত্তরা ব্রাঞ্চ, ঢাকা',
                     time: '07:00 am - 11:30 pm',
+                    rating: '4.9',
                     imageUrl:
                         'https://img.freepik.com/free-photo/empty-emergency-room-with-medical-equipment_23-2149138092.jpg',
                   ),
                   _buildHospitalCard(
-                    name: 'Ibn Sina Hospital',
-                    address: 'Dhanmondi, Dhaka',
-                    time: '24 Hours Open',
+                    name: 'ইবনে সিনা হাসপাতাল',
+                    address: 'ধানমন্ডি, ঢাকা',
+                    time: '২৪ ঘণ্টা খোলা',
+                    rating: '4.8',
                     imageUrl:
                         'https://img.freepik.com/free-photo/modern-operating-room-hospital_23-2148942918.jpg',
                   ),
                   _buildHospitalCard(
-                    name: 'Labaid Hospital',
-                    address: 'Gulshan, Dhaka',
-                    time: '24 Hours Open',
+                    name: 'ল্যাবএইড হাসপাতাল',
+                    address: 'গুলশান, ঢাকা',
+                    time: '২৪ ঘণ্টা খোলা',
+                    rating: '4.9',
                     imageUrl:
                         'https://img.freepik.com/free-photo/interior-view-operating-room_1170-2254.jpg',
                   ),
                   _buildHospitalCard(
-                    name: 'Square Hospital',
-                    address: 'Panthapath, Dhaka',
-                    time: '24 Hours Open',
+                    name: 'স্কয়ার হাসপাতাল',
+                    address: 'পান্থপথ, ঢাকা',
+                    time: '২৪ ঘণ্টা খোলা',
+                    rating: '5.0',
                     imageUrl:
                         'https://img.freepik.com/free-photo/medical-clinic-reception-counter-registration_482257-26804.jpg',
                   ),
@@ -504,85 +489,7 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  // 2. 24/7 Red Emergency Call Bar
-  Widget _buildEmergencyHotlineBar() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFDC2626), Color(0xFFEF4444)],
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.red.withValues(alpha: 0.35),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.phone_in_talk_rounded, color: Color(0xFFDC2626), size: 20),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _langController.tr('২৪/৭ জরুরি হেল্পলাইন হটলাইন', '24/7 Emergency Helpline Hotline'),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                const Text(
-                  '📞 09647111666',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () => showHelplineBottomSheet(context),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: const Color(0xFFDC2626),
-              elevation: 0,
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            child: Text(
-              _langController.tr('কল করুন', 'Call Now'),
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+
 
   // 5. Horizontal Top Doctors List Carousel
   Widget _buildHorizontalDoctorsList() {
@@ -1299,102 +1206,158 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  // Hospital Grid Card Item
+  // Hospital Grid Card Item (Redesigned UI/UX)
   Widget _buildHospitalCard({
     required String name,
     required String address,
     required String time,
     required String imageUrl,
+    String rating = '4.9',
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(16),
-                ),
-                child: Image.network(
-                  imageUrl,
-                  height: 90,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => Container(
-                    height: 90,
-                    color: const Color(0xFFE2E8F0),
-                    child: const Icon(Icons.local_hospital, color: textMuted),
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 6,
-                left: 6,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: brandGreen,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Text(
-                    'Sponsor',
-                    style: TextStyle(
-                      fontSize: 8.5,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return GestureDetector(
+      onTap: () {
+        setState(() => _currentBottomNavIndex = 2);
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: cardBg,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
+          boxShadow: [
+            BoxShadow(
+              color: brandGreen.withValues(alpha: 0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Stack(
               children: [
-                Text(
-                  name,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: textDark,
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(15),
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                  child: Image.network(
+                    imageUrl,
+                    height: 84,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      height: 84,
+                      color: const Color(0xFFE2E8F0),
+                      child: const Icon(Icons.local_hospital_rounded, color: textMuted, size: 28),
+                    ),
+                  ),
                 ),
-                Text(
-                  address,
-                  style: const TextStyle(fontSize: 10, color: textMuted),
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.access_time_rounded,
-                      size: 11,
+                Positioned(
+                  top: 6,
+                  left: 6,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                    decoration: BoxDecoration(
                       color: brandGreen,
+                      borderRadius: BorderRadius.circular(6),
                     ),
-                    const SizedBox(width: 3),
-                    Text(
-                      time,
-                      style: const TextStyle(fontSize: 9.5, color: textMuted),
+                    child: Text(
+                      _langController.tr('সুপারিশকৃত', 'Sponsor'),
+                      style: const TextStyle(
+                        fontSize: 8.5,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
-                  ],
+                  ),
+                ),
+                Positioned(
+                  top: 6,
+                  right: 6,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.65),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.star_rounded, color: Color(0xFFF59E0B), size: 11),
+                        const SizedBox(width: 2),
+                        Text(
+                          rating,
+                          style: const TextStyle(
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),
-          ),
-        ],
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(10, 6, 10, 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      name,
+                      style: const TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.bold,
+                        color: textDark,
+                        height: 1.15,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      address,
+                      style: const TextStyle(
+                        fontSize: 10,
+                        color: Color(0xFF64748B),
+                        fontWeight: FontWeight.w500,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.access_time_rounded,
+                          size: 11,
+                          color: brandGreen,
+                        ),
+                        const SizedBox(width: 3),
+                        Expanded(
+                          child: Text(
+                            time,
+                            style: const TextStyle(
+                              fontSize: 9.5,
+                              color: brandGreen,
+                              fontWeight: FontWeight.w700,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -1827,20 +1790,20 @@ class _QueryBannerCardState extends State<_QueryBannerCard> {
               children: [
                 // Left Icon Graphic Container
                 Container(
-                  width: 64,
-                  height: 64,
+                  width: 52,
+                  height: 52,
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(14),
                     border: Border.all(color: Colors.white24, width: 1.5),
                   ),
                   child: const Icon(
                     Icons.psychology_rounded,
                     color: Colors.white,
-                    size: 34,
+                    size: 28,
                   ),
                 ),
-                const SizedBox(width: 14),
+                const SizedBox(width: 12),
 
                 // Content Column
                 Expanded(
@@ -1851,7 +1814,7 @@ class _QueryBannerCardState extends State<_QueryBannerCard> {
                       Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2.5),
                             decoration: BoxDecoration(
                               color: const Color(0xFF10B981),
                               borderRadius: BorderRadius.circular(20),
@@ -1859,7 +1822,7 @@ class _QueryBannerCardState extends State<_QueryBannerCard> {
                             child: const Text(
                               'ফ্রি কনসালটেশন',
                               style: TextStyle(
-                                fontSize: 9.5,
+                                fontSize: 9,
                                 fontWeight: FontWeight.w800,
                                 color: Colors.white,
                               ),
@@ -1867,26 +1830,26 @@ class _QueryBannerCardState extends State<_QueryBannerCard> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 5),
+                      const SizedBox(height: 4),
                       const Text(
                         'স্বাস্থ্য বিষয়ক জিজ্ঞাসা',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 15,
                           fontWeight: FontWeight.w900,
                           color: Colors.white,
-                          height: 1.2,
+                          height: 1.15,
                         ),
                       ),
                       const SizedBox(height: 3),
                       Text(
-                        'অভিজ্ঞ ডাক্তারগণ ৪৮ ঘণ্টার মধ্যে উত্তর দিবেন',
+                        'অভিজ্ঞ ডাক্তারদের মতামত পান',
                         style: TextStyle(
-                          fontSize: 11,
+                          fontSize: 10.5,
                           fontWeight: FontWeight.w500,
-                          color: Colors.white.withValues(alpha: 0.88),
+                          color: Colors.white.withValues(alpha: 0.9),
+                          height: 1.15,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
                       ),
                     ],
                   ),
