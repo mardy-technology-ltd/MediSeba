@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../controllers/language_controller.dart';
 import '../views/partner/doctor_partner_view.dart';
 import '../views/partner/ambulance_partner_view.dart';
+import '../views/partner/hospital_partner_view.dart';
+import '../views/partner/dealer_partner_view.dart';
 
 void showPartnerBottomSheet(BuildContext context, {LanguageController? languageController}) {
   showModalBottomSheet(
@@ -17,123 +18,6 @@ class PartnerBottomSheet extends StatelessWidget {
   final LanguageController? languageController;
 
   const PartnerBottomSheet({super.key, this.languageController});
-
-  static const hotlinePhone = '+88009647111666';
-  static const hotlinePhoneDisplay = '09647111666';
-  static const supportEmail = 'info@mediseba.org';
-
-  Future<void> _makePhoneCall() async {
-    final Uri uri = Uri.parse('tel:$hotlinePhone');
-    try {
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
-      }
-    } catch (e) {
-      debugPrint('Error making phone call: $e');
-    }
-  }
-
-  void _showPartnerContactDialog(BuildContext context, String partnerTitle) {
-    final lang = languageController ?? LanguageController();
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: const Color(0xFFE8F5E9),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(Icons.handshake_rounded, color: Color(0xFF0F9D58), size: 22),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                partnerTitle,
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              lang.tr(
-                '$partnerTitle হিসেবে মেডিসেবা প্ল্যাটফর্মে যুক্ত হতে আমাদের পার্টনারশিপ টিমের সাথে যোগাযোগ করুন:',
-                'To join the MediSeba platform as $partnerTitle, please contact our partnership team:',
-              ),
-              style: const TextStyle(fontSize: 13.5, color: Color(0xFF475569), height: 1.4),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.phone_in_talk_rounded, color: Color(0xFF0F9D58), size: 18),
-                      const SizedBox(width: 10),
-                      const Text(
-                        'হটলাইন: ',
-                        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-                      ),
-                      Text(
-                        hotlinePhoneDisplay,
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF0F9D58)),
-                      ),
-                    ],
-                  ),
-                  const Divider(height: 16),
-                  Row(
-                    children: [
-                      const Icon(Icons.email_rounded, color: Color(0xFF1565C0), size: 18),
-                      const SizedBox(width: 10),
-                      const Text(
-                        'ইমেইল: ',
-                        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-                      ),
-                      const Text(
-                        supportEmail,
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF1565C0)),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('বন্ধ করুন'),
-          ),
-          ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF0F9D58),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-              _makePhoneCall();
-            },
-            icon: const Icon(Icons.call_rounded, color: Colors.white, size: 16),
-            label: const Text('কল করুন', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-          ),
-        ],
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -286,7 +170,12 @@ class PartnerBottomSheet extends StatelessWidget {
             badgeText: lang.tr('হাসপাতাল', 'Hospital'),
             onTap: () {
               Navigator.pop(context);
-              _showPartnerContactDialog(context, lang.tr('হাসপাতাল ও ডায়াগনস্টিক পার্টনার', 'Hospital & Diagnostic Partner'));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => HospitalPartnerView(languageController: languageController),
+                ),
+              );
             },
           ),
 
@@ -306,7 +195,12 @@ class PartnerBottomSheet extends StatelessWidget {
             badgeText: lang.tr('ডিলার', 'Dealer'),
             onTap: () {
               Navigator.pop(context);
-              _showPartnerContactDialog(context, lang.tr('ডিলার পার্টনার', 'Dealer Partner'));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => DealerPartnerView(languageController: languageController),
+                ),
+              );
             },
           ),
 
