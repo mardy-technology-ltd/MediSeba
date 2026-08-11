@@ -18,6 +18,7 @@ import '../more/more_menu_view.dart';
 import '../profile/profile_view.dart';
 import '../patient_portal/patient_portal_view.dart';
 import '../medishop/medishop_view.dart';
+import '../ambulance/ambulance_seba_view.dart';
 
 class HomeView extends StatefulWidget {
   final HomeController homeController;
@@ -409,7 +410,12 @@ class _HomeViewState extends State<HomeView> {
         iconBg: const Color(0xFFE3F2FD),
         borderColor: const Color(0xFF90CAF9),
         imagePath: 'assets/images/ambulance_seba.png',
-        onTap: () => showHelplineBottomSheet(context),
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => AmbulanceSebaView(languageController: _langController),
+          ),
+        ),
       ),
       _CategoryItem(
         title: lang.tr('মাতৃসেবা', 'Maternal Care'),
@@ -1106,6 +1112,10 @@ class _HomeViewState extends State<HomeView> {
                     title: isBangla ? 'অ্যাম্বুলেন্স সেবা' : 'Ambulance Service',
                     onTap: () {
                       Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => AmbulanceSebaView(languageController: _langController)),
+                      );
                     },
                   ),
                   _buildBkashMenuItem(
