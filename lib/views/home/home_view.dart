@@ -8,6 +8,7 @@ import '../social/social_media_view.dart';
 import '../health_consultation/health_consultation_view.dart';
 import '../../widgets/share_app_dialog.dart';
 import '../../widgets/helpline_bottom_sheet.dart';
+import '../../widgets/partner_bottom_sheet.dart';
 import '../../widgets/modern_glow_navbar.dart';
 import '../blood_service/rokto_seba_view.dart';
 import '../offers/offer_list_view.dart';
@@ -61,125 +62,130 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      drawer: _buildSidebarDrawer(context),
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        centerTitle: true,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu_rounded, color: brandGreen, size: 28),
-            onPressed: () {
-              Scaffold.of(context).openDrawer();
-            },
-          ),
-        ),
-        title: Image.asset(
-          'assets/images/logo.png',
-          height: 42,
-          fit: BoxFit.contain,
-        ),
-        actions: [
-          // User Profile Button (Switches to Profile Tab)
-          ListenableBuilder(
-            listenable: widget.authController,
-            builder: (context, _) {
-              final uData = widget.authController.currentUserData;
-              final hasImage = uData?.profileImageUrl != null && uData!.profileImageUrl!.isNotEmpty;
+    return ListenableBuilder(
+      listenable: _langController,
+      builder: (context, _) {
+        return Scaffold(
+          key: _scaffoldKey,
+          drawer: _buildSidebarDrawer(context),
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            scrolledUnderElevation: 0,
+            centerTitle: true,
+            leading: Builder(
+              builder: (context) => IconButton(
+                icon: const Icon(Icons.menu_rounded, color: brandGreen, size: 28),
+                onPressed: () {
+                  Scaffold.of(context).openDrawer();
+                },
+              ),
+            ),
+            title: Image.asset(
+              'assets/images/logo.png',
+              height: 42,
+              fit: BoxFit.contain,
+            ),
+            actions: [
+              // User Profile Button (Switches to Profile Tab)
+              ListenableBuilder(
+                listenable: widget.authController,
+                builder: (context, _) {
+                  final uData = widget.authController.currentUserData;
+                  final hasImage = uData?.profileImageUrl != null && uData!.profileImageUrl!.isNotEmpty;
 
-              return GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ProfileView(
-                        authController: widget.authController,
-                        homeController: widget.homeController,
-                        showAppBarLeading: true,
-                        languageController: _langController,
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ProfileView(
+                            authController: widget.authController,
+                            homeController: widget.homeController,
+                            showAppBarLeading: true,
+                            languageController: _langController,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      height: 34,
+                      width: 34,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: const Color(0xFFF1F5F9),
+                        border: Border.all(color: brandGreen, width: 1.5),
+                        image: hasImage
+                            ? DecorationImage(
+                                image: NetworkImage(uData.profileImageUrl!),
+                                fit: BoxFit.cover,
+                              )
+                            : null,
                       ),
+                      child: !hasImage
+                          ? const Icon(
+                              Icons.person_rounded,
+                              color: brandGreen,
+                              size: 20,
+                            )
+                          : null,
                     ),
                   );
                 },
-                child: Container(
-                  height: 34,
-                  width: 34,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: const Color(0xFFF1F5F9),
-                    border: Border.all(color: brandGreen, width: 1.5),
-                    image: hasImage
-                        ? DecorationImage(
-                            image: NetworkImage(uData.profileImageUrl!),
-                            fit: BoxFit.cover,
-                          )
-                        : null,
-                  ),
-                  child: !hasImage
-                      ? const Icon(
-                          Icons.person_rounded,
-                          color: brandGreen,
-                          size: 20,
-                        )
-                      : null,
-                ),
-              );
+              ),
+              const SizedBox(width: 16),
+            ],
+          ),
+          body: IndexedStack(
+            index: _currentBottomNavIndex,
+            children: [
+              // Tab 0: Home Content
+              _buildHomeBodyContent(),
+              // Tab 1: Offer List View
+              OfferListView(languageController: _langController),
+              // Tab 2: Hospital List View
+              HospitalListView(languageController: _langController),
+              // Tab 3: Doctor List View
+              DoctorListView(showAppBar: false, languageController: _langController),
+              // Tab 4: More Menu View
+              MoreMenuView(
+                authController: widget.authController,
+                homeController: widget.homeController,
+                languageController: _langController,
+              ),
+            ],
+          ),
+          bottomNavigationBar: ModernGlowNavBar(
+            currentIndex: _currentBottomNavIndex,
+            onTap: (index) {
+              setState(() => _currentBottomNavIndex = index);
             },
+            items: [
+              ModernGlowNavBarItem(
+                icon: Icons.home_rounded,
+                label: _langController.tr('হোম', 'Home'),
+              ),
+              ModernGlowNavBarItem(
+                icon: Icons.local_offer_rounded,
+                label: _langController.tr('অফার', 'Offers'),
+              ),
+              ModernGlowNavBarItem(
+                icon: Icons.local_hospital_rounded,
+                label: _langController.tr('হাসপাতাল', 'Hospitals'),
+              ),
+              ModernGlowNavBarItem(
+                icon: Icons.medical_services_rounded,
+                label: _langController.tr('ডাক্তার', 'Doctors'),
+              ),
+              ModernGlowNavBarItem(
+                icon: Icons.grid_view_rounded,
+                label: _langController.tr('আরও', 'More'),
+              ),
+            ],
           ),
-          const SizedBox(width: 16),
-        ],
-      ),
-      body: IndexedStack(
-        index: _currentBottomNavIndex,
-        children: [
-          // Tab 0: Home Content
-          _buildHomeBodyContent(),
-          // Tab 1: Offer List View
-          OfferListView(languageController: _langController),
-          // Tab 2: Hospital List View
-          HospitalListView(languageController: _langController),
-          // Tab 3: Doctor List View
-          DoctorListView(showAppBar: false, languageController: _langController),
-          // Tab 4: More Menu View
-          MoreMenuView(
-            authController: widget.authController,
-            homeController: widget.homeController,
-            languageController: _langController,
-          ),
-        ],
-      ),
-      bottomNavigationBar: ModernGlowNavBar(
-        currentIndex: _currentBottomNavIndex,
-        onTap: (index) {
-          setState(() => _currentBottomNavIndex = index);
-        },
-        items: [
-          ModernGlowNavBarItem(
-            icon: Icons.home_rounded,
-            label: _langController.tr('হোম', 'Home'),
-          ),
-          ModernGlowNavBarItem(
-            icon: Icons.local_offer_rounded,
-            label: _langController.tr('অফার', 'Offers'),
-          ),
-          ModernGlowNavBarItem(
-            icon: Icons.local_hospital_rounded,
-            label: _langController.tr('হাসপাতাল', 'Hospitals'),
-          ),
-          ModernGlowNavBarItem(
-            icon: Icons.medical_services_rounded,
-            label: _langController.tr('ডাক্তার', 'Doctors'),
-          ),
-          ModernGlowNavBarItem(
-            icon: Icons.grid_view_rounded,
-            label: _langController.tr('আরও', 'More'),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -1088,14 +1094,11 @@ class _HomeViewState extends State<HomeView> {
                     },
                   ),
                   _buildBkashMenuItem(
-                    icon: Icons.bloodtype_outlined,
-                    title: isBangla ? 'রক্তসেবা' : 'Blood Service',
+                    icon: Icons.handshake_outlined,
+                    title: isBangla ? 'পার্টনার' : 'Partner',
                     onTap: () {
                       Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => RoktoSebaView(languageController: _langController)),
-                      );
+                      showPartnerBottomSheet(context, languageController: _langController);
                     },
                   ),
                   _buildBkashMenuItem(

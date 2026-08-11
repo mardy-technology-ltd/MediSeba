@@ -3,17 +3,20 @@ import 'register_view.dart';
 import '../home/home_view.dart';
 import '../../controllers/home_controller.dart';
 import '../../controllers/auth_controller.dart';
+import '../../controllers/language_controller.dart';
 
 enum LoginRole { patient, doctor, admin }
 
 class LoginView extends StatefulWidget {
   final HomeController homeController;
   final AuthController authController;
+  final LanguageController? languageController;
 
   const LoginView({
     super.key,
     required this.homeController,
     required this.authController,
+    this.languageController,
   });
 
   @override
@@ -72,6 +75,7 @@ class _LoginViewState extends State<LoginView> {
             builder: (context) => HomeView(
               homeController: widget.homeController,
               authController: widget.authController,
+              languageController: widget.languageController,
             ),
           ),
         );
@@ -83,6 +87,7 @@ class _LoginViewState extends State<LoginView> {
             builder: (context) => HomeView(
               homeController: widget.homeController,
               authController: widget.authController,
+              languageController: widget.languageController,
             ),
           ),
         );
@@ -318,6 +323,7 @@ class _LoginViewState extends State<LoginView> {
                                     builder: (context) => HomeView(
                                       homeController: widget.homeController,
                                       authController: widget.authController,
+                                      languageController: widget.languageController,
                                     ),
                                   ),
                                 );
