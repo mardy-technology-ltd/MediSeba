@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../controllers/language_controller.dart';
 import '../views/partner/doctor_partner_view.dart';
+import '../views/partner/ambulance_partner_view.dart';
 
 void showPartnerBottomSheet(BuildContext context, {LanguageController? languageController}) {
   showModalBottomSheet(
@@ -260,7 +261,12 @@ class PartnerBottomSheet extends StatelessWidget {
             badgeText: lang.tr('অ্যাম্বুলেন্স', 'Ambulance'),
             onTap: () {
               Navigator.pop(context);
-              _showPartnerContactDialog(context, lang.tr('অ্যাম্বুলেন্স পার্টনার', 'Ambulance Partner'));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => AmbulancePartnerView(languageController: languageController),
+                ),
+              );
             },
           ),
 
