@@ -45,7 +45,7 @@ class SocialMediaLauncher {
         'https://www.youtube.com/@mediseba00',
       ],
       androidPackageName: 'com.google.android.youtube',
-      iconData: Icons.play_arrow_rounded,
+      iconData: Icons.play_circle_fill_rounded,
       brandColor: Color(0xFFFF0000),
     ),
     SocialMediaItem(
@@ -68,7 +68,7 @@ class SocialMediaLauncher {
       ],
       androidPackageName: 'com.twitter.android',
       iconData: Icons.alternate_email_rounded,
-      brandColor: Color(0xFF1DA1F2),
+      brandColor: Color(0xFF0F172A),
     ),
     SocialMediaItem(
       id: 'pinterest',
@@ -79,7 +79,7 @@ class SocialMediaLauncher {
       ],
       androidPackageName: 'com.pinterest',
       iconData: Icons.push_pin_rounded,
-      brandColor: Color(0xFFBD081C),
+      brandColor: Color(0xFFE60023),
     ),
     SocialMediaItem(
       id: 'linkedin',

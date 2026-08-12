@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
-import '../../constants/app_constants.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/home_controller.dart';
 import '../health_consultation/health_consultation_view.dart';
 import '../about/about_us_view.dart';
+import '../privacy_policy/privacy_policy_view.dart';
 import '../social/social_media_view.dart';
 import '../../controllers/language_controller.dart';
 import '../../widgets/share_app_dialog.dart';
@@ -249,7 +248,9 @@ class MoreMenuView extends StatelessWidget {
                       title: 'সোশ্যাল মিডিয়া পেজসমূহ',
                       onTap: () => Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const SocialMediaView()),
+                        MaterialPageRoute(
+                          builder: (_) => SocialMediaView(languageController: languageController),
+                        ),
                       ),
                     ),
                     const Divider(height: 1, indent: 60, color: Color(0xFFF1F5F9)),
@@ -269,12 +270,12 @@ class MoreMenuView extends StatelessWidget {
                       iconBg: const Color(0xFFE8F5E9),
                       iconColor: const Color(0xFF0F9D58),
                       title: 'প্রাইভেসি পলিসি (Privacy Policy)',
-                      onTap: () async {
-                        final uri = Uri.parse(AppConstants.privacyPolicyUrl);
-                        if (await canLaunchUrl(uri)) {
-                          await launchUrl(uri, mode: LaunchMode.externalApplication);
-                        }
-                      },
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => PrivacyPolicyView(languageController: languageController),
+                        ),
+                      ),
                     ),
                     const Divider(height: 1, indent: 60, color: Color(0xFFF1F5F9)),
                     _buildListOption(
