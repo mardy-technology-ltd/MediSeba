@@ -23,6 +23,7 @@ import '../ambulance/ambulance_seba_view.dart';
 import '../career/career_view.dart';
 import '../blog/blog_view.dart';
 import '../contact/contact_us_view.dart';
+import '../matriseba/matriseba_view.dart';
 
 class HomeView extends StatefulWidget {
   final HomeController homeController;
@@ -805,7 +806,12 @@ class _HomeViewState extends State<HomeView> {
         iconBg: const Color(0xFFFCE4EC),
         borderColor: const Color(0xFFF48FB1),
         imagePath: 'assets/images/matriseba.png',
-        onTap: () => showHelplineBottomSheet(context),
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => MatriSebaView(languageController: _langController),
+          ),
+        ),
       ),
       _CategoryItem(
         title: lang.tr('ডিসকাউন্ট অফার', 'Discount Offers'),
