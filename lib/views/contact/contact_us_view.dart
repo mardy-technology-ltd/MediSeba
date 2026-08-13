@@ -35,7 +35,7 @@ class _ContactUsViewState extends State<ContactUsView> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         precacheImage(
-          const NetworkImage('https://static-maps.yandex.ru/1.x/?l=sat&ll=90.3845,23.8718&z=16&size=650,320'),
+          const NetworkImage('https://static-maps.yandex.ru/1.x/?l=sat&ll=90.385123,23.874854&z=16&size=650,320'),
           context,
         );
         precacheImage(
@@ -476,8 +476,8 @@ class _ContactUsViewState extends State<ContactUsView> {
       'Rajshahi Office: Opposite Talaimari Market Mosque, Boalia, Rajshahi',
     );
 
-    final double lat = _selectedMapIndex == 0 ? 23.8759 : 24.360968474850758;
-    final double lng = _selectedMapIndex == 0 ? 90.3795 : 88.6249481800218;
+    final double lat = _selectedMapIndex == 0 ? 23.874854 : 24.360968474850758;
+    final double lng = _selectedMapIndex == 0 ? 90.385123 : 88.6249481800218;
 
     return Container(
       width: double.infinity,
@@ -621,7 +621,7 @@ class _ContactUsViewState extends State<ContactUsView> {
                     Positioned.fill(
                       child: Image.network(
                         _selectedMapIndex == 0
-                            ? 'https://static-maps.yandex.ru/1.x/?l=sat&ll=90.3845,23.8718&z=16&size=650,320'
+                            ? 'https://static-maps.yandex.ru/1.x/?l=sat&ll=90.385123,23.874854&z=16&size=650,320'
                             : 'https://static-maps.yandex.ru/1.x/?l=sat&ll=88.6249481800218,24.360968474850758&z=16&size=650,320',
                         fit: BoxFit.cover,
                         gaplessPlayback: true,
