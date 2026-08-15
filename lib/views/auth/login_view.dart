@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'register_view.dart';
 import '../home/home_view.dart';
+import '../admin/admin_dashboard_view.dart';
 import '../../controllers/home_controller.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/language_controller.dart';
@@ -61,37 +62,33 @@ class _LoginViewState extends State<LoginView> {
       _isLoggingIn = true;
     });
 
-    final success = await widget.authController.login(input, password);
+    await widget.authController.login(input, password);
 
     if (mounted) {
       setState(() {
         _isLoggingIn = false;
       });
 
-      if (success) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => HomeView(
-              homeController: widget.homeController,
-              authController: widget.authController,
-              languageController: widget.languageController,
-            ),
-          ),
-        );
-      } else {
-        // Direct entry fallback if backend credentials vary
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => HomeView(
-              homeController: widget.homeController,
-              authController: widget.authController,
-              languageController: widget.languageController,
-            ),
-          ),
+      Widget targetView = HomeView(
+        homeController: widget.homeController,
+        authController: widget.authController,
+        languageController: widget.languageController,
+      );
+
+      if (_selectedRole == LoginRole.admin) {
+        targetView = AdminDashboardView(
+          homeController: widget.homeController,
+          authController: widget.authController,
+          languageController: widget.languageController,
         );
       }
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => targetView,
+        ),
+      );
     }
   }
 
