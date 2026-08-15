@@ -74,10 +74,10 @@ class _ShareAppDialogState extends State<ShareAppDialog> {
           await launchUrl(uri, mode: LaunchMode.externalApplication);
         } else {
           // Fallback to system share
-          await Share.share(shareMessage, subject: 'MediSeba App');
+          await SharePlus.instance.share(shareMessage, subject: 'MediSeba App');
         }
       } catch (_) {
-        await Share.share(shareMessage, subject: 'MediSeba App');
+        await SharePlus.instance.share(shareMessage, subject: 'MediSeba App');
       }
     }
   }
@@ -270,7 +270,7 @@ class _ShareAppDialogState extends State<ShareAppDialog> {
                         bgColor: const Color(0xFF0F9D58),
                         onTap: () {
                           Navigator.pop(context);
-                          Share.share(shareMessage, subject: 'MediSeba App');
+                          SharePlus.instance.share(shareMessage, subject: 'MediSeba App');
                         },
                       ),
                     ],

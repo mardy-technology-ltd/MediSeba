@@ -15,7 +15,8 @@ class NotificationView extends StatelessWidget {
     final notifications = [
       {
         'title': 'মেডি সেবা সার্ভিস আপডেট',
-        'subtitle': 'এখন ঘরে বসেই ডাক্তার সিরিয়াল ও স্বাস্থ্য পরামর্শ নিন একদম সহজে!',
+        'subtitle':
+            'এখন ঘরে বসেই ডাক্তার সিরিয়াল ও স্বাস্থ্য পরামর্শ নিন একদম সহজে!',
         'time': '১০ মিনিট আগে',
         'icon': Icons.medical_information_rounded,
         'color': const Color(0xFF0F9D58),
@@ -23,7 +24,8 @@ class NotificationView extends StatelessWidget {
       },
       {
         'title': 'ডাক্তার অপয়েন্টমেন্ট রিমাইন্ডার',
-        'subtitle': 'আপনার আগামী কাল সকাল ১০:০০ টায় জেনারেল ফিজিশিয়ানের অ্যাপয়েন্টমেন্ট রয়েছে।',
+        'subtitle':
+            'আপনার আগামী কাল সকাল ১০:০০ টায় জেনারেল ফিজিশিয়ানের অ্যাপয়েন্টমেন্ট রয়েছে।',
         'time': '২ ঘণ্টা আগে',
         'icon': Icons.event_available_rounded,
         'color': const Color(0xFF1565C0),
@@ -31,7 +33,8 @@ class NotificationView extends StatelessWidget {
       },
       {
         'title': 'জরুরি অ্যাম্বুলেন্স সেবা',
-        'subtitle': 'মেডি সেবা ২৪/৭ জরুরি অ্যাম্বুলেন্স সার্ভিস এখন চালু রয়েছে।',
+        'subtitle':
+            'মেডি সেবা ২৪/৭ জরুরি অ্যাম্বুলেন্স সার্ভিস এখন চালু রয়েছে।',
         'time': '১ দিন আগে',
         'icon': Icons.airport_shuttle_rounded,
         'color': const Color(0xFFE53935),
@@ -60,7 +63,10 @@ class NotificationView extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFE8F5E9),
                       borderRadius: BorderRadius.circular(20),
@@ -81,9 +87,12 @@ class NotificationView extends StatelessWidget {
             // Notification List
             Expanded(
               child: ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 itemCount: notifications.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 10),
+                separatorBuilder: (_, _) => const SizedBox(height: 10),
                 itemBuilder: (context, index) {
                   final item = notifications[index];
                   return Container(
@@ -91,7 +100,10 @@ class NotificationView extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: const Color(0xFFF1F5F9), width: 1.2),
+                      border: Border.all(
+                        color: const Color(0xFFF1F5F9),
+                        width: 1.2,
+                      ),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withValues(alpha: 0.03),
@@ -121,7 +133,8 @@ class NotificationView extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Expanded(
                                     child: Text(
