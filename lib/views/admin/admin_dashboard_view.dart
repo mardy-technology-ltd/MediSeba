@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'admin_inbox_view.dart';
 import '../../controllers/home_controller.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/language_controller.dart';
@@ -953,7 +954,14 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                           : null,
                       onTap: () {
                         Navigator.pop(context);
-                        if (!isSelected) {
+                        if (index == 1) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AdminInboxView(),
+                            ),
+                          );
+                        } else if (!isSelected) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text('${item['title']} সেকশন নির্বাচন করা হয়েছে')),
                           );
