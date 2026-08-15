@@ -12,7 +12,7 @@ class _AdminInboxViewState extends State<AdminInboxView> {
   static const darkGreen = Color(0xFF006B4A);
   static const textDark = Color(0xFF0F172A);
 
-  int _selectedTabIndex = 1; // Default 1: Partnership Applications (as shown in web screenshot)
+  int _selectedTabIndex = 0; // Default 0: Contact Messages
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
@@ -267,31 +267,43 @@ class _AdminInboxViewState extends State<AdminInboxView> {
 
             const SizedBox(height: 10),
 
-            // 2. Segmented Filter Tabs (Scrollable)
-            SizedBox(
-              height: 42,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                children: [
-                  _buildTabPill(
-                    index: 0,
-                    icon: Icons.mail_outline_rounded,
-                    title: 'কন্টাক্ট মেসেজ (${_contactMessages.length})',
-                  ),
-                  const SizedBox(width: 8),
-                  _buildTabPill(
-                    index: 1,
-                    icon: Icons.people_outline_rounded,
-                    title: 'পার্টনারশিপ আবেদন (${_partnershipApps.length})',
-                  ),
-                  const SizedBox(width: 8),
-                  _buildTabPill(
-                    index: 2,
-                    icon: Icons.work_outline_rounded,
-                    title: 'চাকরির আবেদন (${_jobApps.length})',
-                  ),
-                ],
+            // 2. Segmented Filter Tabs (Responsive 3-Column Bar - All 3 Tabs Visible)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _buildTabPill(
+                        index: 0,
+                        icon: Icons.mail_outline_rounded,
+                        title: 'কন্টাক্ট (${_contactMessages.length})',
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: _buildTabPill(
+                        index: 1,
+                        icon: Icons.people_outline_rounded,
+                        title: 'পার্টনারশিপ (${_partnershipApps.length})',
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: _buildTabPill(
+                        index: 2,
+                        icon: Icons.work_outline_rounded,
+                        title: 'চাকরি (${_jobApps.length})',
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
 
@@ -405,7 +417,7 @@ class _AdminInboxViewState extends State<AdminInboxView> {
     }
   }
 
-  /// Build Tab Selection Pill
+  /// Build Tab Selection Pill (Fully Responsive & Scaled)
   Widget _buildTabPill({required int index, required IconData icon, required String title}) {
     final isSelected = _selectedTabIndex == index;
     return GestureDetector(
@@ -416,14 +428,10 @@ class _AdminInboxViewState extends State<AdminInboxView> {
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
         decoration: BoxDecoration(
-          color: isSelected ? darkGreen : Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isSelected ? darkGreen : const Color(0xFFE2E8F0),
-            width: 1.2,
-          ),
+          color: isSelected ? darkGreen : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
           boxShadow: isSelected
               ? [
                   BoxShadow(
@@ -434,24 +442,27 @@ class _AdminInboxViewState extends State<AdminInboxView> {
                 ]
               : null,
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 16,
-              color: isSelected ? Colors.white : const Color(0xFF475569),
-            ),
-            const SizedBox(width: 6),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 15,
                 color: isSelected ? Colors.white : const Color(0xFF475569),
               ),
-            ),
-          ],
+              const SizedBox(width: 4),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 11.5,
+                  fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                  color: isSelected ? Colors.white : const Color(0xFF475569),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -921,7 +932,11 @@ class _AdminInboxViewState extends State<AdminInboxView> {
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setModalState) {
+            final isApproved = item['isApproved'] as bool;
             final approvedSection = item['approvedSection'] as String?;
+            final vehicleNo = item['vehicleNo'] as String?;
+            final bmdc = item['bmdc'] as String?;
+            final specialty = item['specialty'] as String?;
 
             return Container(
               decoration: const BoxDecoration(
@@ -946,182 +961,247 @@ class _AdminInboxViewState extends State<AdminInboxView> {
                     ),
                     const SizedBox(height: 14),
 
-                    // Title
-                    const Text(
-                      'পার্টনারশিপ আবেদন বিস্তারিত',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: textDark),
+                    // Header Title & Status Badge
+                    Row(
+                      children: [
+                        const Expanded(
+                          child: Text(
+                            'পার্টনারশিপ আবেদন বিস্তারিত',
+                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: textDark),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: isApproved ? const Color(0xFFECFDF5) : const Color(0xFFFEF3C7),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: isApproved ? const Color(0xFFA7F3D0) : const Color(0xFFFDE68A),
+                            ),
+                          ),
+                          child: Text(
+                            item['status'] as String,
+                            style: TextStyle(
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.bold,
+                              color: isApproved ? const Color(0xFF047857) : const Color(0xFFB45309),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     const Divider(color: Color(0xFFF1F5F9), height: 18),
 
-                    // Details Key-Value List (Exact Web Format)
+                    // Key-Value Information Rows
                     _buildDetailRow('পার্টনার টাইপ:', item['typeSimple'] as String? ?? item['type'] as String),
                     _buildDetailRow('নাম / প্রতিষ্ঠান:', item['name'] as String),
-                    _buildDetailRow('BMDC নম্বর:', item['bmdc'] as String? ?? 'N/A', isHighlight: true),
-                    _buildDetailRow('বিশেষজ্ঞতা:', item['specialty'] as String? ?? 'N/A'),
+
+                    if (vehicleNo != null)
+                      _buildDetailRow('গাড়ি নং:', vehicleNo, isHighlight: true)
+                    else if (bmdc != null)
+                      _buildDetailRow('BMDC নম্বর:', bmdc, isHighlight: true),
+
+                    if (specialty != null)
+                      _buildDetailRow('বিশেষজ্ঞতা:', specialty),
+
                     _buildDetailRow('ফোন:', item['phone'] as String, isPhone: true),
 
-                    if (approvedSection != null) ...[
-                      const SizedBox(height: 6),
+                    // Approved Status Banner (If already approved)
+                    if (isApproved) ...[
+                      const SizedBox(height: 10),
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                         decoration: BoxDecoration(
                           color: const Color(0xFFECFDF5),
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: const Color(0xFFA7F3D0)),
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.check_circle_rounded, color: Color(0xFF059669), size: 16),
-                            const SizedBox(width: 6),
+                            const Icon(Icons.check_circle_rounded, color: Color(0xFF059669), size: 18),
+                            const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                'বর্তমান অনুমোদন সেকশন: $approvedSection',
-                                style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: Color(0xFF047857)),
+                                approvedSection != null
+                                    ? 'অনুমোদিত সেকশন: $approvedSection'
+                                    : 'আবেদনটি সফলভাবে এপ্রুভড করা হয়েছে।',
+                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF047857)),
                               ),
                             ),
                           ],
                         ),
                       ),
+                      const SizedBox(height: 16),
+                      const Divider(color: Color(0xFFF1F5F9)),
+                      const SizedBox(height: 10),
+
+                      // Call Candidate Button (Dark Navy Blue)
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF0F172A),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 13),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            elevation: 0,
+                          ),
+                          onPressed: () {
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('${item['phone']} ক্যান্ডিডেটকে ডায়াল করা হচ্ছে...')),
+                            );
+                          },
+                          icon: const Icon(Icons.call_rounded, size: 18),
+                          label: const Text(
+                            'ক্যান্ডিডেটকে কল দিন',
+                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800),
+                          ),
+                        ),
+                      ),
+                    ] else ...[
+                      // PENDING STATE POP-UP (Shows 3 Section Approval Buttons)
+                      const SizedBox(height: 16),
+                      const Divider(color: Color(0xFFF1F5F9)),
+                      const SizedBox(height: 10),
+
+                      // Section Approval Header (Exact Web Text)
+                      const Text(
+                        '১-ক্লিক ডাক্তার এপ্রুভ করে সেকশনে যুক্ত করুন:',
+                        style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800, color: Color(0xFF334155)),
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Button 1: Approve & Add to Doctor Ghar (Teal Green Button)
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF00897B),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 13),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            elevation: 0,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              item['isApproved'] = true;
+                              item['status'] = 'এপ্রুভড (Approved)';
+                              item['approvedSection'] = 'ডাক্তার ঘর (ভিডিও কল)';
+                            });
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('${item['name']} সফলভাবে "ডাক্তার ঘর" সেকশনে এপ্রুভড করা হয়েছে!'),
+                                backgroundColor: const Color(0xFF00897B),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.videocam_rounded, size: 18),
+                          label: const Text(
+                            'এপ্রুভ & ডাক্তার ঘরে যুক্ত করুন',
+                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+
+                      // Button 2: Approve & Add to Chamber Serial (Emerald Green Button)
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF006B4A),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 13),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            elevation: 0,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              item['isApproved'] = true;
+                              item['status'] = 'এপ্রুভড (Approved)';
+                              item['approvedSection'] = 'চেম্বার সিরিয়াল';
+                            });
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('${item['name']} সফলভাবে "চেম্বার সিরিয়াল" সেকশনে এপ্রুভড করা হয়েছে!'),
+                                backgroundColor: const Color(0xFF006B4A),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.local_hospital_rounded, size: 18),
+                          label: const Text(
+                            'এপ্রুভ & চেম্বার সিরিয়ালে যুক্ত করুন',
+                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+
+                      // Button 3: Approve & Add to Both Sections (Purple/Indigo Button)
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF5B21B6),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 13),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            elevation: 0,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              item['isApproved'] = true;
+                              item['status'] = 'এপ্রুভড (Approved)';
+                              item['approvedSection'] = 'ডাক্তার ঘর & চেম্বার সিরিয়াল (উভয়)';
+                            });
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('${item['name']} সফলভাবে "উভয়" সেকশনে এপ্রুভড করা হয়েছে!'),
+                                backgroundColor: const Color(0xFF5B21B6),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.medical_services_rounded, size: 18),
+                          label: const Text(
+                            'এপ্রুভ & উভয় সেকশনে যুক্ত করুন',
+                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+
+                      // Button 4: Call Candidate (Dark Navy Blue Button)
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF0F172A),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 13),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            elevation: 0,
+                          ),
+                          onPressed: () {
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('${item['phone']} ক্যান্ডিডেটকে ডায়াল করা হচ্ছে...')),
+                            );
+                          },
+                          icon: const Icon(Icons.call_rounded, size: 18),
+                          label: const Text(
+                            'ক্যান্ডিডেটকে কল দিন',
+                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800),
+                          ),
+                        ),
+                      ),
                     ],
-
-                    const SizedBox(height: 16),
-                    const Divider(color: Color(0xFFF1F5F9)),
-                    const SizedBox(height: 10),
-
-                    // Section Approval Header (Exact Web Text)
-                    const Text(
-                      '১-ক্লিক ডাক্তার এপ্রুভ করে সেকশনে যুক্ত করুন:',
-                      style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800, color: Color(0xFF334155)),
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Button 1: Approve & Add to Doctor Ghar (Teal Green Button)
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF00897B),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 13),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          elevation: 0,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            item['isApproved'] = true;
-                            item['status'] = 'এপ্রুভড (Approved)';
-                            item['approvedSection'] = 'ডাক্তার ঘর (ভিডিও কল)';
-                          });
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('${item['name']} সফলভাবে "ডাক্তার ঘর" সেকশনে এপ্রুভড করা হয়েছে!'),
-                              backgroundColor: const Color(0xFF00897B),
-                            ),
-                          );
-                        },
-                        icon: const Icon(Icons.videocam_rounded, size: 18),
-                        label: const Text(
-                          'এপ্রুভ & ডাক্তার ঘরে যুক্ত করুন',
-                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-
-                    // Button 2: Approve & Add to Chamber Serial (Emerald Green Button)
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF006B4A),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 13),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          elevation: 0,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            item['isApproved'] = true;
-                            item['status'] = 'এপ্রুভড (Approved)';
-                            item['approvedSection'] = 'চেম্বার সিরিয়াল';
-                          });
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('${item['name']} সফলভাবে "চেম্বার সিরিয়াল" সেকশনে এপ্রুভড করা হয়েছে!'),
-                              backgroundColor: const Color(0xFF006B4A),
-                            ),
-                          );
-                        },
-                        icon: const Icon(Icons.local_hospital_rounded, size: 18),
-                        label: const Text(
-                          'এপ্রুভ & চেম্বার সিরিয়ালে যুক্ত করুন',
-                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-
-                    // Button 3: Approve & Add to Both Sections (Purple/Indigo Button)
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF5B21B6),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 13),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          elevation: 0,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            item['isApproved'] = true;
-                            item['status'] = 'এপ্রুভড (Approved)';
-                            item['approvedSection'] = 'ডাক্তার ঘর & চেম্বার সিরিয়াল (উভয়)';
-                          });
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('${item['name']} সফলভাবে "উভয়" সেকশনে এপ্রুভড করা হয়েছে!'),
-                              backgroundColor: const Color(0xFF5B21B6),
-                            ),
-                          );
-                        },
-                        icon: const Icon(Icons.medical_services_rounded, size: 18),
-                        label: const Text(
-                          'এপ্রুভ & উভয় সেকশনে যুক্ত করুন',
-                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-
-                    // Button 4: Call Candidate (Dark Navy Blue Button)
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF0F172A),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 13),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          elevation: 0,
-                        ),
-                        onPressed: () {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('${item['phone']} ক্যান্ডিডেটকে ডায়াল করা হচ্ছে...')),
-                          );
-                        },
-                        icon: const Icon(Icons.call_rounded, size: 18),
-                        label: const Text(
-                          'ক্যান্ডিডেটকে কল দিন',
-                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800),
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ),
