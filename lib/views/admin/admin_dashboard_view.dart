@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'admin_inbox_view.dart';
 import 'admin_job_circulars_view.dart';
 import 'admin_doctors_management_view.dart';
+import 'admin_patient_records_view.dart';
 import '../../controllers/home_controller.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/language_controller.dart';
@@ -975,6 +976,13 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => const AdminDoctorsManagementView(),
+                            ),
+                          );
+                        } else if (index == 4) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AdminPatientRecordsView(),
                             ),
                           );
                         } else if (!isSelected) {

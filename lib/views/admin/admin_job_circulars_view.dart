@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'admin_dashboard_view.dart';
 import 'admin_inbox_view.dart';
 import 'admin_doctors_management_view.dart';
+import 'admin_patient_records_view.dart';
 
 class AdminJobCircularsView extends StatefulWidget {
   const AdminJobCircularsView({super.key});
@@ -956,6 +957,13 @@ class _AdminJobCircularsViewState extends State<AdminJobCircularsView> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => const AdminDoctorsManagementView(),
+                            ),
+                          );
+                        } else if (index == 4) {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AdminPatientRecordsView(),
                             ),
                           );
                         } else if (!isSelected) {
