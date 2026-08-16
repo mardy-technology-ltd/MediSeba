@@ -319,15 +319,7 @@ class _AdminPatientRecordsViewState extends State<AdminPatientRecordsView> {
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
-                        onPressed: () {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('রোগীর প্রোফাইল ডাটাবেজ সমবায় আপডেটেড'),
-                              backgroundColor: brandGreen,
-                            ),
-                          );
-                        },
+                        onPressed: () => Navigator.pop(context),
                         icon: const Icon(Icons.check_circle_rounded, size: 18),
                         label: const Text('বন্ধ করুন', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
                       ),
