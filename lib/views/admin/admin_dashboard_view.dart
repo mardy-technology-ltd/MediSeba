@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'admin_inbox_view.dart';
+import 'admin_job_circulars_view.dart';
 import '../../controllers/home_controller.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/language_controller.dart';
@@ -959,6 +960,13 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => const AdminInboxView(),
+                            ),
+                          );
+                        } else if (index == 2) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AdminJobCircularsView(),
                             ),
                           );
                         } else if (!isSelected) {
