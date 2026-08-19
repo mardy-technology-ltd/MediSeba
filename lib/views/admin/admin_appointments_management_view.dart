@@ -452,18 +452,16 @@ class _AdminAppointmentsManagementViewState
 
             const SizedBox(height: 12),
 
-            // Filter Chips Horizontal Scroll
+            // Filter Chips Bar matching Web exact 3 options
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  _buildFilterChip('সকল সিরিয়াল', 'সকল ($totalCount)'),
+                  _buildFilterChip('সকল সিরিয়াল', 'সকল সিরিয়াল ($totalCount)'),
                   const SizedBox(width: 8),
-                  _buildFilterChip('চেম্বার সিরিয়াল', '🏥 চেম্বার ($chamberCount)'),
+                  _buildFilterChip('চেম্বার সিরিয়াল', '🏢 চেম্বার সিরিয়াল'),
                   const SizedBox(width: 8),
-                  _buildFilterChip('টেলিমেডিসিন কল', '🩺 টেলিমেডিসিন ($teleCount)'),
-                  const SizedBox(width: 8),
-                  _buildFilterChip('পেন্ডিং', '⏳ পেন্ডিং ($pendingCount)'),
+                  _buildFilterChip('টেলিমেডিসিন কল', '🎥 টেলিমেডিসিন কল'),
                 ],
               ),
             ),
