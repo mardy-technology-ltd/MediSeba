@@ -4,6 +4,7 @@ import 'admin_inbox_view.dart';
 import 'admin_job_circulars_view.dart';
 import 'admin_patient_records_view.dart';
 import 'admin_appointments_management_view.dart';
+import 'admin_medicine_inventory_view.dart';
 
 class AdminDoctorsManagementView extends StatefulWidget {
   const AdminDoctorsManagementView({super.key});
@@ -1382,6 +1383,13 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
                             context,
                             MaterialPageRoute(
                               builder: (context) => const AdminAppointmentsManagementView(),
+                            ),
+                          );
+                        } else if (index == 6) {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AdminMedicineInventoryView(),
                             ),
                           );
                         } else if (!isSelected) {

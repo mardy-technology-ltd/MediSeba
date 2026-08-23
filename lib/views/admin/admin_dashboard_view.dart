@@ -4,6 +4,7 @@ import 'admin_job_circulars_view.dart';
 import 'admin_doctors_management_view.dart';
 import 'admin_patient_records_view.dart';
 import 'admin_appointments_management_view.dart';
+import 'admin_medicine_inventory_view.dart';
 import '../../controllers/home_controller.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/language_controller.dart';
@@ -991,6 +992,13 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => const AdminAppointmentsManagementView(),
+                            ),
+                          );
+                        } else if (index == 6) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AdminMedicineInventoryView(),
                             ),
                           );
                         } else if (!isSelected) {
