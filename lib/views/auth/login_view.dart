@@ -262,12 +262,12 @@ class _LoginViewState extends State<LoginView> {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
             child: LayoutBuilder(
               builder: (context, constraints) {
                 final double containerWidth = constraints.maxWidth > 580 ? 560 : constraints.maxWidth;
@@ -276,15 +276,16 @@ class _LoginViewState extends State<LoginView> {
                 return Container(
                   width: containerWidth,
                   padding: EdgeInsets.symmetric(
-                    horizontal: isSmallScreen ? 14.0 : 24.0,
-                    vertical: isSmallScreen ? 18.0 : 26.0,
+                    horizontal: isSmallScreen ? 12.0 : 24.0,
+                    vertical: isSmallScreen ? 16.0 : 26.0,
                   ),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: const Color(0xFFF1F5F9), width: 1.0),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
+                        color: Colors.black.withValues(alpha: 0.04),
                         blurRadius: 20,
                         offset: const Offset(0, 4),
                       ),
@@ -512,9 +513,12 @@ class _LoginViewState extends State<LoginView> {
 
                       const SizedBox(height: 12),
 
-                      // Footer Row: Left Option (Back to Home) & Right Option (Sign Up)
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      // Responsive Footer Wrap (Left Option: Back to Home & Right Option: Sign Up)
+                      Wrap(
+                        alignment: WrapAlignment.spaceBetween,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 10,
+                        runSpacing: 8,
                         children: [
                           // Left Option: ← হোমপেজে ফিরে যান
                           GestureDetector(
@@ -538,7 +542,7 @@ class _LoginViewState extends State<LoginView> {
                                 Text(
                                   'হোমপেজে ফিরে যান',
                                   style: TextStyle(
-                                    fontSize: 12.5,
+                                    fontSize: 12,
                                     fontWeight: FontWeight.w600,
                                     color: textMuted,
                                   ),
@@ -564,7 +568,7 @@ class _LoginViewState extends State<LoginView> {
                               TextSpan(
                                 text: 'অ্যাকাউন্ট নেই? ',
                                 style: TextStyle(
-                                  fontSize: 12.5,
+                                  fontSize: 12,
                                   fontWeight: FontWeight.w500,
                                   color: Color(0xFF334155),
                                 ),
