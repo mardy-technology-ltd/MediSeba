@@ -195,12 +195,21 @@ class _DoctorListViewState extends State<DoctorListView> {
                       return DoctorCard(
                         doctor: doctor,
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DoctorDetailView(doctor: doctor),
-                            ),
-                          );
+                          if (doctor.isAvailableToday) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PaymentView(doctor: doctor),
+                              ),
+                            );
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => BookAppointmentView(doctor: doctor),
+                              ),
+                            );
+                          }
                         },
                       );
                     },

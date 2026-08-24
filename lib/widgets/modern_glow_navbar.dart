@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class ModernGlowNavBarItem {
-  final String iconPath;
+  final String? iconPath;
+  final IconData? icon;
   final String label;
   final bool isPng;
 
   const ModernGlowNavBarItem({
-    required this.iconPath,
+    this.iconPath,
+    this.icon,
     required this.label,
     this.isPng = false,
   });
@@ -56,32 +58,35 @@ class ModernGlowNavBar extends StatelessWidget {
       child: SafeArea(
         top: false,
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: List.generate(items.length, (index) {
             final item = items[index];
             final isSelected = currentIndex == index;
             final iconColor = isSelected ? primaryTeal : textMuted;
 
-            final iconWidget = SizedBox(
-              width: 24,
-              height: 24,
-              child: item.isPng
-                  ? Image.asset(
-                      item.iconPath,
-                      width: 24,
-                      height: 24,
-                      color: iconColor,
-                      colorBlendMode: BlendMode.srcIn,
-                      fit: BoxFit.contain,
-                    )
-                  : SvgPicture.asset(
-                      item.iconPath,
-                      width: 24,
-                      height: 24,
-                      colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
-                      fit: BoxFit.contain,
-                    ),
-            );
+            final Widget iconWidget;
+            if (item.icon != null) {
+              iconWidget = Icon(item.icon, size: 24, color: iconColor);
+            } else if (item.isPng && item.iconPath != null) {
+              iconWidget = Image.asset(
+                item.iconPath!,
+                width: 24,
+                height: 24,
+                color: iconColor,
+                colorBlendMode: BlendMode.srcIn,
+                fit: BoxFit.contain,
+              );
+            } else if (item.iconPath != null) {
+              iconWidget = SvgPicture.asset(
+                item.iconPath!,
+                width: 24,
+                height: 24,
+                colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+                fit: BoxFit.contain,
+              );
+            } else {
+              iconWidget = Icon(Icons.circle, size: 24, color: iconColor);
+            }
 
             return Expanded(
               child: GestureDetector(
