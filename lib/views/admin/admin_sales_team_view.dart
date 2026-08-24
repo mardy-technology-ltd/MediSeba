@@ -32,52 +32,18 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
   String _searchQuery = '';
   String _selectedRoleFilter = 'সকল';
 
-  final List<Map<String, dynamic>> _roleStatCards = [
-    {
-      'title': 'HBP এজেন্টস',
-      'count': '1 জন',
-      'icon': Icons.stars_rounded,
-      'iconColor': const Color(0xFFD97706),
-      'roleKey': 'HBP Field Agent',
-    },
-    {
-      'title': 'সুপারভাইজার',
-      'count': '1 জন',
-      'icon': Icons.shield_outlined,
-      'iconColor': const Color(0xFF2563EB),
-      'roleKey': 'Supervisor',
-    },
-    {
-      'title': 'এরিয়া ম্যানেজার',
-      'count': '1 জন',
-      'icon': Icons.business_outlined,
-      'iconColor': const Color(0xFF0284C7),
-      'roleKey': 'Area Manager',
-    },
-    {
-      'title': 'মার্কেটিং ম্যানেজার',
-      'count': '1 জন',
-      'icon': Icons.edit_note_rounded,
-      'iconColor': const Color(0xFF64748B),
-      'roleKey': 'Marketing Manager',
-    },
-    {
-      'title': 'হেড অব সেলস',
-      'count': '1 জন',
-      'icon': Icons.bar_chart_rounded,
-      'iconColor': const Color(0xFF2563EB),
-      'roleKey': 'Head of Sales',
-    },
-    {
-      'title': 'সেলস ডিরেক্টর',
-      'count': '1 জন',
-      'icon': Icons.account_balance_outlined,
-      'iconColor': const Color(0xFF7C3AED),
-      'roleKey': 'Sales Director',
-    },
-  ];
-
   late List<Map<String, dynamic>> _usersList;
+
+  final List<String> _availableRoles = [
+    'Sales Director',
+    'Head of Sales',
+    'Marketing Manager',
+    'Area Manager',
+    'Supervisor',
+    'HBP Field Agent',
+    'Verified Doctor',
+    'Patient',
+  ];
 
   @override
   void initState() {
@@ -164,25 +130,35 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
     super.dispose();
   }
 
-  final List<String> _availableRoles = [
-    'Sales Director',
-    'Head of Sales',
-    'Marketing Manager',
-    'Area Manager',
-    'Supervisor',
-    'HBP Field Agent',
-    'Verified Doctor',
-    'Patient',
-  ];
+  /// Get list of reporting bosses dynamically from current sales leaders
+  List<String> get _dynamicReportingBosses {
+    final List<String> bosses = [
+      '-- কোনো রিপোর্টিং বস নেই (Top Boss / None) --',
+    ];
+    for (var u in _usersList) {
+      final role = (u['role'] ?? '').toString();
+      final name = (u['name'] ?? '').toString();
+      if (role == 'Sales Director' ||
+          role == 'Head of Sales' ||
+          role == 'Marketing Manager' ||
+          role == 'Area Manager' ||
+          role == 'Supervisor') {
+        bosses.add('$name ($role)');
+      }
+    }
+    return bosses;
+  }
 
-  final List<String> _availableBosses = [
-    '-- কোনো রিপোর্টিং বস নেই (Top Boss / None) --',
-    'ফারহান আহমেদ (Sales Director)',
-    'মোঃ রফিকুল ইসলাম (Head of Sales)',
-    'নাসরিন আক্তার (Marketing Manager)',
-    'শাহরিয়ার কবির (Area Manager)',
-    'তানভীর আহমেদ (Supervisor)',
-  ];
+  /// Get role count dynamically
+  int _getRoleCount(String roleKey) {
+    if (roleKey == 'সকল') {
+      return _usersList.where((u) {
+        final r = (u['role'] ?? '').toString();
+        return r != 'Verified Doctor' && r != 'Patient';
+      }).length;
+    }
+    return _usersList.where((u) => (u['role'] ?? '').toString() == roleKey).length;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -209,7 +185,7 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 1. Hero Banner (Deep Slate / Dark Navy)
+              // 1. Hero Banner (Deep Navy Slate)
               _buildHeroBanner(),
 
               const SizedBox(height: 14),
@@ -242,7 +218,7 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('লাইভ সাপোর্ট চ্যাট সাপোর্ট ওপেন হয়েছে'),
+                  content: Text('লাইভ সাপোর্ট চ্যাট ওপেন হয়েছে'),
                   behavior: SnackBarBehavior.floating,
                 ),
               );
@@ -427,11 +403,7 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
                 ),
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('নতুন অ্যাকাউন্ট তৈরি করুন ফর্ম খুলছে...'), behavior: SnackBarBehavior.floating),
-                  );
-                },
+                onPressed: _showCreateUserModal,
                 icon: const Icon(Icons.person_add_alt_1_rounded, size: 14),
                 label: const Text(
                   '+ নতুন একাউন্ট তৈরি করুন (Create Profile)',
@@ -454,7 +426,7 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
           ),
           const SizedBox(height: 4),
           const Text(
-            'HBP, Supervisor, Area Manager, Marketing Manager, Head of Sales & Sales Director আইডি সৃষ্টি ও অ্যাসাইনমেন্ট',
+            'HBP, Supervisor, Area Manager, Marketing Manager, Head of Sales ও Sales Director আইডি সৃষ্টি ও অ্যাসাইনমেন্ট',
             style: TextStyle(
               fontSize: 11.5,
               color: Color(0xFF94A3B8),
@@ -468,6 +440,51 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
 
   /// 2. 6 Role Stat Cards Grid
   Widget _buildRoleStatCardsGrid() {
+    final statCards = [
+      {
+        'title': '✨ HBP এজেন্টস',
+        'count': '${_getRoleCount('HBP Field Agent')} জন',
+        'icon': Icons.stars_rounded,
+        'iconColor': const Color(0xFF059669),
+        'roleKey': 'HBP Field Agent',
+      },
+      {
+        'title': '🛡️ সুপারভাইজার',
+        'count': '${_getRoleCount('Supervisor')} জন',
+        'icon': Icons.shield_outlined,
+        'iconColor': const Color(0xFFD97706),
+        'roleKey': 'Supervisor',
+      },
+      {
+        'title': '🏢 এরিয়া ম্যানেজার',
+        'count': '${_getRoleCount('Area Manager')} জন',
+        'icon': Icons.business_outlined,
+        'iconColor': const Color(0xFF4F46E5),
+        'roleKey': 'Area Manager',
+      },
+      {
+        'title': '📈 মার্কেটিং ম্যানেজার',
+        'count': '${_getRoleCount('Marketing Manager')} জন',
+        'icon': Icons.edit_note_rounded,
+        'iconColor': const Color(0xFF0891B2),
+        'roleKey': 'Marketing Manager',
+      },
+      {
+        'title': '👔 হেড অব সেলস',
+        'count': '${_getRoleCount('Head of Sales')} জন',
+        'icon': Icons.bar_chart_rounded,
+        'iconColor': const Color(0xFF0284C7),
+        'roleKey': 'Head of Sales',
+      },
+      {
+        'title': '📊 সেলস ডিরেক্টর',
+        'count': '${_getRoleCount('Sales Director')} জন',
+        'icon': Icons.account_balance_outlined,
+        'iconColor': const Color(0xFF7C3AED),
+        'roleKey': 'Sales Director',
+      },
+    ];
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final double width = constraints.maxWidth;
@@ -483,13 +500,11 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
             mainAxisSpacing: 8,
             childAspectRatio: childAspectRatio,
           ),
-          itemCount: _roleStatCards.length,
+          itemCount: statCards.length,
           itemBuilder: (context, index) {
-            final card = _roleStatCards[index];
+            final card = statCards[index];
             final String title = (card['title'] ?? '').toString();
             final String count = (card['count'] ?? '').toString();
-            final IconData icon = (card['icon'] as IconData?) ?? Icons.person_outline;
-            final Color iconColor = (card['iconColor'] as Color?) ?? brandGreen;
             final String roleKey = (card['roleKey'] ?? '').toString();
 
             final bool isSelected = _selectedRoleFilter == roleKey;
@@ -522,19 +537,11 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Row(
-                      children: [
-                        Icon(icon, color: iconColor, size: 14),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: Text(
-                            title,
-                            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: textMuted),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
+                    Text(
+                      title,
+                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: textMuted),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -566,13 +573,13 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
   /// 3. Filter & Realtime Search Card
   Widget _buildFilterSearchCard() {
     final filterOptions = [
-      {'label': 'সকল সেলস সদস্য', 'count': '6', 'role': 'সকল'},
-      {'label': 'HBP ফিল্ড এজেন্ট', 'count': '1', 'role': 'HBP Field Agent'},
-      {'label': 'সুপারভাইজার', 'count': '1', 'role': 'Supervisor'},
-      {'label': 'এরিয়া ম্যানেজার', 'count': '1', 'role': 'Area Manager'},
-      {'label': 'মার্কেটিং ম্যানেজার', 'count': '1', 'role': 'Marketing Manager'},
-      {'label': 'হেড অব সেলস', 'count': '1', 'role': 'Head of Sales'},
-      {'label': 'সেলস ডিরেক্টর', 'count': '1', 'role': 'Sales Director'},
+      {'label': '🌐 সকল সেলস সদস্য', 'count': '${_getRoleCount('সকল')}', 'role': 'সকল'},
+      {'label': '✨ HBP ফিল্ড এজেন্ট', 'count': '${_getRoleCount('HBP Field Agent')}', 'role': 'HBP Field Agent'},
+      {'label': '🛡️ সুপারভাইজার', 'count': '${_getRoleCount('Supervisor')}', 'role': 'Supervisor'},
+      {'label': '🏢 এরিয়া ম্যানেজার', 'count': '${_getRoleCount('Area Manager')}', 'role': 'Area Manager'},
+      {'label': '📈 মার্কেটিং ম্যানেজার', 'count': '${_getRoleCount('Marketing Manager')}', 'role': 'Marketing Manager'},
+      {'label': '👔 হেড অব সেলস', 'count': '${_getRoleCount('Head of Sales')}', 'role': 'Head of Sales'},
+      {'label': '📊 সেলস ডিরেক্টর', 'count': '${_getRoleCount('Sales Director')}', 'role': 'Sales Director'},
     ];
 
     return Container(
@@ -608,22 +615,22 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
                       Icon(Icons.filter_list_rounded, color: Color(0xFF4F46E5), size: 18),
                       SizedBox(width: 6),
                       Text(
-                        'রোল অনুসারে ফিল্টার ও রিয়েল-টাইম সার্চ',
+                        'রোল অনুসারে ফিল্টার ও রিয়েল-টাইম সার্চ',
                         style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: textDark),
                       ),
                     ],
                   ),
                   SizedBox(height: 2),
                   Text(
-                    'মেম্বারদের দ্রুত খুঁজে বের করতে সার্চ দিন অথবা ফিল্টার চিপে ট্যাপ করুন',
+                    'মেম্বারদের দ্রুত খুঁজে বের করতে ট্যাব বেছে নিন অথবা ফিল্ডে টাইপ করুন',
                     style: TextStyle(fontSize: 10, color: textMuted),
                   ),
                 ],
               ),
 
-              // Search Box
+              // Search Box matching web placeholder
               SizedBox(
-                width: 220,
+                width: 230,
                 height: 36,
                 child: TextField(
                   controller: _searchController,
@@ -634,10 +641,9 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
                   },
                   style: const TextStyle(fontSize: 11.5),
                   decoration: InputDecoration(
-                    hintText: 'নাম, ফোন, ইমেইল দিয়ে খুঁজুন...',
-                    hintStyle: const TextStyle(fontSize: 11, color: textMuted),
-                    prefixIcon: const Icon(Icons.search_rounded, size: 16, color: textMuted),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 8),
+                    hintText: '🔍 নাম, ফোন, ইমেইল বা বস দিয়ে খুঁজুন...',
+                    hintStyle: const TextStyle(fontSize: 10.5, color: textMuted),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
                     filled: true,
                     fillColor: const Color(0xFFF8FAFC),
                     border: OutlineInputBorder(
@@ -773,6 +779,18 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
             builder: (context, constraints) {
               final bool isMobile = constraints.maxWidth < 680;
 
+              if (users.isEmpty) {
+                return Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(32),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'কোনো ইউজার পাওয়া যায়নি।',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: textMuted),
+                  ),
+                );
+              }
+
               if (isMobile) {
                 // Mobile Card Layout
                 return Column(
@@ -783,6 +801,8 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
                     final String boss = (u['boss'] ?? '').toString();
                     final String date = (u['date'] ?? '').toString();
                     final bool isSelected = (u['isSelected'] as bool?) ?? false;
+
+                    final bossesList = _dynamicReportingBosses;
 
                     return Container(
                       margin: const EdgeInsets.only(bottom: 10),
@@ -847,6 +867,12 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
                                     setState(() {
                                       u['role'] = newRole;
                                     });
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('$name এর পদবী [$newRole] এ আপডেট করা হয়েছে'),
+                                        behavior: SnackBarBehavior.floating,
+                                      ),
+                                    );
                                   }
                                 },
                               ),
@@ -856,7 +882,7 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
                           const SizedBox(height: 8),
 
                           // Reporting Boss Selector Dropdown
-                          const Text('রিপোর্টিং বস (REPORTING BOSS):', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: textMuted)),
+                          const Text('রিপোর্টিং বস (REPORTING BOSS SELECTION):', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: textMuted)),
                           const SizedBox(height: 2),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -867,10 +893,10 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
                             ),
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<String>(
-                                value: _availableBosses.contains(boss) ? boss : _availableBosses.first,
+                                value: bossesList.contains(boss) ? boss : bossesList.first,
                                 isExpanded: true,
                                 style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600, color: textDark),
-                                items: _availableBosses.map((b) {
+                                items: bossesList.map((b) {
                                   return DropdownMenuItem<String>(
                                     value: b,
                                     child: Text(b, overflow: TextOverflow.ellipsis),
@@ -881,6 +907,12 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
                                     setState(() {
                                       u['boss'] = newBoss;
                                     });
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('$name এর রিপোর্টিং বস পরিবর্তন করা হয়েছে'),
+                                        behavior: SnackBarBehavior.floating,
+                                      ),
+                                    );
                                   }
                                 },
                               ),
@@ -931,6 +963,8 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
                         final String boss = (u['boss'] ?? '').toString();
                         final String date = (u['date'] ?? '').toString();
                         final bool isSelected = (u['isSelected'] as bool?) ?? false;
+
+                        final bossesList = _dynamicReportingBosses;
 
                         return Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
@@ -986,6 +1020,12 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
                                           setState(() {
                                             u['role'] = newRole;
                                           });
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text('$name এর পদবী [$newRole] এ আপডেট করা হয়েছে'),
+                                              behavior: SnackBarBehavior.floating,
+                                            ),
+                                          );
                                         }
                                       },
                                     ),
@@ -1007,10 +1047,10 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
                                   ),
                                   child: DropdownButtonHideUnderline(
                                     child: DropdownButton<String>(
-                                      value: _availableBosses.contains(boss) ? boss : _availableBosses.first,
+                                      value: bossesList.contains(boss) ? boss : bossesList.first,
                                       isExpanded: true,
                                       style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: textDark),
-                                      items: _availableBosses.map((b) {
+                                      items: bossesList.map((b) {
                                         return DropdownMenuItem<String>(
                                           value: b,
                                           child: Text(b, overflow: TextOverflow.ellipsis),
@@ -1021,6 +1061,12 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
                                           setState(() {
                                             u['boss'] = newBoss;
                                           });
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text('$name এর রিপোর্টিং বস পরিবর্তন করা হয়েছে'),
+                                              behavior: SnackBarBehavior.floating,
+                                            ),
+                                          );
                                         }
                                       },
                                     ),
@@ -1048,6 +1094,214 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
           ),
         ],
       ),
+    );
+  }
+
+  /// Create Profile Modal (Modal Bottom Sheet / Dialog)
+  void _showCreateUserModal() {
+    final nameCtrl = TextEditingController();
+    final phoneCtrl = TextEditingController();
+    final emailCtrl = TextEditingController();
+    String selectedRole = 'HBP Field Agent';
+    String selectedBoss = _dynamicReportingBosses.first;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            final bosses = _dynamicReportingBosses;
+
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 20,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Row(
+                        children: [
+                          Icon(Icons.person_add_alt_1_rounded, color: Color(0xFF4F46E5), size: 22),
+                          SizedBox(width: 8),
+                          Text(
+                            'নতুন অ্যাকাউন্ট তৈরি করুন',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: textDark),
+                          ),
+                        ],
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close_rounded, size: 22),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
+                  const Divider(color: Color(0xFFE2E8F0)),
+                  const SizedBox(height: 10),
+
+                  // Name Input
+                  const Text('পূর্ণ নাম', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: textMuted)),
+                  const SizedBox(height: 4),
+                  TextField(
+                    controller: nameCtrl,
+                    style: const TextStyle(fontSize: 12.5),
+                    decoration: InputDecoration(
+                      hintText: 'যেমন: ফারহান আহমেদ',
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Phone Input
+                  const Text('মোবাইল নাম্বার', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: textMuted)),
+                  const SizedBox(height: 4),
+                  TextField(
+                    controller: phoneCtrl,
+                    keyboardType: TextInputType.phone,
+                    style: const TextStyle(fontSize: 12.5),
+                    decoration: InputDecoration(
+                      hintText: '01700000000',
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Email Input
+                  const Text('ইমেইল অ্যাড্রেস', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: textMuted)),
+                  const SizedBox(height: 4),
+                  TextField(
+                    controller: emailCtrl,
+                    keyboardType: TextInputType.emailAddress,
+                    style: const TextStyle(fontSize: 12.5),
+                    decoration: InputDecoration(
+                      hintText: 'agent@mediseba.com',
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Role Dropdown Selection
+                  const Text('পদবী নির্বাচন করুন (Update Role)', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: textMuted)),
+                  const SizedBox(height: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: const Color(0xFFCBD5E1)),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: selectedRole,
+                        isExpanded: true,
+                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: textDark),
+                        items: _availableRoles.map((r) => DropdownMenuItem(value: r, child: Text(r))).toList(),
+                        onChanged: (val) {
+                          if (val != null) {
+                            setModalState(() {
+                              selectedRole = val;
+                            });
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Reporting Boss Dropdown Selection
+                  const Text('রিপোর্টিং বস নির্বাচন করুন (Reporting Boss)', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: textMuted)),
+                  const SizedBox(height: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: const Color(0xFFCBD5E1)),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: bosses.contains(selectedBoss) ? selectedBoss : bosses.first,
+                        isExpanded: true,
+                        style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: textDark),
+                        items: bosses.map((b) => DropdownMenuItem(value: b, child: Text(b, overflow: TextOverflow.ellipsis))).toList(),
+                        onChanged: (val) {
+                          if (val != null) {
+                            setModalState(() {
+                              selectedBoss = val;
+                            });
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Submit Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 44,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF4F46E5),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      onPressed: () {
+                        final name = nameCtrl.text.trim();
+                        final phone = phoneCtrl.text.trim();
+                        final email = emailCtrl.text.trim();
+
+                        if (name.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('দয়া করে নাম টাইপ করুন'), behavior: SnackBarBehavior.floating),
+                          );
+                          return;
+                        }
+
+                        final contactStr = '${phone.isNotEmpty ? phone : "01700000000"} | ${email.isNotEmpty ? email : "agent@mediseba.com"}';
+                        final nowStr = DateTime.now().toString().substring(0, 16);
+
+                        setState(() {
+                          _usersList.insert(0, {
+                            'id': DateTime.now().millisecondsSinceEpoch.toString(),
+                            'name': name,
+                            'contact': contactStr,
+                            'role': selectedRole,
+                            'boss': selectedBoss,
+                            'date': nowStr,
+                            'isSelected': false,
+                          });
+                        });
+
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('$name এর জন্য নতুন অ্যাকাউন্ট সফলভাবে সৃষ্টি করা হয়েছে!'),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      },
+                      child: const Text('অ্যাকাউন্ট তৈরি করুন', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }
