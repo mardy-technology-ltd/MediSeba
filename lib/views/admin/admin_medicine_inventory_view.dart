@@ -1138,31 +1138,36 @@ class _AdminMedicineInventoryViewState extends State<AdminMedicineInventoryView>
                 style: const TextStyle(fontSize: 12.5, color: textMuted, height: 1.3),
               ),
               const Divider(height: 18, color: Color(0xFFF1F5F9)),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 8,
+                runSpacing: 8,
                 children: [
                   Text(
                     'মোট বিল: ৳ ${order['totalBill']}',
                     style: const TextStyle(
-                      fontSize: 15,
+                      fontSize: 14.5,
                       fontWeight: FontWeight.bold,
                       color: brandGreen,
                     ),
                   ),
                   Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFF1F5F9),
                           elevation: 0,
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),
                         onPressed: () => _showUpdateOrderStatusModal(actualIndex),
                         icon: const Icon(Icons.change_circle_rounded, size: 14, color: Color(0xFF475569)),
                         label: const Text(
                           'স্ট্যাটাস পরিবর্তন',
-                          style: TextStyle(fontSize: 11, color: Color(0xFF334155), fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 10.5, color: Color(0xFF334155), fontWeight: FontWeight.bold),
                         ),
                       ),
                       if (order['status'] != 'বাতিল' && order['status'] != 'ডেলিভারড') ...[
