@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'register_view.dart';
 import '../home/home_view.dart';
-import '../admin/admin_dashboard_view.dart';
 import '../../controllers/home_controller.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/language_controller.dart';
@@ -95,7 +94,7 @@ class _LoginViewState extends State<LoginView> {
                   ),
                   const SizedBox(height: 8),
                   const Text(
-                    'অ্যাডমিন পোর্টালের এই সেকশনটি বর্তমানে ডেভেলপমেন্ট ফেজ Step 7-এ চলমান রয়েছে। আপনি অ্যাডমিন ড্যাশবোর্ড ডেমো প্যানেলে প্রবেশ করে ইউআই পর্যবেক্ষণ করতে পারেন।',
+                    'অ্যাডমিন পোর্টালের এই সেকশনটি বর্তমানে ডেভেলপমেন্ট ফেজ Step 7-এ প্রস্তুত করা হচ্ছে। শীঘ্রই এটি ব্যবহারের জন্য উন্মুক্ত করা হবে।',
                     style: TextStyle(
                       fontSize: 12.5,
                       color: Color(0xFF64748B),
@@ -104,43 +103,22 @@ class _LoginViewState extends State<LoginView> {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Color(0xFFCBD5E1)),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                          ),
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text(
-                            'বন্ধ করুন',
-                            style: TextStyle(color: Color(0xFF475569), fontWeight: FontWeight.w700),
-                          ),
-                        ),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 44,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF005C45),
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF005C45),
-                            foregroundColor: Colors.white,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                          ),
-                          onPressed: () {
-                            Navigator.pop(context); // Close dialog
-                            _proceedAdminLogin();
-                          },
-                          child: const Text(
-                            'ডেমো দেখুন',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text(
+                        'ঠিক আছে',
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                       ),
-                    ],
+                    ),
                   ),
                 ],
               ),
@@ -152,31 +130,6 @@ class _LoginViewState extends State<LoginView> {
     }
 
     _proceedNormalLogin();
-  }
-
-  void _proceedAdminLogin() async {
-    setState(() {
-      _isLoggingIn = true;
-    });
-
-    await widget.authController.login(_inputController.text.trim(), _passwordController.text);
-
-    if (mounted) {
-      setState(() {
-        _isLoggingIn = false;
-      });
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => AdminDashboardView(
-            homeController: widget.homeController,
-            authController: widget.authController,
-            languageController: widget.languageController,
-          ),
-        ),
-      );
-    }
   }
 
   void _proceedNormalLogin() async {
