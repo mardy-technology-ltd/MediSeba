@@ -5,7 +5,17 @@ import '../../controllers/home_controller.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/language_controller.dart';
 
-enum LoginRole { patient, doctor, hbp, supervisor, admin }
+enum LoginRole {
+  patient,
+  doctor,
+  hbp,
+  supervisor,
+  areaMgr,
+  marketingMgr,
+  headOfSales,
+  salesDirector,
+  admin
+}
 
 class LoginView extends StatefulWidget {
   final HomeController homeController;
@@ -30,9 +40,9 @@ class _LoginViewState extends State<LoginView> {
   static const textDark = Color(0xFF0F172A);
   static const textMuted = Color(0xFF64748B);
 
-  LoginRole _selectedRole = LoginRole.doctor;
+  LoginRole _selectedRole = LoginRole.patient;
 
-  final TextEditingController _inputController = TextEditingController(text: 'doctor@mediseba.org');
+  final TextEditingController _inputController = TextEditingController(text: 'patient@mediseba.org');
   final TextEditingController _passwordController = TextEditingController(text: 'password123');
   bool _isPasswordVisible = false;
   bool _isLoggingIn = false;
@@ -53,6 +63,18 @@ class _LoginViewState extends State<LoginView> {
           break;
         case LoginRole.supervisor:
           _inputController.text = 'tanvir@mediseba.com';
+          break;
+        case LoginRole.areaMgr:
+          _inputController.text = 'areamanager@mediseba.com';
+          break;
+        case LoginRole.marketingMgr:
+          _inputController.text = 'marketing@mediseba.com';
+          break;
+        case LoginRole.headOfSales:
+          _inputController.text = 'headsales@mediseba.com';
+          break;
+        case LoginRole.salesDirector:
+          _inputController.text = 'director@mediseba.com';
           break;
         case LoginRole.admin:
           _inputController.text = 'admin@mediseba.org';
@@ -83,10 +105,15 @@ class _LoginViewState extends State<LoginView> {
       return;
     }
 
-    if (_selectedRole == LoginRole.admin || _selectedRole == LoginRole.hbp || _selectedRole == LoginRole.supervisor) {
-      String roleTitle = 'অ্যাডমিন';
-      if (_selectedRole == LoginRole.hbp) roleTitle = 'HBP এজেন্ট';
-      if (_selectedRole == LoginRole.supervisor) roleTitle = 'সুপারভাইজার';
+    if (_selectedRole != LoginRole.patient && _selectedRole != LoginRole.doctor) {
+      String roleTitle = 'এডমিন';
+      if (_selectedRole == LoginRole.hbp) roleTitle = 'HBP Field';
+      if (_selectedRole == LoginRole.supervisor) roleTitle = 'Supervisor';
+      if (_selectedRole == LoginRole.areaMgr) roleTitle = 'Area Manager';
+      if (_selectedRole == LoginRole.marketingMgr) roleTitle = 'Marketing Manager';
+      if (_selectedRole == LoginRole.headOfSales) roleTitle = 'Head of Sales';
+      if (_selectedRole == LoginRole.salesDirector) roleTitle = 'Sales Director';
+      if (_selectedRole == LoginRole.admin) roleTitle = 'System Admin';
 
       showDialog(
         context: context,
@@ -203,7 +230,7 @@ class _LoginViewState extends State<LoginView> {
 
   @override
   Widget build(BuildContext context) {
-    String roleNameUpper = 'DOCTOR';
+    String roleNameUpper = 'PATIENT';
     switch (_selectedRole) {
       case LoginRole.patient:
         roleNameUpper = 'PATIENT';
@@ -212,37 +239,64 @@ class _LoginViewState extends State<LoginView> {
         roleNameUpper = 'DOCTOR';
         break;
       case LoginRole.hbp:
-        roleNameUpper = 'HBP';
+        roleNameUpper = 'HBP FIELD';
         break;
       case LoginRole.supervisor:
         roleNameUpper = 'SUPERVISOR';
         break;
+      case LoginRole.areaMgr:
+        roleNameUpper = 'AREA MGR';
+        break;
+      case LoginRole.marketingMgr:
+        roleNameUpper = 'MARKETING MGR';
+        break;
+      case LoginRole.headOfSales:
+        roleNameUpper = 'HEAD OF SALES';
+        break;
+      case LoginRole.salesDirector:
+        roleNameUpper = 'SALES DIRECTOR';
+        break;
       case LoginRole.admin:
-        roleNameUpper = 'ADMIN';
+        roleNameUpper = 'SYSTEM ADMIN';
         break;
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF8FAFC),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
             child: LayoutBuilder(
               builder: (context, constraints) {
                 final double containerWidth = constraints.maxWidth > 580 ? 560 : constraints.maxWidth;
                 final bool isSmallScreen = constraints.maxWidth < 420;
 
-                return SizedBox(
+                return Container(
                   width: containerWidth,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isSmallScreen ? 16.0 : 24.0,
+                    vertical: isSmallScreen ? 20.0 : 26.0,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 20,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       // Top Logo Image
                       Image.asset(
                         'assets/images/logo.png',
-                        height: isSmallScreen ? 48 : 56,
+                        height: isSmallScreen ? 46 : 54,
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stackTrace) => Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -301,29 +355,9 @@ class _LoginViewState extends State<LoginView> {
                         textAlign: TextAlign.center,
                       ),
 
-                      const SizedBox(height: 24),
-
-                      // Section 1 Header
-                      const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          '১. আপনার পোর্টাল ভূমিকা (Role) নির্বাচন করুন:',
-                          style: TextStyle(
-                            fontSize: 13.5,
-                            fontWeight: FontWeight.w800,
-                            color: textDark,
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 10),
-
-                      // Adaptive 5 Role Selector Pills Container
-                      _buildAdaptiveRoleBar(isSmallScreen),
-
                       const SizedBox(height: 22),
 
-                      // Adaptive Quick Auto-fill Credentials Box Card
+                      // Adaptive Quick Auto-fill Credentials Card (Integrated Role Selector 9 Cards)
                       _buildAdaptiveCredentialsCard(isSmallScreen),
 
                       const SizedBox(height: 22),
@@ -359,7 +393,7 @@ class _LoginViewState extends State<LoginView> {
                             color: textDark,
                           ),
                           decoration: const InputDecoration(
-                            icon: Icon(Icons.mail_outline_rounded, color: primaryBlue, size: 20),
+                            icon: Icon(Icons.mail_outline_rounded, color: textMuted, size: 20),
                             hintText: 'ইমেইল বা মোবাইল নম্বর প্রদান করুন',
                             hintStyle: TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
                             border: InputBorder.none,
@@ -401,7 +435,7 @@ class _LoginViewState extends State<LoginView> {
                             letterSpacing: 1.5,
                           ),
                           decoration: InputDecoration(
-                            icon: const Icon(Icons.lock_outline_rounded, color: primaryBlue, size: 20),
+                            icon: const Icon(Icons.lock_outline_rounded, color: textMuted, size: 20),
                             hintText: '••••••••••',
                             hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF94A3B8), letterSpacing: 0),
                             border: InputBorder.none,
@@ -562,97 +596,19 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
-  // Adaptive Role Selection Bar (Scrollable on small screens, expanded on wider screens)
-  Widget _buildAdaptiveRoleBar(bool isSmallScreen) {
-    final List<Map<String, dynamic>> roles = [
-      {'role': LoginRole.patient, 'label': 'রোগী', 'icon': Icons.person_outline_rounded, 'color': const Color(0xFF2563EB)},
-      {'role': LoginRole.doctor, 'label': 'ডাক্তার', 'icon': Icons.medical_services_outlined, 'color': const Color(0xFF2563EB)},
-      {'role': LoginRole.hbp, 'label': 'HBP', 'icon': Icons.auto_awesome_rounded, 'color': const Color(0xFF0D9488)},
-      {'role': LoginRole.supervisor, 'label': 'Sup.', 'icon': Icons.check_circle_outline_rounded, 'color': const Color(0xFF4F46E5)},
-      {'role': LoginRole.admin, 'label': 'Admin', 'icon': Icons.shield_outlined, 'color': const Color(0xFFDC2626)},
-    ];
-
-    return Container(
-      padding: const EdgeInsets.all(5),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF1F5F9),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
-      ),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        physics: const BouncingScrollPhysics(),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: roles.map((item) {
-            final LoginRole role = item['role'];
-            final String label = item['label'];
-            final IconData icon = item['icon'];
-            final Color activeColor = item['color'];
-            final isSelected = _selectedRole == role;
-
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 2.0),
-              child: GestureDetector(
-                onTap: () => _onRoleChanged(role),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 12),
-                  decoration: BoxDecoration(
-                    color: isSelected ? Colors.white : Colors.transparent,
-                    borderRadius: BorderRadius.circular(16),
-                    border: isSelected ? Border.all(color: activeColor, width: 1.6) : Border.all(color: Colors.transparent, width: 1.6),
-                    boxShadow: isSelected
-                        ? [
-                            BoxShadow(
-                              color: activeColor.withValues(alpha: 0.15),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ]
-                        : null,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        icon,
-                        size: 16,
-                        color: isSelected ? activeColor : textMuted,
-                      ),
-                      const SizedBox(width: 5),
-                      Text(
-                        label,
-                        style: TextStyle(
-                          fontSize: 12.5,
-                          fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                          color: isSelected ? activeColor : textMuted,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-      ),
-    );
-  }
-
-  // Adaptive Quick Auto-fill Credentials Box Card
+  // Adaptive Quick Auto-fill Credentials Box Card (Integrated 9 Roles Grid)
   Widget _buildAdaptiveCredentialsCard(bool isSmallScreen) {
     return Container(
       padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
       decoration: BoxDecoration(
-        color: const Color(0xFFF0FDFA),
+        color: const Color(0xFFF8FAFC),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFCCFBF1), width: 1.5),
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header Wrap (Prevents text overflow on 320px screens)
+          // Header Wrap
           Wrap(
             alignment: WrapAlignment.spaceBetween,
             crossAxisAlignment: WrapCrossAlignment.center,
@@ -662,12 +618,12 @@ class _LoginViewState extends State<LoginView> {
               const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.vpn_key_outlined, size: 17, color: Color(0xFFD97706)),
+                  Icon(Icons.vpn_key_outlined, size: 17, color: Color(0xFF00A859)),
                   SizedBox(width: 6),
                   Text(
-                    'টেস্টিং ক্রেডেনশিয়াল (Auto-fill):',
+                    'আপনার অ্যাকাউন্ট রোল বা ভূমিকা সিলেক্ট করুন (১-ক্লিকে ফিল):',
                     style: TextStyle(
-                      fontSize: 12.5,
+                      fontSize: 12,
                       fontWeight: FontWeight.w800,
                       color: textDark,
                     ),
@@ -681,7 +637,7 @@ class _LoginViewState extends State<LoginView> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Text(
-                  '১-ক্লিকে পূরণ',
+                  '১-ক্লিক অটো ফিল',
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w800,
@@ -692,21 +648,25 @@ class _LoginViewState extends State<LoginView> {
             ],
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
 
-          // Responsive Wrap for 5 Credential Cards (Adapts dynamically to mobile vs desktop)
+          // Responsive Wrap for 9 Credential Cards (3 columns grid matching image)
           LayoutBuilder(
             builder: (context, cardConstraints) {
               final double availableWidth = cardConstraints.maxWidth;
-              final int columns = availableWidth < 380 ? 2 : 3;
+              final int columns = availableWidth < 360 ? 2 : 3;
               final double cardWidth = (availableWidth - (columns - 1) * 8) / columns;
 
               final List<Map<String, dynamic>> items = [
-                {'role': LoginRole.patient, 'title': 'রোগী (Patient)', 'email': 'patient@mediseba.org', 'dot': const Color(0xFF10B981)},
-                {'role': LoginRole.doctor, 'title': 'ডাক্তার (Doctor)', 'email': 'doctor@mediseba.org', 'icon': Icons.medical_services_outlined, 'iconColor': const Color(0xFF4F46E5)},
-                {'role': LoginRole.admin, 'title': 'অ্যাডমিন (Admin)', 'email': 'admin@mediseba.org', 'icon': Icons.workspace_premium_rounded, 'iconColor': const Color(0xFFD97706)},
-                {'role': LoginRole.hbp, 'title': 'HBP এজেন্ট', 'email': 'rahim@mediseba.com', 'icon': Icons.auto_awesome_rounded, 'iconColor': const Color(0xFFD97706)},
-                {'role': LoginRole.supervisor, 'title': 'সুপারভাইজার', 'email': 'tanvir@mediseba.com', 'icon': Icons.shield_rounded, 'iconColor': const Color(0xFF2563EB)},
+                {'role': LoginRole.patient, 'title': 'Patient', 'email': 'patient@mediseba.org', 'dot': const Color(0xFF10B981)},
+                {'role': LoginRole.doctor, 'title': 'Doctor', 'email': 'doctor@mediseba.org', 'icon': Icons.medical_services_outlined, 'iconColor': const Color(0xFF2563EB)},
+                {'role': LoginRole.hbp, 'title': 'HBP Field', 'email': 'rahim@mediseba.com', 'icon': Icons.build_outlined, 'iconColor': const Color(0xFFD97706)},
+                {'role': LoginRole.supervisor, 'title': 'Supervisor', 'email': 'tanvir@mediseba.com', 'icon': Icons.shield_outlined, 'iconColor': const Color(0xFF2563EB)},
+                {'role': LoginRole.areaMgr, 'title': 'Area Mgr', 'email': 'areamanager@mediseba.com', 'icon': Icons.business_outlined, 'iconColor': const Color(0xFF64748B)},
+                {'role': LoginRole.marketingMgr, 'title': 'Marketing Mgr', 'email': 'marketing@mediseba.com', 'icon': Icons.edit_note_rounded, 'iconColor': const Color(0xFF64748B)},
+                {'role': LoginRole.headOfSales, 'title': 'Head of Sales', 'email': 'headsales@mediseba.com', 'icon': Icons.bar_chart_rounded, 'iconColor': const Color(0xFF2563EB)},
+                {'role': LoginRole.salesDirector, 'title': 'Sales Director', 'email': 'director@mediseba.com', 'icon': Icons.account_balance_outlined, 'iconColor': const Color(0xFF64748B)},
+                {'role': LoginRole.admin, 'title': 'System Admin', 'email': 'admin@mediseba.org', 'icon': Icons.workspace_premium_rounded, 'iconColor': const Color(0xFFD97706)},
               ];
 
               return Wrap(
@@ -727,19 +687,19 @@ class _LoginViewState extends State<LoginView> {
                       onTap: () => _onRoleChanged(role),
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 180),
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 9),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: isSelected ? const Color(0xFFF0FDFA) : Colors.white,
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
-                            color: isSelected ? const Color(0xFF2563EB) : const Color(0xFFE2E8F0),
+                            color: isSelected ? brandGreen : const Color(0xFFE2E8F0),
                             width: isSelected ? 1.8 : 1.0,
                           ),
                           boxShadow: [
                             BoxShadow(
                               color: isSelected
-                                  ? const Color(0xFF2563EB).withValues(alpha: 0.12)
-                                  : Colors.black.withValues(alpha: 0.03),
+                                  ? brandGreen.withValues(alpha: 0.12)
+                                  : Colors.black.withValues(alpha: 0.02),
                               blurRadius: isSelected ? 8 : 4,
                               offset: const Offset(0, 2),
                             ),
@@ -761,13 +721,13 @@ class _LoginViewState extends State<LoginView> {
                                     ),
                                   )
                                 else if (icon != null)
-                                  Icon(icon, size: 14, color: iconColor ?? const Color(0xFF2563EB)),
+                                  Icon(icon, size: 13, color: isSelected ? brandGreen : (iconColor ?? primaryBlue)),
                                 if (dotColor != null || icon != null) const SizedBox(width: 4),
                                 Expanded(
                                   child: Text(
                                     title,
                                     style: TextStyle(
-                                      fontSize: isSmallScreen ? 11 : 11.5,
+                                      fontSize: isSmallScreen ? 10.5 : 11.5,
                                       fontWeight: FontWeight.w800,
                                       color: textDark,
                                     ),
@@ -777,9 +737,9 @@ class _LoginViewState extends State<LoginView> {
                                 ),
                                 if (isSelected)
                                   const Icon(
-                                    Icons.check_circle_rounded,
+                                    Icons.check_circle_outlined,
                                     size: 13,
-                                    color: Color(0xFF2563EB),
+                                    color: brandGreen,
                                   ),
                               ],
                             ),
@@ -787,8 +747,8 @@ class _LoginViewState extends State<LoginView> {
                             Text(
                               email,
                               style: TextStyle(
-                                fontSize: isSmallScreen ? 9.5 : 10,
-                                color: isSelected ? const Color(0xFF1E293B) : textMuted,
+                                fontSize: isSmallScreen ? 9 : 9.8,
+                                color: isSelected ? const Color(0xFF0F172A) : textMuted,
                                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                               ),
                               maxLines: 1,
