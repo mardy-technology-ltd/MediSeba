@@ -22,28 +22,31 @@ class AdminDashboardView extends StatefulWidget {
 
 class _AdminDashboardViewState extends State<AdminDashboardView> {
   static const darkGreen = Color(0xFF005C45);
+  static const brandGreen = Color(0xFF00A859);
+  static const textDark = Color(0xFF0F172A);
+  static const textMuted = Color(0xFF64748B);
 
-  String _selectedGraphFilter = 'গত ৩ মাস';
+  String _selectedGraphFilter = 'গত ৬ মাস';
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final List<Map<String, dynamic>> _kpiStats = [
     {
       'title': 'সক্রিয় ডাক্তার',
-      'value': '12',
+      'value': '12 জন',
       'icon': Icons.medical_services_outlined,
       'color': const Color(0xFF10B981),
       'bg': const Color(0xFFECFDF5),
     },
     {
       'title': 'নিবন্ধিত রোগী',
-      'value': '48',
+      'value': '49 জন',
       'icon': Icons.people_outline_rounded,
       'color': const Color(0xFF3B82F6),
       'bg': const Color(0xFFEFF6FF),
     },
     {
       'title': 'মোট অ্যাপয়েন্টমেন্ট',
-      'value': '84',
+      'value': '84 টি',
       'icon': Icons.calendar_month_outlined,
       'color': const Color(0xFF8B5CF6),
       'bg': const Color(0xFFF5F3FF),
@@ -58,37 +61,43 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
   ];
 
   final List<Map<String, dynamic>> _monthlyRevenueData = [
-    {'month': 'মার্চ', 'amount': '৳ 18.0k', 'heightRatio': 0.40},
-    {'month': 'এপ্রিল', 'amount': '৳ 24.6k', 'heightRatio': 0.55},
-    {'month': 'মে', 'amount': '৳ 31.0k', 'heightRatio': 0.70},
-    {'month': 'জুন', 'amount': '৳ 28.8k', 'heightRatio': 0.65},
-    {'month': 'জুলাই', 'amount': '৳ 35.0k', 'heightRatio': 0.80},
-    {'month': 'আগস্ট (চলতি)', 'amount': '৳ 45.0k', 'heightRatio': 1.00},
+    {'month': 'মার্চ', 'amount': '৳ 18.0k', 'heightRatio': 0.43},
+    {'month': 'এপ্রিল', 'amount': '৳ 24.0k', 'heightRatio': 0.57},
+    {'month': 'মে', 'amount': '৳ 31.0k', 'heightRatio': 0.74},
+    {'month': 'জুন', 'amount': '৳ 28.0k', 'heightRatio': 0.67},
+    {'month': 'জুলাই', 'amount': '৳ 36.0k', 'heightRatio': 0.86},
+    {'month': 'আগস্ট (চলতি)', 'amount': '৳ 42.0k', 'heightRatio': 1.00},
   ];
 
   final List<Map<String, dynamic>> _recentAppointments = [
     {
-      'id': 'APT-20268004-884920',
+      'id': 'APT-20260804-884920',
       'patient': 'Mohammad Ali',
+      'doctor': 'Dr. Tanvir Hasan',
+      'fee': '৳ ১,২০০',
       'dateTime': 'আজ, ১০:০০ AM',
-      'status': 'সম্পন্ন',
-      'statusColor': const Color(0xFF15803D),
-      'statusBg': const Color(0xFFDCFCE7),
+      'status': 'কনফার্মড',
+      'statusColor': const Color(0xFF059669),
+      'statusBg': const Color(0xFFD1FAE5),
     },
     {
-      'id': 'APT-20268604-493E10',
+      'id': 'APT-20260804-492810',
       'patient': 'Tania Rahman',
-      'dateTime': 'আজ, ০১:০০ PM',
-      'status': 'অপেক্ষমান',
-      'statusColor': const Color(0xFF0369A1),
-      'statusBg': const Color(0xFFE0F2FE),
+      'doctor': 'Dr. Ahmed Rahman',
+      'fee': '৳ ১,০০০',
+      'dateTime': 'আজ, ১১:০০ AM',
+      'status': 'সম্পন্ন',
+      'statusColor': const Color(0xFF2563EB),
+      'statusBg': const Color(0xFFDBEAFE),
     },
     {
-      'id': 'APT-20268804-104938',
+      'id': 'APT-20260804-104928',
       'patient': 'Kabir Hossain',
-      'dateTime': 'আজ, ০২:৩৩ PM',
-      'status': 'প্রসেসিং',
-      'statusColor': const Color(0xFFB45309),
+      'doctor': 'Dr. Farzana Islam',
+      'fee': '৳ ১,২০০',
+      'dateTime': 'আজ, ০২:১৫ PM',
+      'status': 'অপেক্ষমাণ',
+      'statusColor': const Color(0xFFD97706),
       'statusBg': const Color(0xFFFEF3C7),
     },
   ];
@@ -98,97 +107,53 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: const Color(0xFFF8FAFC),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0.5,
-        scrolledUnderElevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.menu_rounded, color: Color(0xFF334155), size: 26),
-          onPressed: () => _scaffoldKey.currentState?.openDrawer(),
-        ),
-        title: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                'assets/images/logo.png',
-                height: 32,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) => Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Icon(Icons.favorite_rounded, color: Color(0xFFED1B24), size: 20),
-                    SizedBox(width: 4),
-                    Text(
-                      'মেডি সেবা',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: darkGreen),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 12),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFECFDF5),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.notifications_none_rounded, color: Color(0xFF059669), size: 22),
-                ),
-                Positioned(
-                  top: 2,
-                  right: 2,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFEF4444),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Text(
-                      '2',
-                      style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+      appBar: _buildTopAppBar(),
       drawer: const AdminDrawer(selectedIndex: 0),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 1. Hero Gradient Banner Card
+              // 1. Executive Analytics Hero Banner (Teal Dark Green Card)
               _buildHeroBanner(),
-
-              const SizedBox(height: 14),
-
-              // 2. Secondary Flagship Banner Card
-              _buildFlagshipSalesBanner(),
 
               const SizedBox(height: 16),
 
-              // 3. KPI Stats 2x2 Grid Cards
+              // 2. Stat Cards Grid (4 Cards: Active Doctors, Patients, Appointments, Revenue)
               _buildKPIStatsGrid(),
 
               const SizedBox(height: 16),
 
-              // 4. Dynamic Revenue Growth Graph Card
-              _buildRevenueGraphCard(),
+              // 3. Sales Team Hierarchy Banner (Deep Navy Card)
+              _buildFlagshipSalesBanner(),
+
+              const SizedBox(height: 16),
+
+              // 4. Analytics Row: Left Revenue Graph + Right Booking Share
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  if (constraints.maxWidth > 800) {
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(flex: 3, child: _buildRevenueGraphCard()),
+                        const SizedBox(width: 16),
+                        Expanded(flex: 2, child: _buildBookingShareCard()),
+                      ],
+                    );
+                  } else {
+                    return Column(
+                      children: [
+                        _buildRevenueGraphCard(),
+                        const SizedBox(height: 16),
+                        _buildBookingShareCard(),
+                      ],
+                    );
+                  }
+                },
+              ),
 
               const SizedBox(height: 16),
 
@@ -200,31 +165,170 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: darkGreen,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-        child: const Icon(Icons.chat_bubble_outline_rounded, color: Colors.white),
-        onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('লাইভ সাপোর্ট চ্যাট ওপেন হয়েছে')),
-          );
-        },
+      floatingActionButton: Stack(
+        alignment: Alignment.topRight,
+        children: [
+          FloatingActionButton(
+            backgroundColor: darkGreen,
+            elevation: 6,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('লাইভ সাপোর্ট চ্যাট সাপোর্ট ওপেন হয়েছে'),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            },
+            child: const Icon(Icons.chat_bubble_rounded, color: Colors.white, size: 24),
+          ),
+          Positioned(
+            top: 2,
+            right: 2,
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: const BoxDecoration(
+                color: Color(0xFFEF4444),
+                shape: BoxShape.circle,
+              ),
+              child: const Text(
+                '1',
+                style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  /// Build Hero Banner (Teal Dark Green Card) - Fully Responsive
+  /// Top App Bar matching web visual header
+  PreferredSizeWidget _buildTopAppBar() {
+    return AppBar(
+      backgroundColor: Colors.white,
+      elevation: 0.5,
+      scrolledUnderElevation: 0,
+      leading: IconButton(
+        icon: const Icon(Icons.menu_rounded, color: Color(0xFF334155), size: 26),
+        onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+      ),
+      title: LayoutBuilder(
+        builder: (context, constraints) {
+          return Row(
+            children: [
+              Image.asset(
+                'assets/images/logo.png',
+                height: 30,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) => Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    Icon(Icons.local_hospital_rounded, color: Color(0xFFED1C24), size: 22),
+                    SizedBox(width: 4),
+                    Text(
+                      'মেডি সেবা',
+                      style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: darkGreen),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Text(
+                  'ADMIN CONTROL PANEL',
+                  style: TextStyle(fontSize: 8.5, fontWeight: FontWeight.w800, color: textMuted),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+      actions: [
+        // Cash Refresh Button
+        IconButton(
+          tooltip: 'ক্যাশ রিফ্রেশ',
+          icon: const Icon(Icons.sync_rounded, color: Color(0xFF64748B), size: 20),
+          onPressed: () {
+            setState(() {});
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('ক্যাশ রিফ্রেশ সম্পন্ন হয়েছে'), behavior: SnackBarBehavior.floating),
+            );
+          },
+        ),
+
+        // Notifications Bell
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.notifications_none_rounded, color: Color(0xFF475569), size: 22),
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('২টি নতুন নোটিফিকেশন আছে'), behavior: SnackBarBehavior.floating),
+                );
+              },
+            ),
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: const BoxDecoration(
+                  color: Color(0xFFEF4444),
+                  shape: BoxShape.circle,
+                ),
+                child: const Text(
+                  '2',
+                  style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ],
+        ),
+
+        // Profile Avatar Menu Pill
+        Container(
+          margin: const EdgeInsets.only(right: 12, left: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF1F5F9),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircleAvatar(
+                radius: 11,
+                backgroundColor: darkGreen,
+                child: const Text('S', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+              ),
+              const SizedBox(width: 4),
+              const Text('System', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: textDark)),
+              const Icon(Icons.keyboard_arrow_down_rounded, size: 16, color: textMuted),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// 1. Executive Analytics Hero Banner (Teal Dark Green Card)
   Widget _buildHeroBanner() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: darkGreen, // Color(0xFF005C45)
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
             color: darkGreen.withValues(alpha: 0.25),
-            blurRadius: 10,
+            blurRadius: 12,
             offset: const Offset(0, 4),
           ),
         ],
@@ -232,13 +336,13 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Top Badge & Action Button
           Wrap(
             alignment: WrapAlignment.spaceBetween,
             crossAxisAlignment: WrapCrossAlignment.center,
             spacing: 8,
             runSpacing: 8,
             children: [
-              // Pill Chip Left
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
@@ -246,39 +350,39 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
                 ),
-                child: Row(
+                child: const Row(
                   mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Icon(Icons.analytics_outlined, color: Colors.white, size: 13),
+                  children: [
+                    Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 13),
                     SizedBox(width: 5),
                     Text(
-                      'প্রিমিয়াম সার্ভিস ও আপডেট',
+                      'মেডিসেবা আল্ট্রা-মডার্ন এক্সিকিউটিভ অ্যানালিটিক্স',
                       style: TextStyle(color: Colors.white, fontSize: 10.5, fontWeight: FontWeight.w700),
                     ),
                   ],
                 ),
               ),
 
-              // Action Button Right (+ নতুন সত্তার অ্যাকাউন্ট তৈরি করুন)
+              // Action Button Right (+ চেইন অ্যাকাউন্ট তৈরি)
               InkWell(
                 onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('নতুন সত্তার অ্যাকাউন্ট তৈরির সুবিধা')),
+                    const SnackBar(content: Text('চেইন অ্যাকাউন্ট তৈরি স্ক্রিন খুলছে...'), behavior: SnackBarBehavior.floating),
                   );
                 },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Row(
+                  child: const Row(
                     mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Icon(Icons.person_add_alt_outlined, color: darkGreen, size: 13),
+                    children: [
+                      Icon(Icons.person_add_alt_outlined, color: darkGreen, size: 14),
                       SizedBox(width: 4),
                       Text(
-                        'নতুন সত্তার অ্যাকাউন্ট তৈরি করুন',
+                        '+ চেইন অ্যাকাউন্ট তৈরি (HBP / Supervisor / Doctor / Admin)',
                         style: TextStyle(color: darkGreen, fontSize: 10.5, fontWeight: FontWeight.w800),
                       ),
                     ],
@@ -287,24 +391,40 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
               ),
             ],
           ),
-          const SizedBox(height: 14),
+
+          const SizedBox(height: 16),
+
+          // Main Header Title with Refresh Button
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Flexible(
-                child: Text(
-                  'ড্যাশবোর্ড ওভারভিউ',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
-                    color: Colors.white,
-                  ),
-                  overflow: TextOverflow.ellipsis,
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'ড্যাশবোর্ড ওভারভিউ & লাইভ চার্ট অ্যানালিটিক্স',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.white,
+                        letterSpacing: -0.3,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      'Stripe & Vercel স্টাইল গ্রোয়িং গ্রাফ চার্ট, রিয়েল-টাইম রেভিনিউ ট্র্যাকিং এবং বুকিং অ্যানালিটিক্স।',
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        color: Colors.white70,
+                        height: 1.35,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(width: 8),
               IconButton(
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
                 icon: const Icon(Icons.sync_rounded, color: Colors.white, size: 20),
                 onPressed: () {
                   setState(() {});
@@ -317,19 +437,107 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
     );
   }
 
-  /// Build Flagship Sales Hierarchy Banner (Deep Navy Card) - Fully Responsive
+  /// 2. Stat Cards Grid (4 Cards: Active Doctors, Patients, Appointments, Revenue)
+  Widget _buildKPIStatsGrid() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final int crossAxisCount = constraints.maxWidth > 650 ? 4 : 2;
+        final double childAspectRatio = constraints.maxWidth > 650 ? 1.6 : 1.45;
+
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            childAspectRatio: childAspectRatio,
+          ),
+          itemCount: _kpiStats.length,
+          itemBuilder: (context, index) {
+            final stat = _kpiStats[index];
+            return Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.02),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: stat['bg'] as Color,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      stat['icon'] as IconData,
+                      color: stat['color'] as Color,
+                      size: 22,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          stat['title'] as String,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF64748B),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 2),
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            stat['value'] as String,
+                            style: const TextStyle(
+                              fontSize: 17.5,
+                              fontWeight: FontWeight.w900,
+                              color: Color(0xFF0F172A),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  /// 3. Sales Team Hierarchy Banner (Deep Navy Card)
   Widget _buildFlagshipSalesBanner() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1B4B), // Deep Navy / Slate Blue
-        borderRadius: BorderRadius.circular(16),
+        color: const Color(0xFF0F172A), // Deep Slate Navy
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -337,61 +545,66 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Text(
-              '⚡ ফ্ল্যাগশিপ সেবা পেশেন্ট টিম (HSP & S...)',
-              style: TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.w600),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.trending_up_rounded, color: Color(0xFF818CF8), size: 13),
+                SizedBox(width: 4),
+                Text(
+                  'ফিল্ড লেভেল সেলস টিম (HBP & Supervisor Status)',
+                  style: TextStyle(color: Color(0xFFC7D2FE), fontSize: 10.5, fontWeight: FontWeight.w700),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           const Text(
-            'সেলস টিম হায়ারার্কি ও পারফরম্যান্স',
+            'সেলস টিম হায়ারার্কি ও পারফরম্যান্স ম্যানেজমেন্ট',
             style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w800,
+              fontSize: 16,
+              fontWeight: FontWeight.w900,
               color: Colors.white,
+              letterSpacing: -0.2,
             ),
           ),
           const SizedBox(height: 4),
-          Text(
-            'stripe knill (gee new / ২৬৬... আসামী তামাম, ডাক্তার/রিসেলার ১০০ জন টিমস ও প্রিজার্ভ স্বাক্লি অ্যাসাইনমেন্ট তৈরি করুন)',
+          const Text(
+            'এইচআরপি টার্গেট (৬৫০ সেলস / ৩০% স্যালারি প্রমোশন), সুপারভাইজারের ফেক সেল ফিল্টার ও ইউজার আইডি পাসওয়ার্ড তৈরি করুন।',
             style: TextStyle(
-              fontSize: 10.5,
-              color: Colors.white.withValues(alpha: 0.75),
-              height: 1.3,
+              fontSize: 11.5,
+              color: Color(0xFF94A3B8),
+              height: 1.4,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF6366F1), // Purple Accent
+              backgroundColor: const Color(0xFF4F46E5), // Indigo Purple Pill
               foregroundColor: Colors.white,
-              elevation: 0,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              elevation: 4,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
             ),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('নতুন অ্যাকাউন্ট তৈরি ও আমন্ত্রণ লিংক খুলছে')),
+                const SnackBar(content: Text('সেলস এজেন্ট তৈরি ও ম্যানেজমেন্ট খুলছে...'), behavior: SnackBarBehavior.floating),
               );
             },
-            icon: const Icon(Icons.person_add_rounded, size: 14),
+            icon: const Icon(Icons.person_add_alt_rounded, size: 16),
             label: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Flexible(
-                  child: Text(
-                    'নতুন একাউন্ট তৈরি ও আমন্ত্রণ করুন',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                Text(
+                  'সেলস এজেন্ট তৈরি ও ম্যানেজ করুন',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(width: 4),
-                Icon(Icons.arrow_forward_rounded, size: 13),
+                Icon(Icons.arrow_forward_rounded, size: 14),
               ],
             ),
           ),
@@ -400,94 +613,13 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
     );
   }
 
-  /// Build KPI Stats 2x2 Grid Cards - Fully Responsive
-  Widget _buildKPIStatsGrid() {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-        childAspectRatio: 1.25,
-      ),
-      itemCount: _kpiStats.length,
-      itemBuilder: (context, index) {
-        final stat = _kpiStats[index];
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFFE2E8F0)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.02),
-                blurRadius: 6,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: stat['bg'] as Color,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(
-                  stat['icon'] as IconData,
-                  color: stat['color'] as Color,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      stat['title'] as String,
-                      style: const TextStyle(
-                        fontSize: 10.5,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF64748B),
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 2),
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        stat['value'] as String,
-                        style: const TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w900,
-                          color: Color(0xFF0F172A),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  /// Build Revenue Growth Graph Card - Fully Responsive
+  /// 4. Left Chart Card: Revenue Growth Bar Graph Card
   Widget _buildRevenueGraphCard() {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: [
           BoxShadow(
@@ -500,46 +632,47 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header Row with Expanded Title Column
+          // Header Row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
+              const Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      children: const [
-                        Icon(Icons.bar_chart_rounded, color: Color(0xFF10B981), size: 18),
+                      children: [
+                        Icon(Icons.bar_chart_rounded, color: Color(0xFF10B981), size: 20),
                         SizedBox(width: 6),
                         Flexible(
                           child: Text(
-                            'রেভিনিউ প্রবৃদ্ধি',
+                            'রেভিনিউ প্রবৃদ্ধি & কাস্টম চার্ট',
                             style: TextStyle(
                               fontSize: 14.5,
                               fontWeight: FontWeight.w800,
-                              color: Color(0xFF0F172A),
+                              color: textDark,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 2),
-                    const Text(
-                      'সমগ্র সময় পরিক্রমা হতে রিয়েল টাইম অটো তথ্য',
-                      style: TextStyle(fontSize: 9.5, color: Color(0xFF64748B)),
+                    SizedBox(height: 2),
+                    Text(
+                      'সময়সীমা পরিবর্তন করে রিয়েল-টাইমে আয় দেখুন',
+                      style: TextStyle(fontSize: 10, color: textMuted),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
-              // Filter Chips on right
+              const SizedBox(width: 6),
+              // Filter Chips
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
-                  children: ['গত ৭ দিন', 'গত ৩০ দিন', 'গত ৩ মাস'].map((filter) {
+                  children: ['গত ৭ দিন', 'গত ৩০ দিন', 'গত ৬ মাস'].map((filter) {
                     final isSelected = _selectedGraphFilter == filter;
                     return Padding(
                       padding: const EdgeInsets.only(left: 3.0),
@@ -550,20 +683,21 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                           });
                         },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: isSelected ? const Color(0xFFDCFCE7) : Colors.transparent,
-                            borderRadius: BorderRadius.circular(8),
+                            color: isSelected ? const Color(0xFFCCFBF1) : const Color(0xFFF8FAFC),
+                            borderRadius: BorderRadius.circular(10),
                             border: Border.all(
-                              color: isSelected ? const Color(0xFF86EFAC) : const Color(0xFFE2E8F0),
+                              color: isSelected ? brandGreen : const Color(0xFFE2E8F0),
+                              width: isSelected ? 1.4 : 1.0,
                             ),
                           ),
                           child: Text(
                             filter,
                             style: TextStyle(
                               fontSize: 9.5,
-                              fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
-                              color: isSelected ? const Color(0xFF15803D) : const Color(0xFF64748B),
+                              fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                              color: isSelected ? darkGreen : textMuted,
                             ),
                           ),
                         ),
@@ -577,15 +711,15 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
 
           const SizedBox(height: 18),
 
-          // Custom Vertical Bar Chart
+          // Bar Chart Visual (Matching exact colors and labels in image)
           SizedBox(
-            height: 140,
+            height: 150,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: _monthlyRevenueData.map((data) {
                 final heightRatio = data['heightRatio'] as double;
-                final barHeight = 85.0 * heightRatio;
+                final barHeight = 90.0 * heightRatio;
                 final isCurrent = data['month'].toString().contains('আগস্ট');
 
                 return Column(
@@ -596,37 +730,37 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                       child: Text(
                         data['amount'] as String,
                         style: TextStyle(
-                          fontSize: 9,
+                          fontSize: 9.5,
                           fontWeight: FontWeight.bold,
-                          color: isCurrent ? const Color(0xFF059669) : const Color(0xFF64748B),
+                          color: isCurrent ? darkGreen : const Color(0xFF475569),
                         ),
                       ),
                     ),
                     const SizedBox(height: 4),
                     AnimatedContainer(
                       duration: const Duration(milliseconds: 300),
-                      width: 18,
+                      width: 22,
                       height: barHeight,
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: isCurrent
-                              ? [const Color(0xFF10B981), const Color(0xFF059669)]
-                              : [const Color(0xFF14B8A6), const Color(0xFF0D9488)],
+                              ? [const Color(0xFF10B981), const Color(0xFF00A859)]
+                              : [const Color(0xFF059669), const Color(0xFF047857)],
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                         ),
-                        borderRadius: BorderRadius.circular(6),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    const SizedBox(height: 5),
+                    const SizedBox(height: 6),
                     FittedBox(
                       fit: BoxFit.scaleDown,
                       child: Text(
                         data['month'] as String,
                         style: TextStyle(
-                          fontSize: 9,
-                          fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
-                          color: const Color(0xFF475569),
+                          fontSize: 9.5,
+                          fontWeight: isCurrent ? FontWeight.bold : FontWeight.w500,
+                          color: isCurrent ? textDark : textMuted,
                         ),
                       ),
                     ),
@@ -640,7 +774,7 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
           const Divider(color: Color(0xFFF1F5F9)),
           const SizedBox(height: 4),
 
-          // Footer Stat - Wrap layout to prevent right overflow
+          // Footnote Summary
           Wrap(
             alignment: WrapAlignment.spaceBetween,
             crossAxisAlignment: WrapCrossAlignment.center,
@@ -650,17 +784,17 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.bolt_rounded, color: Color(0xFF10B981), size: 14),
+                  Icon(Icons.bolt_rounded, color: brandGreen, size: 15),
                   SizedBox(width: 4),
                   Text(
-                    'রেভিনিউ প্রবৃদ্ধি গ্রোথ হার: +২৫.৪%',
-                    style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: Color(0xFF15803D)),
+                    'প্ল্যাটফর্ম কমিশন গ্রোথ হার: +২৭.৪%',
+                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFF059669)),
                   ),
                 ],
               ),
               Text(
                 'সর্বশেষ আপডেট: আজ',
-                style: TextStyle(fontSize: 10, color: Color(0xFF94A3B8)),
+                style: TextStyle(fontSize: 10, color: textMuted),
               ),
             ],
           ),
@@ -669,13 +803,128 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
     );
   }
 
-  /// Build Recent Telemedicine Appointments Table - Fully Responsive
+  /// 5. Right Chart Card: Booking Share Analytics (`সর্বাধিক বুকিং শেয়ার`)
+  Widget _buildBookingShareCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(Icons.pie_chart_outline_rounded, color: Color(0xFF0284C7), size: 20),
+              SizedBox(width: 6),
+              Text(
+                'সর্বাধিক বুকিং শেয়ার',
+                style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w800, color: textDark),
+              ),
+            ],
+          ),
+          const SizedBox(height: 2),
+          const Text(
+            'ডাক্তার ঘর vs ফিজিক্যাল চেম্বার',
+            style: TextStyle(fontSize: 10, color: textMuted),
+          ),
+
+          const SizedBox(height: 18),
+
+          // Telemedicine (Doctor Ghar) 58% Progress Bar
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('📺 ডাক্তার ঘর (ভিডিও কল)', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: textDark)),
+                  Text('58%', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: Color(0xFF059669))),
+                ],
+              ),
+              const SizedBox(height: 6),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(6),
+                child: const LinearProgressIndicator(
+                  value: 0.58,
+                  minHeight: 10,
+                  backgroundColor: Color(0xFFF1F5F9),
+                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF10B981)),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 16),
+
+          // Chamber Physical Serial 42% Progress Bar
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('🏢 চেম্বার সিরিয়াল (শারীরিক)', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: textDark)),
+                  Text('42%', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: Color(0xFF0284C7))),
+                ],
+              ),
+              const SizedBox(height: 6),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(6),
+                child: const LinearProgressIndicator(
+                  value: 0.42,
+                  minHeight: 10,
+                  backgroundColor: Color(0xFFF1F5F9),
+                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0284C7)),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 20),
+
+          // Bottom Success Callout Box
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: const Color(0xFFECFDF5),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFA7F3D0)),
+            ),
+            child: const Row(
+              children: [
+                Icon(Icons.check_circle_rounded, color: Color(0xFF059669), size: 16),
+                SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    'গত ৩০ দিনে ৯৬% সফল কনসাল্টেশন সম্পন্ন হয়েছে!',
+                    style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: Color(0xFF047857)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 6. Recent Telemedicine Appointments Table
   Widget _buildRecentAppointmentsSection() {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: [
           BoxShadow(
@@ -694,7 +943,7 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
               const Expanded(
                 child: Text(
                   'সাম্প্রতিক টেলিমেডিসিন অ্যাপয়েন্টমেন্ট তালিকা',
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: textDark),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -702,35 +951,38 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
               GestureDetector(
                 onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('সকল অ্যাপয়েন্টমেন্ট তালিকা দেখাচ্ছে')),
+                    const SnackBar(content: Text('সকল অ্যাপয়েন্টমেন্ট তালিকা দেখাচ্ছে'), behavior: SnackBarBehavior.floating),
                   );
                 },
-                child: Row(
+                child: const Row(
                   mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Text('সবগুলো', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF10B981))),
+                  children: [
+                    Text('সবগুলো', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: brandGreen)),
                     SizedBox(width: 2),
-                    Icon(Icons.north_east_rounded, size: 12, color: Color(0xFF10B981)),
+                    Icon(Icons.north_east_rounded, size: 13, color: brandGreen),
                   ],
                 ),
               ),
             ],
           ),
+
           const SizedBox(height: 14),
 
           // Table Headers Row
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             decoration: BoxDecoration(
               color: const Color(0xFFF8FAFC),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(10),
             ),
-            child: Row(
-              children: const [
-                Expanded(flex: 3, child: Text('আইডি', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF64748B)), overflow: TextOverflow.ellipsis)),
-                Expanded(flex: 3, child: Text('রোগীর নাম', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF64748B)), overflow: TextOverflow.ellipsis)),
-                Expanded(flex: 3, child: Text('তারিখ & সময়', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF64748B)), overflow: TextOverflow.ellipsis)),
-                Expanded(flex: 2, child: Text('স্ট্যাটাস', textAlign: TextAlign.right, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF64748B)), overflow: TextOverflow.ellipsis)),
+            child: const Row(
+              children: [
+                Expanded(flex: 3, child: Text('আইডি', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textMuted))),
+                Expanded(flex: 3, child: Text('রোগীর নাম', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textMuted))),
+                Expanded(flex: 3, child: Text('ডাক্তারের নাম', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textMuted))),
+                Expanded(flex: 2, child: Text('ফি', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textMuted))),
+                Expanded(flex: 3, child: Text('তারিখ & সময়', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textMuted))),
+                Expanded(flex: 2, child: Text('স্ট্যাটাস', textAlign: TextAlign.right, style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textMuted))),
               ],
             ),
           ),
@@ -761,7 +1013,25 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                       flex: 3,
                       child: Text(
                         item['patient'] as String,
-                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
+                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: textDark),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Expanded(
+                      flex: 3,
+                      child: Text(
+                        item['doctor'] as String,
+                        style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600, color: textDark),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Expanded(
+                      flex: 2,
+                      child: Text(
+                        item['fee'] as String,
+                        style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textDark),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -770,7 +1040,7 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                       flex: 3,
                       child: Text(
                         item['dateTime'] as String,
-                        style: const TextStyle(fontSize: 9.5, color: Color(0xFF64748B)),
+                        style: const TextStyle(fontSize: 10, color: textMuted),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -780,7 +1050,7 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                       child: Align(
                         alignment: Alignment.centerRight,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
                             color: item['statusBg'] as Color,
                             borderRadius: BorderRadius.circular(12),
