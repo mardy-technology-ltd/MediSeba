@@ -200,16 +200,19 @@ class _AdminPackagesAuditViewState extends State<AdminPackagesAuditView> {
       ),
       titleSpacing: 0,
       title: Row(
-        mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.show_chart_rounded, color: brandGreen, size: 22),
-          const SizedBox(width: 6),
-          Text(
-            'প্যাকেজ ও ফাইন্যান্সিয়াল অডিট',
-            style: TextStyle(
-              fontSize: isSmallScreen ? 14 : 16,
-              fontWeight: FontWeight.w900,
-              color: textDark,
+          const Icon(Icons.show_chart_rounded, color: brandGreen, size: 20),
+          const SizedBox(width: 4),
+          Expanded(
+            child: Text(
+              'প্যাকেজ ও ফাইন্যান্সিয়াল অডিট',
+              style: TextStyle(
+                fontSize: isSmallScreen ? 13 : 15,
+                fontWeight: FontWeight.w900,
+                color: textDark,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
@@ -217,10 +220,10 @@ class _AdminPackagesAuditViewState extends State<AdminPackagesAuditView> {
       actions: [
         // Cash Refresh Button
         IconButton(
-          constraints: const BoxConstraints(minWidth: 36),
+          constraints: const BoxConstraints(minWidth: 32),
           padding: EdgeInsets.zero,
           tooltip: 'ক্যাশ রিফ্রেশ',
-          icon: const Icon(Icons.sync_rounded, color: Color(0xFF64748B), size: 20),
+          icon: const Icon(Icons.sync_rounded, color: Color(0xFF64748B), size: 19),
           onPressed: () {
             setState(() {});
             ScaffoldMessenger.of(context).showSnackBar(
@@ -234,9 +237,9 @@ class _AdminPackagesAuditViewState extends State<AdminPackagesAuditView> {
           alignment: Alignment.center,
           children: [
             IconButton(
-              constraints: const BoxConstraints(minWidth: 36),
+              constraints: const BoxConstraints(minWidth: 32),
               padding: EdgeInsets.zero,
-              icon: const Icon(Icons.notifications_none_rounded, color: Color(0xFF475569), size: 22),
+              icon: const Icon(Icons.notifications_none_rounded, color: Color(0xFF475569), size: 20),
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('২টি নতুন নোটিফিকেশন আছে'), behavior: SnackBarBehavior.floating),
@@ -245,16 +248,16 @@ class _AdminPackagesAuditViewState extends State<AdminPackagesAuditView> {
             ),
             Positioned(
               top: 8,
-              right: 6,
+              right: 4,
               child: Container(
-                padding: const EdgeInsets.all(3.5),
+                padding: const EdgeInsets.all(3),
                 decoration: const BoxDecoration(
                   color: Color(0xFFEF4444),
                   shape: BoxShape.circle,
                 ),
                 child: const Text(
                   '2',
-                  style: TextStyle(color: Colors.white, fontSize: 8.5, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -264,21 +267,21 @@ class _AdminPackagesAuditViewState extends State<AdminPackagesAuditView> {
         // Profile Avatar Menu Pill
         Container(
           margin: const EdgeInsets.only(right: 8, left: 2),
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
           decoration: BoxDecoration(
             color: const Color(0xFFF1F5F9),
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(14),
           ),
           child: const Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               CircleAvatar(
-                radius: 10,
+                radius: 9,
                 backgroundColor: darkGreen,
-                child: Text('S', style: TextStyle(color: Colors.white, fontSize: 9.5, fontWeight: FontWeight.bold)),
+                child: Text('S', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold)),
               ),
-              SizedBox(width: 3),
-              Icon(Icons.keyboard_arrow_down_rounded, size: 15, color: textMuted),
+              SizedBox(width: 2),
+              Icon(Icons.keyboard_arrow_down_rounded, size: 14, color: textMuted),
             ],
           ),
         ),
