@@ -751,7 +751,7 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
           const SizedBox(width: 4),
         ],
       ),
-      drawer: const AdminDrawer(selectedIndex: 4),
+      drawer: const AdminDrawer(selectedIndex: 5),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),

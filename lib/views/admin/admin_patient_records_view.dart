@@ -413,7 +413,7 @@ class _AdminPatientRecordsViewState extends State<AdminPatientRecordsView> {
           const SizedBox(width: 4),
         ],
       ),
-      drawer: const AdminDrawer(selectedIndex: 5),
+      drawer: const AdminDrawer(selectedIndex: 6),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),

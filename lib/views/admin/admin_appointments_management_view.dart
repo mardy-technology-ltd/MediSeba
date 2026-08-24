@@ -207,7 +207,7 @@ class _AdminAppointmentsManagementViewState
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: const Color(0xFFF8FAFC),
-      drawer: const AdminDrawer(selectedIndex: 6),
+      drawer: const AdminDrawer(selectedIndex: 7),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,

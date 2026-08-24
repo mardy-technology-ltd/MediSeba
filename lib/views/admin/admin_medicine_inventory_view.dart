@@ -609,7 +609,7 @@ class _AdminMedicineInventoryViewState extends State<AdminMedicineInventoryView>
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      drawer: const AdminDrawer(selectedIndex: 7),
+      drawer: const AdminDrawer(selectedIndex: 8),
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
         backgroundColor: Colors.white,

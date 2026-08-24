@@ -448,7 +448,7 @@ class _AdminJobCircularsViewState extends State<AdminJobCircularsView> {
           const SizedBox(width: 4),
         ],
       ),
-      drawer: const AdminDrawer(selectedIndex: -1),
+      drawer: const AdminDrawer(selectedIndex: 3),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
