@@ -5,6 +5,7 @@ import 'admin_job_circulars_view.dart';
 import 'admin_doctors_management_view.dart';
 import 'admin_appointments_management_view.dart';
 import 'admin_medicine_inventory_view.dart';
+import 'admin_drawer.dart';
 
 class AdminPatientRecordsView extends StatefulWidget {
   const AdminPatientRecordsView({super.key});
@@ -412,7 +413,7 @@ class _AdminPatientRecordsViewState extends State<AdminPatientRecordsView> {
           const SizedBox(width: 4),
         ],
       ),
-      drawer: _buildAdminDrawer(context),
+      drawer: const AdminDrawer(selectedIndex: 5),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
@@ -826,6 +827,10 @@ class _AdminPatientRecordsViewState extends State<AdminPatientRecordsView> {
 
   /// Build Navigation Drawer matching Web Screenshot
   Widget _buildAdminDrawer(BuildContext context) {
+    return const AdminDrawer(selectedIndex: 5);
+  }
+
+  Widget _ignored_buildAdminDrawer(BuildContext context) {
     final menuItems = [
       {'title': 'ড্যাশবোর্ড (Overview)', 'icon': Icons.dashboard_rounded, 'selected': false},
       {'title': 'ইনবক্স ও অ্যাপ্লিকেশন', 'icon': Icons.mail_outline_rounded, 'selected': false},

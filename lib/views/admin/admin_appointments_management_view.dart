@@ -5,6 +5,7 @@ import 'admin_job_circulars_view.dart';
 import 'admin_doctors_management_view.dart';
 import 'admin_patient_records_view.dart';
 import 'admin_medicine_inventory_view.dart';
+import 'admin_drawer.dart';
 
 class AdminAppointmentsManagementView extends StatefulWidget {
   const AdminAppointmentsManagementView({super.key});
@@ -206,7 +207,7 @@ class _AdminAppointmentsManagementViewState
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: const Color(0xFFF8FAFC),
-      drawer: _buildAdminDrawer(context),
+      drawer: const AdminDrawer(selectedIndex: 6),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -1128,6 +1129,10 @@ class _AdminAppointmentsManagementViewState
   }
 
   Widget _buildAdminDrawer(BuildContext context) {
+    return const AdminDrawer(selectedIndex: 6);
+  }
+
+  Widget _ignored_buildAdminDrawer(BuildContext context) {
     final menuItems = [
       {
         'title': 'ড্যাশবোর্ড (Overview)',

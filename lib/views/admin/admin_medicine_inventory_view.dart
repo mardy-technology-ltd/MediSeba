@@ -5,6 +5,7 @@ import 'admin_job_circulars_view.dart';
 import 'admin_doctors_management_view.dart';
 import 'admin_patient_records_view.dart';
 import 'admin_appointments_management_view.dart';
+import 'admin_drawer.dart';
 
 class AdminMedicineInventoryView extends StatefulWidget {
   const AdminMedicineInventoryView({super.key});
@@ -608,7 +609,7 @@ class _AdminMedicineInventoryViewState extends State<AdminMedicineInventoryView>
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      drawer: _buildAdminDrawer(context),
+      drawer: const AdminDrawer(selectedIndex: 7),
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -1201,6 +1202,10 @@ class _AdminMedicineInventoryViewState extends State<AdminMedicineInventoryView>
 
   /// Build Navigation Drawer matching other screens
   Widget _buildAdminDrawer(BuildContext context) {
+    return const AdminDrawer(selectedIndex: 7);
+  }
+
+  Widget _ignored_buildAdminDrawer(BuildContext context) {
     final menuItems = [
       {'title': 'ড্যাশবোর্ড (Overview)', 'icon': Icons.dashboard_rounded, 'selected': false},
       {'title': 'ইনবক্স ও অ্যাপ্লিকেশন', 'icon': Icons.mail_outline_rounded, 'selected': false},

@@ -5,6 +5,7 @@ import 'admin_job_circulars_view.dart';
 import 'admin_patient_records_view.dart';
 import 'admin_appointments_management_view.dart';
 import 'admin_medicine_inventory_view.dart';
+import 'admin_drawer.dart';
 
 class AdminDoctorsManagementView extends StatefulWidget {
   const AdminDoctorsManagementView({super.key});
@@ -750,7 +751,7 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
           const SizedBox(width: 4),
         ],
       ),
-      drawer: _buildAdminDrawer(context),
+      drawer: const AdminDrawer(selectedIndex: 4),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
