@@ -274,15 +274,17 @@ class _AdminPrescriptionsViewState extends State<AdminPrescriptionsView> {
       children: const [
         Row(
           children: [
-            Icon(Icons.description_rounded, color: brandGreen, size: 24),
-            SizedBox(width: 8),
-            Text(
-              'ডিজিটাল প্রেসক্রিপশন ভল্ট (Prescription Vault)',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w900,
-                color: textDark,
-                letterSpacing: -0.2,
+            Icon(Icons.description_rounded, color: brandGreen, size: 22),
+            SizedBox(width: 6),
+            Expanded(
+              child: Text(
+                'ডিজিটাল প্রেসক্রিপশন ভল্ট (Prescription Vault)',
+                style: TextStyle(
+                  fontSize: 16.5,
+                  fontWeight: FontWeight.w900,
+                  color: textDark,
+                  letterSpacing: -0.2,
+                ),
               ),
             ),
           ],
