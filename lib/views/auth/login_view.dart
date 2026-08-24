@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'register_view.dart';
 import '../home/home_view.dart';
+import '../admin/admin_dashboard_view.dart';
 import '../../controllers/home_controller.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/language_controller.dart';
@@ -105,94 +106,6 @@ class _LoginViewState extends State<LoginView> {
       return;
     }
 
-    if (_selectedRole != LoginRole.patient && _selectedRole != LoginRole.doctor) {
-      String roleTitle = 'এডমিন';
-      if (_selectedRole == LoginRole.hbp) roleTitle = 'HBP Field';
-      if (_selectedRole == LoginRole.supervisor) roleTitle = 'Supervisor';
-      if (_selectedRole == LoginRole.areaMgr) roleTitle = 'Area Manager';
-      if (_selectedRole == LoginRole.marketingMgr) roleTitle = 'Marketing Manager';
-      if (_selectedRole == LoginRole.headOfSales) roleTitle = 'Head of Sales';
-      if (_selectedRole == LoginRole.salesDirector) roleTitle = 'Sales Director';
-      if (_selectedRole == LoginRole.admin) roleTitle = 'System Admin';
-
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return Dialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-            elevation: 12,
-            backgroundColor: Colors.white,
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFEF3C7),
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFFD97706).withValues(alpha: 0.2),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.construction_rounded,
-                      color: Color(0xFFD97706),
-                      size: 38,
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  const Text(
-                    'কাজটি ডেভেলপমেন্টে আছে (Step 7)',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w900,
-                      color: Color(0xFF0F172A),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    '$roleTitle পোর্টালের এই সেকশনটি বর্তমানে ডেভেলপমেন্ট ফেজ Step 7-এ প্রস্তুত করা হচ্ছে। শীঘ্রই এটি ব্যবহারের জন্য উন্মুক্ত করা হবে।',
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: Color(0xFF64748B),
-                      height: 1.45,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF005C45),
-                        foregroundColor: Colors.white,
-                        elevation: 2,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                      ),
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text(
-                        'ঠিক আছে',
-                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      );
-      return;
-    }
-
     _proceedNormalLogin();
   }
 
@@ -208,15 +121,25 @@ class _LoginViewState extends State<LoginView> {
         _isLoggingIn = false;
       });
 
-      Navigator.push(
+      Widget targetView;
+      if (_selectedRole == LoginRole.patient) {
+        targetView = HomeView(
+          homeController: widget.homeController,
+          authController: widget.authController,
+          languageController: widget.languageController,
+        );
+      } else {
+        // Direct entry into Admin/Management Portal for all staff & admin roles
+        targetView = AdminDashboardView(
+          homeController: widget.homeController,
+          authController: widget.authController,
+          languageController: widget.languageController,
+        );
+      }
+
+      Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (context) => HomeView(
-            homeController: widget.homeController,
-            authController: widget.authController,
-            languageController: widget.languageController,
-          ),
-        ),
+        MaterialPageRoute(builder: (context) => targetView),
       );
     }
   }
