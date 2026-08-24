@@ -107,39 +107,39 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: const Color(0xFFF8FAFC),
-      appBar: _buildTopAppBar(),
+      appBar: _buildTopAppBar(context),
       drawer: const AdminDrawer(selectedIndex: 0),
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // 1. Executive Analytics Hero Banner (Teal Dark Green Card)
               _buildHeroBanner(),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
 
               // 2. Stat Cards Grid (4 Cards: Active Doctors, Patients, Appointments, Revenue)
               _buildKPIStatsGrid(),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
 
               // 3. Sales Team Hierarchy Banner (Deep Navy Card)
               _buildFlagshipSalesBanner(),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
 
               // 4. Analytics Row: Left Revenue Graph + Right Booking Share
               LayoutBuilder(
                 builder: (context, constraints) {
-                  if (constraints.maxWidth > 800) {
+                  if (constraints.maxWidth > 768) {
                     return Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(flex: 3, child: _buildRevenueGraphCard()),
-                        const SizedBox(width: 16),
+                        const SizedBox(width: 14),
                         Expanded(flex: 2, child: _buildBookingShareCard()),
                       ],
                     );
@@ -147,7 +147,7 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                     return Column(
                       children: [
                         _buildRevenueGraphCard(),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 14),
                         _buildBookingShareCard(),
                       ],
                     );
@@ -155,9 +155,9 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                 },
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
 
-              // 5. Recent Telemedicine Appointments Table
+              // 5. Recent Telemedicine Appointments Table / Cards
               _buildRecentAppointmentsSection(),
 
               const SizedBox(height: 24),
@@ -175,7 +175,7 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('লাইভ সাপোর্ট চ্যাট সাপোর্ট ওপেন হয়েছে'),
+                  content: Text('লাইভ সাপোর্ট চ্যাট ওপেন হয়েছে'),
                   behavior: SnackBarBehavior.floating,
                 ),
               );
@@ -202,55 +202,60 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
     );
   }
 
-  /// Top App Bar matching web visual header
-  PreferredSizeWidget _buildTopAppBar() {
+  /// Top App Bar matching web visual header with full responsive adaptivity
+  PreferredSizeWidget _buildTopAppBar(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isSmallScreen = screenWidth < 400;
+
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0.5,
       scrolledUnderElevation: 0,
       leading: IconButton(
-        icon: const Icon(Icons.menu_rounded, color: Color(0xFF334155), size: 26),
+        icon: const Icon(Icons.menu_rounded, color: Color(0xFF334155), size: 24),
         onPressed: () => _scaffoldKey.currentState?.openDrawer(),
       ),
-      title: LayoutBuilder(
-        builder: (context, constraints) {
-          return Row(
-            children: [
-              Image.asset(
-                'assets/images/logo.png',
-                height: 30,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) => Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Icon(Icons.local_hospital_rounded, color: Color(0xFFED1C24), size: 22),
-                    SizedBox(width: 4),
-                    Text(
-                      'মেডি সেবা',
-                      style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: darkGreen),
-                    ),
-                  ],
+      titleSpacing: 0,
+      title: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Image.asset(
+            'assets/images/logo.png',
+            height: isSmallScreen ? 24 : 28,
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) => Row(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Icon(Icons.local_hospital_rounded, color: Color(0xFFED1C24), size: 20),
+                SizedBox(width: 4),
+                Text(
+                  'মেডি সেবা',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: darkGreen),
                 ),
+              ],
+            ),
+          ),
+          if (!isSmallScreen) ...[
+            const SizedBox(width: 6),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF1F5F9),
+                borderRadius: BorderRadius.circular(6),
               ),
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: const Text(
-                  'ADMIN CONTROL PANEL',
-                  style: TextStyle(fontSize: 8.5, fontWeight: FontWeight.w800, color: textMuted),
-                ),
+              child: const Text(
+                'ADMIN',
+                style: TextStyle(fontSize: 8.5, fontWeight: FontWeight.w800, color: textMuted),
               ),
-            ],
-          );
-        },
+            ),
+          ],
+        ],
       ),
       actions: [
         // Cash Refresh Button
         IconButton(
+          constraints: const BoxConstraints(minWidth: 36),
+          padding: EdgeInsets.zero,
           tooltip: 'ক্যাশ রিফ্রেশ',
           icon: const Icon(Icons.sync_rounded, color: Color(0xFF64748B), size: 20),
           onPressed: () {
@@ -266,6 +271,8 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
           alignment: Alignment.center,
           children: [
             IconButton(
+              constraints: const BoxConstraints(minWidth: 36),
+              padding: EdgeInsets.zero,
               icon: const Icon(Icons.notifications_none_rounded, color: Color(0xFF475569), size: 22),
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -275,16 +282,16 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
             ),
             Positioned(
               top: 8,
-              right: 8,
+              right: 6,
               child: Container(
-                padding: const EdgeInsets.all(4),
+                padding: const EdgeInsets.all(3.5),
                 decoration: const BoxDecoration(
                   color: Color(0xFFEF4444),
                   shape: BoxShape.circle,
                 ),
                 child: const Text(
                   '2',
-                  style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: Colors.white, fontSize: 8.5, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -293,23 +300,22 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
 
         // Profile Avatar Menu Pill
         Container(
-          margin: const EdgeInsets.only(right: 12, left: 4),
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          margin: const EdgeInsets.only(right: 8, left: 2),
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
           decoration: BoxDecoration(
             color: const Color(0xFFF1F5F9),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(16),
           ),
-          child: Row(
+          child: const Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               CircleAvatar(
-                radius: 11,
+                radius: 10,
                 backgroundColor: darkGreen,
-                child: const Text('S', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                child: Text('S', style: TextStyle(color: Colors.white, fontSize: 9.5, fontWeight: FontWeight.bold)),
               ),
-              const SizedBox(width: 4),
-              const Text('System', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: textDark)),
-              const Icon(Icons.keyboard_arrow_down_rounded, size: 16, color: textMuted),
+              SizedBox(width: 3),
+              Icon(Icons.keyboard_arrow_down_rounded, size: 15, color: textMuted),
             ],
           ),
         ),
@@ -321,14 +327,14 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
   Widget _buildHeroBanner() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: darkGreen, // Color(0xFF005C45)
-        borderRadius: BorderRadius.circular(20),
+        color: darkGreen,
+        borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: darkGreen.withValues(alpha: 0.25),
-            blurRadius: 12,
+            color: darkGreen.withValues(alpha: 0.22),
+            blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
@@ -340,24 +346,24 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
           Wrap(
             alignment: WrapAlignment.spaceBetween,
             crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 8,
-            runSpacing: 8,
+            spacing: 6,
+            runSpacing: 6,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.16),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
                 ),
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 13),
-                    SizedBox(width: 5),
+                    Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 12),
+                    SizedBox(width: 4),
                     Text(
-                      'মেডিসেবা আল্ট্রা-মডার্ন এক্সিকিউটিভ অ্যানালিটিক্স',
-                      style: TextStyle(color: Colors.white, fontSize: 10.5, fontWeight: FontWeight.w700),
+                      'মেডিসেবা এক্সিকিউটিভ অ্যানালিটিক্স',
+                      style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w700),
                     ),
                   ],
                 ),
@@ -371,19 +377,19 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                   );
                 },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(16),
                   ),
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.person_add_alt_outlined, color: darkGreen, size: 14),
+                      Icon(Icons.person_add_alt_outlined, color: darkGreen, size: 13),
                       SizedBox(width: 4),
                       Text(
-                        '+ চেইন অ্যাকাউন্ট তৈরি (HBP / Supervisor / Doctor / Admin)',
-                        style: TextStyle(color: darkGreen, fontSize: 10.5, fontWeight: FontWeight.w800),
+                        '+ চেইন অ্যাকাউন্ট তৈরি',
+                        style: TextStyle(color: darkGreen, fontSize: 10, fontWeight: FontWeight.w800),
                       ),
                     ],
                   ),
@@ -392,7 +398,7 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
             ],
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
 
           // Main Header Title with Refresh Button
           Row(
@@ -405,17 +411,17 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                     Text(
                       'ড্যাশবোর্ড ওভারভিউ & লাইভ চার্ট অ্যানালিটিক্স',
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 16.5,
                         fontWeight: FontWeight.w900,
                         color: Colors.white,
-                        letterSpacing: -0.3,
+                        letterSpacing: -0.2,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    SizedBox(height: 3),
                     Text(
                       'Stripe & Vercel স্টাইল গ্রোয়িং গ্রাফ চার্ট, রিয়েল-টাইম রেভিনিউ ট্র্যাকিং এবং বুকিং অ্যানালিটিক্স।',
                       style: TextStyle(
-                        fontSize: 11.5,
+                        fontSize: 11,
                         color: Colors.white70,
                         height: 1.35,
                       ),
@@ -423,9 +429,10 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
               IconButton(
-                icon: const Icon(Icons.sync_rounded, color: Colors.white, size: 20),
+                constraints: const BoxConstraints(minWidth: 32),
+                padding: EdgeInsets.zero,
+                icon: const Icon(Icons.sync_rounded, color: Colors.white, size: 18),
                 onPressed: () {
                   setState(() {});
                 },
@@ -441,23 +448,24 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
   Widget _buildKPIStatsGrid() {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final int crossAxisCount = constraints.maxWidth > 650 ? 4 : 2;
-        final double childAspectRatio = constraints.maxWidth > 650 ? 1.6 : 1.45;
+        final double width = constraints.maxWidth;
+        final int crossAxisCount = width > 640 ? 4 : (width < 340 ? 1 : 2);
+        final double childAspectRatio = width > 640 ? 1.6 : (width < 340 ? 3.0 : 1.35);
 
         return GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: crossAxisCount,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
+            crossAxisSpacing: 8,
+            mainAxisSpacing: 8,
             childAspectRatio: childAspectRatio,
           ),
           itemCount: _kpiStats.length,
           itemBuilder: (context, index) {
             final stat = _kpiStats[index];
             return Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
@@ -473,18 +481,18 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: stat['bg'] as Color,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(
                       stat['icon'] as IconData,
                       color: stat['color'] as Color,
-                      size: 22,
+                      size: 20,
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -493,7 +501,7 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                         Text(
                           stat['title'] as String,
                           style: const TextStyle(
-                            fontSize: 11,
+                            fontSize: 10.5,
                             fontWeight: FontWeight.w600,
                             color: Color(0xFF64748B),
                           ),
@@ -507,7 +515,7 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                           child: Text(
                             stat['value'] as String,
                             style: const TextStyle(
-                              fontSize: 17.5,
+                              fontSize: 16.5,
                               fontWeight: FontWeight.w900,
                               color: Color(0xFF0F172A),
                             ),
@@ -529,15 +537,15 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
   Widget _buildFlagshipSalesBanner() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFF0F172A), // Deep Slate Navy
-        borderRadius: BorderRadius.circular(20),
+        color: const Color(0xFF0F172A),
+        borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -545,7 +553,7 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(12),
@@ -553,20 +561,20 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
             child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.trending_up_rounded, color: Color(0xFF818CF8), size: 13),
+                Icon(Icons.trending_up_rounded, color: Color(0xFF818CF8), size: 12),
                 SizedBox(width: 4),
                 Text(
-                  'ফিল্ড লেভেল সেলস টিম (HBP & Supervisor Status)',
-                  style: TextStyle(color: Color(0xFFC7D2FE), fontSize: 10.5, fontWeight: FontWeight.w700),
+                  'ফিল্ড লেভেল সেলস টিম (HBP & Supervisor)',
+                  style: TextStyle(color: Color(0xFFC7D2FE), fontSize: 10, fontWeight: FontWeight.w700),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
           const Text(
             'সেলস টিম হায়ারার্কি ও পারফরম্যান্স ম্যানেজমেন্ট',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 15,
               fontWeight: FontWeight.w900,
               color: Colors.white,
               letterSpacing: -0.2,
@@ -576,35 +584,35 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
           const Text(
             'এইচআরপি টার্গেট (৬৫০ সেলস / ৩০% স্যালারি প্রমোশন), সুপারভাইজারের ফেক সেল ফিল্টার ও ইউজার আইডি পাসওয়ার্ড তৈরি করুন।',
             style: TextStyle(
-              fontSize: 11.5,
+              fontSize: 11,
               color: Color(0xFF94A3B8),
-              height: 1.4,
+              height: 1.35,
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 12),
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF4F46E5), // Indigo Purple Pill
+              backgroundColor: const Color(0xFF4F46E5),
               foregroundColor: Colors.white,
-              elevation: 4,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+              elevation: 2,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             ),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('সেলস এজেন্ট তৈরি ও ম্যানেজমেন্ট খুলছে...'), behavior: SnackBarBehavior.floating),
               );
             },
-            icon: const Icon(Icons.person_add_alt_rounded, size: 16),
+            icon: const Icon(Icons.person_add_alt_rounded, size: 15),
             label: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   'সেলস এজেন্ট তৈরি ও ম্যানেজ করুন',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(width: 4),
-                Icon(Icons.arrow_forward_rounded, size: 14),
+                Icon(Icons.arrow_forward_rounded, size: 13),
               ],
             ),
           ),
@@ -616,10 +624,10 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
   /// 4. Left Chart Card: Revenue Growth Bar Graph Card
   Widget _buildRevenueGraphCard() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: [
           BoxShadow(
@@ -632,42 +640,38 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header Row
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
+          // Header Wrap
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 6,
+            runSpacing: 6,
             children: [
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.bar_chart_rounded, color: Color(0xFF10B981), size: 20),
-                        SizedBox(width: 6),
-                        Flexible(
-                          child: Text(
-                            'রেভিনিউ প্রবৃদ্ধি & কাস্টম চার্ট',
-                            style: TextStyle(
-                              fontSize: 14.5,
-                              fontWeight: FontWeight.w800,
-                              color: textDark,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
+              const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.bar_chart_rounded, color: Color(0xFF10B981), size: 18),
+                      SizedBox(width: 5),
+                      Text(
+                        'রেভিনিউ প্রবৃদ্ধি & কাস্টম চার্ট',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          color: textDark,
                         ),
-                      ],
-                    ),
-                    SizedBox(height: 2),
-                    Text(
-                      'সময়সীমা পরিবর্তন করে রিয়েল-টাইমে আয় দেখুন',
-                      style: TextStyle(fontSize: 10, color: textMuted),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 2),
+                  Text(
+                    'সময়সীমা পরিবর্তন করে রিয়েল-টাইমে আয় দেখুন',
+                    style: TextStyle(fontSize: 9.5, color: textMuted),
+                  ),
+                ],
               ),
-              const SizedBox(width: 6),
               // Filter Chips
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
@@ -683,19 +687,19 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                           });
                         },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3.5),
                           decoration: BoxDecoration(
                             color: isSelected ? const Color(0xFFCCFBF1) : const Color(0xFFF8FAFC),
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(8),
                             border: Border.all(
                               color: isSelected ? brandGreen : const Color(0xFFE2E8F0),
-                              width: isSelected ? 1.4 : 1.0,
+                              width: isSelected ? 1.3 : 1.0,
                             ),
                           ),
                           child: Text(
                             filter,
                             style: TextStyle(
-                              fontSize: 9.5,
+                              fontSize: 9,
                               fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
                               color: isSelected ? darkGreen : textMuted,
                             ),
@@ -709,17 +713,17 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
             ],
           ),
 
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
 
-          // Bar Chart Visual (Matching exact colors and labels in image)
+          // Bar Chart Visual
           SizedBox(
-            height: 150,
+            height: 140,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: _monthlyRevenueData.map((data) {
                 final heightRatio = data['heightRatio'] as double;
-                final barHeight = 90.0 * heightRatio;
+                final barHeight = 85.0 * heightRatio;
                 final isCurrent = data['month'].toString().contains('আগস্ট');
 
                 return Column(
@@ -730,7 +734,7 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                       child: Text(
                         data['amount'] as String,
                         style: TextStyle(
-                          fontSize: 9.5,
+                          fontSize: 9,
                           fontWeight: FontWeight.bold,
                           color: isCurrent ? darkGreen : const Color(0xFF475569),
                         ),
@@ -739,7 +743,7 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                     const SizedBox(height: 4),
                     AnimatedContainer(
                       duration: const Duration(milliseconds: 300),
-                      width: 22,
+                      width: 18,
                       height: barHeight,
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
@@ -749,16 +753,16 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                         ),
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(6),
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 5),
                     FittedBox(
                       fit: BoxFit.scaleDown,
                       child: Text(
                         data['month'] as String,
                         style: TextStyle(
-                          fontSize: 9.5,
+                          fontSize: 9,
                           fontWeight: isCurrent ? FontWeight.bold : FontWeight.w500,
                           color: isCurrent ? textDark : textMuted,
                         ),
@@ -770,7 +774,7 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
             ),
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           const Divider(color: Color(0xFFF1F5F9)),
           const SizedBox(height: 4),
 
@@ -778,23 +782,23 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
           Wrap(
             alignment: WrapAlignment.spaceBetween,
             crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 8,
+            spacing: 6,
             runSpacing: 4,
             children: const [
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.bolt_rounded, color: brandGreen, size: 15),
-                  SizedBox(width: 4),
+                  Icon(Icons.bolt_rounded, color: brandGreen, size: 14),
+                  SizedBox(width: 3),
                   Text(
                     'প্ল্যাটফর্ম কমিশন গ্রোথ হার: +২৭.৪%',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFF059669)),
+                    style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w800, color: Color(0xFF059669)),
                   ),
                 ],
               ),
               Text(
                 'সর্বশেষ আপডেট: আজ',
-                style: TextStyle(fontSize: 10, color: textMuted),
+                style: TextStyle(fontSize: 9.5, color: textMuted),
               ),
             ],
           ),
@@ -806,10 +810,10 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
   /// 5. Right Chart Card: Booking Share Analytics (`সর্বাধিক বুকিং শেয়ার`)
   Widget _buildBookingShareCard() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: [
           BoxShadow(
@@ -824,21 +828,21 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
         children: [
           const Row(
             children: [
-              Icon(Icons.pie_chart_outline_rounded, color: Color(0xFF0284C7), size: 20),
-              SizedBox(width: 6),
+              Icon(Icons.pie_chart_outline_rounded, color: Color(0xFF0284C7), size: 18),
+              SizedBox(width: 5),
               Text(
                 'সর্বাধিক বুকিং শেয়ার',
-                style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w800, color: textDark),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: textDark),
               ),
             ],
           ),
           const SizedBox(height: 2),
           const Text(
             'ডাক্তার ঘর vs ফিজিক্যাল চেম্বার',
-            style: TextStyle(fontSize: 10, color: textMuted),
+            style: TextStyle(fontSize: 9.5, color: textMuted),
           ),
 
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
 
           // Telemedicine (Doctor Ghar) 58% Progress Bar
           Column(
@@ -847,16 +851,16 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
               const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('📺 ডাক্তার ঘর (ভিডিও কল)', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: textDark)),
-                  Text('58%', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: Color(0xFF059669))),
+                  Text('📺 ডাক্তার ঘর (ভিডিও কল)', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: textDark)),
+                  Text('58%', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w900, color: Color(0xFF059669))),
                 ],
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 5),
               ClipRRect(
                 borderRadius: BorderRadius.circular(6),
                 child: const LinearProgressIndicator(
                   value: 0.58,
-                  minHeight: 10,
+                  minHeight: 8,
                   backgroundColor: Color(0xFFF1F5F9),
                   valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF10B981)),
                 ),
@@ -864,7 +868,7 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
             ],
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
           // Chamber Physical Serial 42% Progress Bar
           Column(
@@ -873,16 +877,16 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
               const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('🏢 চেম্বার সিরিয়াল (শারীরিক)', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: textDark)),
-                  Text('42%', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: Color(0xFF0284C7))),
+                  Text('🏢 চেম্বার সিরিয়াল (শারীরিক)', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: textDark)),
+                  Text('42%', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w900, color: Color(0xFF0284C7))),
                 ],
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 5),
               ClipRRect(
                 borderRadius: BorderRadius.circular(6),
                 child: const LinearProgressIndicator(
                   value: 0.42,
-                  minHeight: 10,
+                  minHeight: 8,
                   backgroundColor: Color(0xFFF1F5F9),
                   valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0284C7)),
                 ),
@@ -890,24 +894,24 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
             ],
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
 
           // Bottom Success Callout Box
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
             decoration: BoxDecoration(
               color: const Color(0xFFECFDF5),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10),
               border: Border.all(color: const Color(0xFFA7F3D0)),
             ),
             child: const Row(
               children: [
-                Icon(Icons.check_circle_rounded, color: Color(0xFF059669), size: 16),
-                SizedBox(width: 6),
+                Icon(Icons.check_circle_rounded, color: Color(0xFF059669), size: 15),
+                SizedBox(width: 5),
                 Expanded(
                   child: Text(
                     'গত ৩০ দিনে ৯৬% সফল কনসাল্টেশন সম্পন্ন হয়েছে!',
-                    style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: Color(0xFF047857)),
+                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Color(0xFF047857)),
                   ),
                 ),
               ],
@@ -918,13 +922,13 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
     );
   }
 
-  /// 6. Recent Telemedicine Appointments Table
+  /// 6. Recent Telemedicine Appointments Section (Responsive Data Table / Mobile Card Grid)
   Widget _buildRecentAppointmentsSection() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: [
           BoxShadow(
@@ -943,11 +947,11 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
               const Expanded(
                 child: Text(
                   'সাম্প্রতিক টেলিমেডিসিন অ্যাপয়েন্টমেন্ট তালিকা',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: textDark),
+                  style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w900, color: textDark),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 6),
               GestureDetector(
                 onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -957,120 +961,210 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text('সবগুলো', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: brandGreen)),
+                    Text('সবগুলো', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: brandGreen)),
                     SizedBox(width: 2),
-                    Icon(Icons.north_east_rounded, size: 13, color: brandGreen),
+                    Icon(Icons.north_east_rounded, size: 12, color: brandGreen),
                   ],
                 ),
               ),
             ],
           ),
 
-          const SizedBox(height: 14),
+          const SizedBox(height: 12),
 
-          // Table Headers Row
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF8FAFC),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Row(
-              children: [
-                Expanded(flex: 3, child: Text('আইডি', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textMuted))),
-                Expanded(flex: 3, child: Text('রোগীর নাম', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textMuted))),
-                Expanded(flex: 3, child: Text('ডাক্তারের নাম', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textMuted))),
-                Expanded(flex: 2, child: Text('ফি', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textMuted))),
-                Expanded(flex: 3, child: Text('তারিখ & সময়', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textMuted))),
-                Expanded(flex: 2, child: Text('স্ট্যাটাস', textAlign: TextAlign.right, style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textMuted))),
-              ],
-            ),
-          ),
+          // LayoutBuilder to check screen width for Table vs Mobile Cards
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final bool isMobileScreen = constraints.maxWidth < 560;
 
-          const SizedBox(height: 6),
-
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: _recentAppointments.length,
-            separatorBuilder: (context, index) => const Divider(color: Color(0xFFF1F5F9), height: 10),
-            itemBuilder: (context, index) {
-              final item = _recentAppointments[index];
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                child: Row(
+              if (isMobileScreen) {
+                // Mobile Clean Card View for Appointments
+                return Column(
+                  children: _recentAppointments.map((item) {
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF8FAFC),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: const Color(0xFFE2E8F0)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                item['id'] as String,
+                                style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: Color(0xFF0284C7)),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: item['statusBg'] as Color,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Text(
+                                  item['status'] as String,
+                                  style: TextStyle(
+                                    fontSize: 9.5,
+                                    fontWeight: FontWeight.bold,
+                                    color: item['statusColor'] as Color,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              const Icon(Icons.person_outline_rounded, size: 14, color: textMuted),
+                              const SizedBox(width: 4),
+                              Text(
+                                item['patient'] as String,
+                                style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: textDark),
+                              ),
+                              const SizedBox(width: 8),
+                              const Icon(Icons.arrow_forward_rounded, size: 12, color: textMuted),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  item['doctor'] as String,
+                                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: textDark),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                item['dateTime'] as String,
+                                style: const TextStyle(fontSize: 10, color: textMuted),
+                              ),
+                              Text(
+                                item['fee'] as String,
+                                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: textDark),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                );
+              } else {
+                // Desktop / Tablet Full Data Table View
+                return Column(
                   children: [
-                    Expanded(
-                      flex: 3,
-                      child: Text(
-                        item['id'] as String,
-                        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF0284C7)),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF8FAFC),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Row(
+                        children: [
+                          Expanded(flex: 3, child: Text('আইডি', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textMuted))),
+                          Expanded(flex: 3, child: Text('রোগীর নাম', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textMuted))),
+                          Expanded(flex: 3, child: Text('ডাক্তারের নাম', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textMuted))),
+                          Expanded(flex: 2, child: Text('ফি', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textMuted))),
+                          Expanded(flex: 3, child: Text('তারিখ & সময়', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textMuted))),
+                          Expanded(flex: 2, child: Text('স্ট্যাটাস', textAlign: TextAlign.right, style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textMuted))),
+                        ],
                       ),
                     ),
-                    Expanded(
-                      flex: 3,
-                      child: Text(
-                        item['patient'] as String,
-                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: textDark),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    Expanded(
-                      flex: 3,
-                      child: Text(
-                        item['doctor'] as String,
-                        style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600, color: textDark),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    Expanded(
-                      flex: 2,
-                      child: Text(
-                        item['fee'] as String,
-                        style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textDark),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    Expanded(
-                      flex: 3,
-                      child: Text(
-                        item['dateTime'] as String,
-                        style: const TextStyle(fontSize: 10, color: textMuted),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    Expanded(
-                      flex: 2,
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: item['statusBg'] as Color,
-                            borderRadius: BorderRadius.circular(12),
+                    const SizedBox(height: 6),
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: _recentAppointments.length,
+                      separatorBuilder: (context, index) => const Divider(color: Color(0xFFF1F5F9), height: 10),
+                      itemBuilder: (context, index) {
+                        final item = _recentAppointments[index];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                flex: 3,
+                                child: Text(
+                                  item['id'] as String,
+                                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF0284C7)),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              Expanded(
+                                flex: 3,
+                                child: Text(
+                                  item['patient'] as String,
+                                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: textDark),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              Expanded(
+                                flex: 3,
+                                child: Text(
+                                  item['doctor'] as String,
+                                  style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600, color: textDark),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  item['fee'] as String,
+                                  style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textDark),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              Expanded(
+                                flex: 3,
+                                child: Text(
+                                  item['dateTime'] as String,
+                                  style: const TextStyle(fontSize: 10, color: textMuted),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: Align(
+                                  alignment: Alignment.centerRight,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: item['statusBg'] as Color,
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Text(
+                                      item['status'] as String,
+                                      style: TextStyle(
+                                        fontSize: 9.5,
+                                        fontWeight: FontWeight.bold,
+                                        color: item['statusColor'] as Color,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                          child: Text(
-                            item['status'] as String,
-                            style: TextStyle(
-                              fontSize: 9.5,
-                              fontWeight: FontWeight.bold,
-                              color: item['statusColor'] as Color,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ),
+                        );
+                      },
                     ),
                   ],
-                ),
-              );
+                );
+              }
             },
           ),
         ],
