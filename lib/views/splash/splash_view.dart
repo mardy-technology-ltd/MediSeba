@@ -44,7 +44,6 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
 
     _animationController.forward();
 
-    // Always show OnboardingView on app startup after splash
     Future.delayed(const Duration(milliseconds: 2500), () {
       if (mounted) {
         final Widget destinationView = OnboardingView(

@@ -16,6 +16,7 @@ import '../offers/offer_list_view.dart';
 import '../hospitals/hospital_list_view.dart';
 import '../../controllers/language_controller.dart';
 import '../more/more_menu_view.dart';
+<<<<<<< HEAD
 import '../profile/profile_view.dart';
 import '../patient_portal/patient_portal_view.dart';
 import '../medishop/medishop_view.dart';
@@ -25,6 +26,9 @@ import '../blog/blog_view.dart';
 import '../contact/contact_us_view.dart';
 import '../matriseba/matriseba_view.dart';
 import '../customer_support/customer_support_view.dart';
+=======
+import 'widgets/service_tile_card.dart';
+>>>>>>> new-ui
 
 class HomeView extends StatefulWidget {
   final HomeController homeController;
@@ -88,6 +92,7 @@ class _HomeViewState extends State<HomeView> {
     super.dispose();
   }
 
+<<<<<<< HEAD
   void _performHomeSearch() {
     final query = _homeSearchController.text.trim();
     FocusScope.of(context).unfocus();
@@ -99,10 +104,51 @@ class _HomeViewState extends State<HomeView> {
           languageController: _langController,
           initialSearchQuery: query,
         ),
+=======
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      key: _scaffoldKey,
+      extendBody: false,
+      endDrawer: _buildSidebarDrawer(context),
+      backgroundColor: const Color(0xFFF0FDFA),
+      appBar: _buildPinnedAppBar(),
+      body: IndexedStack(
+        index: _currentBottomNavIndex,
+        children: [
+          // Tab 0: Home Content
+          _buildHomeBodyContent(),
+          // Tab 1: Offer List View
+          const OfferListView(),
+          // Tab 2: Hospital List View
+          const HospitalListView(),
+          // Tab 3: Doctor List View
+          const DoctorListView(showAppBar: false),
+          // Tab 4: More Menu View
+          MoreMenuView(
+            authController: widget.authController,
+            homeController: widget.homeController,
+          ),
+        ],
+      ),
+      bottomNavigationBar: ModernGlowNavBar(
+        currentIndex: _currentBottomNavIndex,
+        onTap: (index) {
+          setState(() => _currentBottomNavIndex = index);
+        },
+        items: const [
+          ModernGlowNavBarItem(iconPath: 'assets/icons/nav_home.svg', label: 'Home'),
+          ModernGlowNavBarItem(iconPath: 'assets/icons/nav_offers.png', label: 'Offers', isPng: true),
+          ModernGlowNavBarItem(iconPath: 'assets/icons/nav_hospitals.svg', label: 'Hospitals'),
+          ModernGlowNavBarItem(iconPath: 'assets/icons/nav_doctors.svg', label: 'Doctors'),
+          ModernGlowNavBarItem(iconPath: 'assets/icons/nav_more.svg', label: 'More'),
+        ],
+>>>>>>> new-ui
       ),
     );
   }
 
+<<<<<<< HEAD
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -241,6 +287,25 @@ class _HomeViewState extends State<HomeView> {
         children: [
           // 1. Personalized Greeting & Universal Search Header Card
           _buildUserGreetingAndSearchBar(),
+=======
+  // Home Screen Center Scroll Body with Cyan Header Container
+  Widget _buildHomeBodyContent() {
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 1. Soft Cyan Header Container
+          _buildTopCyanHeader(),
+
+          const SizedBox(height: 14),
+
+          // 2. 8 Service Grid Cards
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: _buildCategoryGrid(),
+          ),
+>>>>>>> new-ui
 
           const SizedBox(height: 20),
 
@@ -345,6 +410,7 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
+<<<<<<< HEAD
   // 1. User Greeting & Universal Search Bar Header Card
   Widget _buildUserGreetingAndSearchBar() {
     return Container(
@@ -868,12 +934,138 @@ class _HomeViewState extends State<HomeView> {
             childAspectRatio: screenWidth > 600
                 ? 1.30
                 : (screenWidth < 360 ? 1.02 : 1.14),
-          ),
-          itemCount: categories.length,
-          itemBuilder: (context, index) {
-            final item = categories[index];
-            return _buildServiceCard(item);
+=======
+  String _getGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour >= 5 && hour < 12) {
+      return 'Good Morning, 👋';
+    } else if (hour >= 12 && hour < 17) {
+      return 'Good Afternoon, 👋';
+    } else if (hour >= 17 && hour < 22) {
+      return 'Good Evening, 👋';
+    } else {
+      return 'Good Night, 👋';
+    }
+  }
+
+  // Static Pinned Top AppBar (MediSeba Logo, Notification Bell, and Profile Avatar)
+  PreferredSizeWidget _buildPinnedAppBar() {
+    return AppBar(
+      backgroundColor: const Color(0xFFF0FDFA),
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      automaticallyImplyLeading: false,
+      titleSpacing: 16,
+      title: Image.asset(
+        'assets/images/logo.png',
+        height: 45,
+        fit: BoxFit.contain,
+      ),
+      actions: [
+        // 1. Notification Bell Button (40x40)
+        GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const NotificationView()),
+            );
           },
+          child: Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.06),
+                  blurRadius: 10,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                const Icon(
+                  Icons.notifications_none_rounded,
+                  color: Color(0xFF0F172A),
+                  size: 22,
+                ),
+                Positioned(
+                  top: 9,
+                  right: 10,
+                  child: Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFEF4444),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+>>>>>>> new-ui
+          ),
+        ),
+
+        const SizedBox(width: 10),
+
+        // 2. User Profile Avatar Button (40x40)
+        ListenableBuilder(
+          listenable: widget.authController,
+          builder: (context, _) {
+            final uData = widget.authController.currentUserData;
+            final profileImg = uData?.profileImageUrl;
+            final hasImage = profileImg != null && profileImg.isNotEmpty;
+
+            return GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ProfileView(
+                      authController: widget.authController,
+                      homeController: widget.homeController,
+                    ),
+                  ),
+                );
+              },
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.06),
+                      blurRadius: 10,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                  image: hasImage
+                      ? DecorationImage(
+                          image: NetworkImage(profileImg),
+                          fit: BoxFit.cover,
+                        )
+                      : null,
+                ),
+                child: !hasImage
+                    ? const CircleAvatar(
+                        backgroundColor: Color(0xFFCBD5E1),
+                        child: Icon(
+                          Icons.person_rounded,
+                          color: Color(0xFF334155),
+                          size: 20,
+                        ),
+                      )
+                    : null,
+              ),
+            );
+          },
+<<<<<<< HEAD
         );
       },
     );
@@ -998,10 +1190,316 @@ class _HomeViewState extends State<HomeView> {
                   size: 13,
                 ),
               ],
-            ),
-          ],
+=======
         ),
+
+        const SizedBox(width: 16),
+      ],
+    );
+  }
+
+  // 1. Top Soft Cyan Header Section (Scrolls with body: Greeting, Search Bar, Teleconsult Promo Banner)
+  Widget _buildTopCyanHeader() {
+    return Container(
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        color: Color(0xFFE2F4F2), // Exact soft mint cyan tint from design mockup
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(36)),
       ),
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Single-Line Inline Dynamic Greeting right above Search Bar
+          Padding(
+            padding: const EdgeInsets.only(left: 4, top: 4, bottom: 8),
+            child: ListenableBuilder(
+              listenable: widget.authController,
+              builder: (context, _) {
+                final uData = widget.authController.currentUserData;
+                final userName = (uData?.name != null && uData!.name.trim().isNotEmpty)
+                    ? uData.name
+                    : 'Basic';
+                final firstName = userName.trim().split(' ').first;
+                final cleanGreeting = _getGreeting().replaceAll('👋', '').trim();
+
+                return Text(
+                  '$cleanGreeting $firstName! 👋',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF1E293B),
+                  ),
+                );
+              },
+            ),
+          ),
+
+          const SizedBox(height: 4),
+
+          // Row 2: Search Bar Input Widget
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const DoctorListView(showAppBar: true),
+                ),
+              );
+            },
+            child: Container(
+              height: 52,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 14,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: const Row(
+                children: [
+                  Icon(
+                    Icons.search_rounded,
+                    color: Color(0xFF64748B),
+                    size: 24,
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Doctors, Medicine, or Services',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: Color(0xFF64748B),
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+>>>>>>> new-ui
+            ),
+          ),
+
+          const SizedBox(height: 18),
+
+          // Row 3: 24/7 Teleconsultation Banner Card (Glassmorphism Light Teal Design)
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const DoctorBariView()),
+              );
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFFF0FDFA),
+                borderRadius: BorderRadius.circular(22),
+                border: Border.all(color: Colors.white, width: 1.5),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF0D9488).withValues(alpha: 0.06),
+                    blurRadius: 16,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  // Teal Doctor Icon Box Badge
+                  Container(
+                    width: 52,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF0D9488),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: const Icon(
+                      Icons.medical_services_rounded,
+                      color: Colors.white,
+                      size: 28,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '24/7 Teleconsultation &\nExpress Healthcare',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF1E293B),
+                            height: 1.25,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          'Connect with medical professionals instantly.',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Color(0xFF475569),
+                            height: 1.3,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Category Grid — 8 Vibrant Service Cards matching reference image
+  Widget _buildCategoryGrid() {
+    return GridView.count(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisCount: 2,
+      crossAxisSpacing: 14,
+      mainAxisSpacing: 14,
+      childAspectRatio: 1.45,
+      children: [
+        ServiceTileCard(
+          title: 'Doctor\nSerial',
+          svgPath: 'assets/icons/doctor_serial.svg',
+          gradient: const LinearGradient(
+            colors: [Color(0xFF0D9488), Color(0xFF059669)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const DoctorListView()),
+            );
+          },
+        ),
+        ServiceTileCard(
+          title: 'Doctor Home/\nTeleconsult',
+          svgPath: 'assets/icons/doctor_home.svg',
+          gradient: const LinearGradient(
+            colors: [Color(0xFFE11D48), Color(0xFFBE123C)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const DoctorBariView()),
+            );
+          },
+        ),
+        ServiceTileCard(
+          title: 'MediShop',
+          svgPath: 'assets/icons/medishop.svg',
+          gradient: const LinearGradient(
+            colors: [Color(0xFF475569), Color(0xFF334155)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const HealthConsultationView(),
+              ),
+            );
+          },
+        ),
+        ServiceTileCard(
+          title: 'Blood\nDonation',
+          svgPath: 'assets/icons/blood_donation.svg',
+          gradient: const LinearGradient(
+            colors: [Color(0xFFF43F5E), Color(0xFFE11D48)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          onTap: () {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              builder: (_) => const HelplineBottomSheet(),
+            );
+          },
+        ),
+        ServiceTileCard(
+          title: 'Special\nDiscounts',
+          svgPath: 'assets/icons/special_discounts.svg',
+          gradient: const LinearGradient(
+            colors: [Color(0xFF0F766E), Color(0xFF0D9488)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          onTap: () {
+            setState(() => _currentBottomNavIndex = 1);
+          },
+        ),
+        ServiceTileCard(
+          title: 'Emergency\nAmbulance',
+          svgPath: 'assets/icons/ambulance.svg',
+          gradient: const LinearGradient(
+            colors: [Color(0xFF334155), Color(0xFF1E293B)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          onTap: () {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              builder: (_) => const HelplineBottomSheet(),
+            );
+          },
+        ),
+        ServiceTileCard(
+          title: 'Maternal &\nChild Care',
+          svgPath: 'assets/icons/maternal_care.svg',
+          gradient: const LinearGradient(
+            colors: [Color(0xFF64748B), Color(0xFF475569)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const DoctorBariView()),
+            );
+          },
+        ),
+        ServiceTileCard(
+          title: '24/7 Customer\nSupport',
+          svgPath: 'assets/icons/customer_support.svg',
+          gradient: const LinearGradient(
+            colors: [Color(0xFF854D0E), Color(0xFFA16207)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          onTap: () {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              builder: (_) => const HelplineBottomSheet(),
+            );
+          },
+        ),
+      ],
     );
   }
 
@@ -1739,7 +2237,7 @@ class _CategoryItem {
   });
 }
 
-// Health Query Banner Card (Redesigned Modern Glassmorphism & Emerald Theme)
+// Health Query Banner Card
 class _QueryBannerCard extends StatefulWidget {
   const _QueryBannerCard();
 

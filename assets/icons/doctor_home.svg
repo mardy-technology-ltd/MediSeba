@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="blueCamGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="1" dy="3" stdDeviation="2" flood-color="#000000" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  <g filter="url(#shadow)">
+    <!-- Main Camera Body -->
+    <rect x="8" y="16" width="36" height="32" rx="9" fill="url(#blueCamGrad)" stroke="#ffffff" stroke-width="1.5"/>
+    <!-- Medical Cross Emblem -->
+    <path d="M 26 23 L 26 41 M 17 32 L 35 32" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round"/>
+    <!-- Camera Lens Side Cone -->
+    <path d="M 44 26 L 56 18 C 58 17 59 18 59 20 L 59 44 C 59 46 58 47 56 46 L 44 38 Z" fill="url(#blueCamGrad)" stroke="#ffffff" stroke-width="1.5"/>
+  </g>
+</svg>

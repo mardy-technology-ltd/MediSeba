@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="headsetGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#fef3c7"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="1" dy="3" stdDeviation="2" flood-color="#000000" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  <g filter="url(#shadow)">
+    <!-- Headset Arc -->
+    <path d="M 14 32 C 14 18 22 10 32 10 C 42 10 50 18 50 32" fill="none" stroke="url(#headsetGrad)" stroke-width="5" stroke-linecap="round"/>
+    <!-- Left Cushion -->
+    <rect x="9" y="27" width="9" height="17" rx="4.5" fill="#f59e0b" stroke="#ffffff" stroke-width="1"/>
+    <!-- Right Cushion -->
+    <rect x="46" y="27" width="9" height="17" rx="4.5" fill="#f59e0b" stroke="#ffffff" stroke-width="1"/>
+    <!-- Mic Boom Arm -->
+    <path d="M 49 38 L 40 48 L 33 48" fill="none" stroke="url(#headsetGrad)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Mic Tip -->
+    <circle cx="32" cy="48" r="3.5" fill="#d97706" stroke="#ffffff" stroke-width="1"/>
+    <!-- 24/7 Badge Tag -->
+    <rect x="22" y="22" width="20" height="11" rx="4" fill="#d97706" stroke="#ffffff" stroke-width="1"/>
+    <text x="32" y="30.5" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="8" fill="#ffffff" text-anchor="middle">24/7</text>
+  </g>
+</svg>

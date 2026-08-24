@@ -4,6 +4,7 @@ import '../home/home_view.dart';
 import '../../controllers/home_controller.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/language_controller.dart';
+import '../../screens/main_screen.dart';
 
 enum LoginRole { patient, doctor, admin }
 
@@ -240,6 +241,12 @@ class _LoginViewState extends State<LoginView> {
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
                               color: Color(0xFF64748B),
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => RegisterView(
+                              homeController: widget.homeController,
+                              authController: widget.authController,
+>>>>>>> new-ui
                             ),
                           ),
                         ],

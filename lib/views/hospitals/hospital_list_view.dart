@@ -114,7 +114,7 @@ class _HospitalListViewState extends State<HospitalListView> {
             // List
             Expanded(
               child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                padding: const EdgeInsets.fromLTRB(16, 6, 16, 100),
                 itemCount: hospitals.length,
                 itemBuilder: (context, index) {
                   final item = hospitals[index];

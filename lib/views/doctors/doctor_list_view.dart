@@ -188,28 +188,19 @@ class _DoctorListViewState extends State<DoctorListView> {
                   color: AppColors.primary,
                   onRefresh: () => _doctorController.fetchDoctors(),
                   child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
                     itemCount: _doctorController.doctors.length,
                     itemBuilder: (context, index) {
                       final doctor = _doctorController.doctors[index];
                       return DoctorCard(
                         doctor: doctor,
                         onTap: () {
-                          if (doctor.isAvailableToday) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PaymentView(doctor: doctor),
-                              ),
-                            );
-                          } else {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => BookAppointmentView(doctor: doctor),
-                              ),
-                            );
-                          }
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DoctorDetailView(doctor: doctor),
+                            ),
+                          );
                         },
                       );
                     },

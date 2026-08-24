@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="stethGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f766e"/>
+      <stop offset="100%" stop-color="#14b8a6"/>
+    </linearGradient>
+    <linearGradient id="clockGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff4b6e"/>
+      <stop offset="100%" stop-color="#e11d48"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="1" dy="3" stdDeviation="2" flood-color="#000000" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  <g filter="url(#shadow)">
+    <!-- Stethoscope Tubes -->
+    <path d="M 16 12 L 16 22 C 16 32 24 38 32 38 C 40 38 48 32 48 22 L 48 12" fill="none" stroke="url(#stethGrad)" stroke-width="4.5" stroke-linecap="round"/>
+    <!-- Earpieces -->
+    <circle cx="16" cy="10" r="3.5" fill="#0f766e"/>
+    <circle cx="48" cy="10" r="3.5" fill="#0f766e"/>
+    <!-- Extension to Chestpiece -->
+    <path d="M 32 38 L 32 46 C 32 50 36 53 40 53" fill="none" stroke="url(#stethGrad)" stroke-width="4.5" stroke-linecap="round"/>
+    <!-- Chestpiece -->
+    <circle cx="41" cy="53" r="5.5" fill="#0d9488" stroke="#ffffff" stroke-width="1.5"/>
+    <circle cx="41" cy="53" r="2.5" fill="#ffffff"/>
+    
+    <!-- Red Clock Badge (Top Right) -->
+    <circle cx="46" cy="16" r="9.5" fill="url(#clockGrad)" stroke="#ffffff" stroke-width="1.5"/>
+    <circle cx="46" cy="16" r="7" fill="#ffffff"/>
+    <polyline points="46,11 46,16 49,17.5" fill="none" stroke="#e11d48" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>
