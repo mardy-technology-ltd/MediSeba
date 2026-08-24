@@ -464,6 +464,12 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
           itemCount: _kpiStats.length,
           itemBuilder: (context, index) {
             final stat = _kpiStats[index];
+            final String title = (stat['title'] ?? '').toString();
+            final String value = (stat['value'] ?? '').toString();
+            final IconData icon = (stat['icon'] as IconData?) ?? Icons.analytics_outlined;
+            final Color iconColor = (stat['color'] as Color?) ?? brandGreen;
+            final Color bgColor = (stat['bg'] as Color?) ?? const Color(0xFFECFDF5);
+
             return Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
               decoration: BoxDecoration(
@@ -483,12 +489,12 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: stat['bg'] as Color,
+                      color: bgColor,
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(
-                      stat['icon'] as IconData,
-                      color: stat['color'] as Color,
+                      icon,
+                      color: iconColor,
                       size: 20,
                     ),
                   ),
@@ -499,7 +505,7 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          stat['title'] as String,
+                          title,
                           style: const TextStyle(
                             fontSize: 10.5,
                             fontWeight: FontWeight.w600,
@@ -513,7 +519,7 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                           fit: BoxFit.scaleDown,
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            stat['value'] as String,
+                            value,
                             style: const TextStyle(
                               fontSize: 16.5,
                               fontWeight: FontWeight.w900,
@@ -722,9 +728,11 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: _monthlyRevenueData.map((data) {
-                final heightRatio = data['heightRatio'] as double;
+                final double heightRatio = (data['heightRatio'] as num?)?.toDouble() ?? 0.5;
+                final String month = (data['month'] ?? '').toString();
+                final String amount = (data['amount'] ?? '').toString();
                 final barHeight = 85.0 * heightRatio;
-                final isCurrent = data['month'].toString().contains('আগস্ট');
+                final isCurrent = month.contains('আগস্ট');
 
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -732,7 +740,7 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                     FittedBox(
                       fit: BoxFit.scaleDown,
                       child: Text(
-                        data['amount'] as String,
+                        amount,
                         style: TextStyle(
                           fontSize: 9,
                           fontWeight: FontWeight.bold,
@@ -760,7 +768,7 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                     FittedBox(
                       fit: BoxFit.scaleDown,
                       child: Text(
-                        data['month'] as String,
+                        month,
                         style: TextStyle(
                           fontSize: 9,
                           fontWeight: isCurrent ? FontWeight.bold : FontWeight.w500,
@@ -981,6 +989,15 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                 // Mobile Clean Card View for Appointments
                 return Column(
                   children: _recentAppointments.map((item) {
+                    final String id = (item['id'] ?? '').toString();
+                    final String patient = (item['patient'] ?? '').toString();
+                    final String doctor = (item['doctor'] ?? '').toString();
+                    final String fee = (item['fee'] ?? '').toString();
+                    final String dateTime = (item['dateTime'] ?? '').toString();
+                    final String status = (item['status'] ?? '').toString();
+                    final Color statusColor = (item['statusColor'] as Color?) ?? const Color(0xFF059669);
+                    final Color statusBg = (item['statusBg'] as Color?) ?? const Color(0xFFD1FAE5);
+
                     return Container(
                       margin: const EdgeInsets.only(bottom: 8),
                       padding: const EdgeInsets.all(10),
@@ -996,21 +1013,21 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                item['id'] as String,
+                                id,
                                 style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: Color(0xFF0284C7)),
                               ),
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                                 decoration: BoxDecoration(
-                                  color: item['statusBg'] as Color,
+                                  color: statusBg,
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Text(
-                                  item['status'] as String,
+                                  status,
                                   style: TextStyle(
                                     fontSize: 9.5,
                                     fontWeight: FontWeight.bold,
-                                    color: item['statusColor'] as Color,
+                                    color: statusColor,
                                   ),
                                 ),
                               ),
@@ -1022,7 +1039,7 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                               const Icon(Icons.person_outline_rounded, size: 14, color: textMuted),
                               const SizedBox(width: 4),
                               Text(
-                                item['patient'] as String,
+                                patient,
                                 style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: textDark),
                               ),
                               const SizedBox(width: 8),
@@ -1030,7 +1047,7 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  item['doctor'] as String,
+                                  doctor,
                                   style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: textDark),
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -1042,11 +1059,11 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                item['dateTime'] as String,
+                                dateTime,
                                 style: const TextStyle(fontSize: 10, color: textMuted),
                               ),
                               Text(
-                                item['fee'] as String,
+                                fee,
                                 style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: textDark),
                               ),
                             ],
@@ -1085,6 +1102,15 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                       separatorBuilder: (context, index) => const Divider(color: Color(0xFFF1F5F9), height: 10),
                       itemBuilder: (context, index) {
                         final item = _recentAppointments[index];
+                        final String id = (item['id'] ?? '').toString();
+                        final String patient = (item['patient'] ?? '').toString();
+                        final String doctor = (item['doctor'] ?? '').toString();
+                        final String fee = (item['fee'] ?? '').toString();
+                        final String dateTime = (item['dateTime'] ?? '').toString();
+                        final String status = (item['status'] ?? '').toString();
+                        final Color statusColor = (item['statusColor'] as Color?) ?? const Color(0xFF059669);
+                        final Color statusBg = (item['statusBg'] as Color?) ?? const Color(0xFFD1FAE5);
+
                         return Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
                           child: Row(
@@ -1092,7 +1118,7 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                               Expanded(
                                 flex: 3,
                                 child: Text(
-                                  item['id'] as String,
+                                  id,
                                   style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF0284C7)),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -1101,7 +1127,7 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                               Expanded(
                                 flex: 3,
                                 child: Text(
-                                  item['patient'] as String,
+                                  patient,
                                   style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: textDark),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -1110,7 +1136,7 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                               Expanded(
                                 flex: 3,
                                 child: Text(
-                                  item['doctor'] as String,
+                                  doctor,
                                   style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600, color: textDark),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -1119,7 +1145,7 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                               Expanded(
                                 flex: 2,
                                 child: Text(
-                                  item['fee'] as String,
+                                  fee,
                                   style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textDark),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -1128,7 +1154,7 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                               Expanded(
                                 flex: 3,
                                 child: Text(
-                                  item['dateTime'] as String,
+                                  dateTime,
                                   style: const TextStyle(fontSize: 10, color: textMuted),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -1141,15 +1167,15 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                     decoration: BoxDecoration(
-                                      color: item['statusBg'] as Color,
+                                      color: statusBg,
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Text(
-                                      item['status'] as String,
+                                      status,
                                       style: TextStyle(
                                         fontSize: 9.5,
                                         fontWeight: FontWeight.bold,
-                                        color: item['statusColor'] as Color,
+                                        color: statusColor,
                                       ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
