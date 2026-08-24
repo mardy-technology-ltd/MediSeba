@@ -223,331 +223,338 @@ class _LoginViewState extends State<LoginView> {
     }
 
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFFF8FAFC),
-              Color(0xFFF0FDFA),
-              Color(0xFFE2E8F0),
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final double containerWidth = constraints.maxWidth > 580 ? 560 : constraints.maxWidth;
-                  final bool isSmallScreen = constraints.maxWidth < 420;
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final double containerWidth = constraints.maxWidth > 580 ? 560 : constraints.maxWidth;
+                final bool isSmallScreen = constraints.maxWidth < 420;
 
-                  return Container(
-                    width: containerWidth,
-                    padding: EdgeInsets.symmetric(
-                      horizontal: isSmallScreen ? 16.0 : 24.0,
-                      vertical: isSmallScreen ? 20.0 : 28.0,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.95),
-                      borderRadius: BorderRadius.circular(28),
-                      border: Border.all(color: Colors.white, width: 2.0),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF0F172A).withValues(alpha: 0.06),
-                          blurRadius: 24,
-                          offset: const Offset(0, 8),
-                        ),
-                        BoxShadow(
-                          color: brandGreen.withValues(alpha: 0.04),
-                          blurRadius: 40,
-                          offset: const Offset(0, 16),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        // Top Logo Image with Gradient Touch
-                        Image.asset(
-                          'assets/images/logo.png',
-                          height: isSmallScreen ? 48 : 56,
-                          fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) => Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.local_hospital_rounded, size: 36, color: brandGreen),
-                              const SizedBox(width: 8),
-                              Text(
-                                'মেডিসেবা',
-                                style: TextStyle(
-                                  fontSize: isSmallScreen ? 22 : 26,
-                                  fontWeight: FontWeight.w900,
-                                  color: const Color(0xFFED1C24),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        const SizedBox(height: 6),
-
-                        // Tagline under logo
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: brandGreen.withValues(alpha: 0.08),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Text(
-                            '“সেবা নিন ঘরে বসে, সুস্থ থাকুন নির্বিঘ্নে”',
-                            style: TextStyle(
-                              fontSize: isSmallScreen ? 11.5 : 12.5,
-                              fontWeight: FontWeight.w700,
-                              color: brandGreenDark,
-                              letterSpacing: 0.1,
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 20),
-
-                        // Main Heading Title
-                        Text(
-                          'MediSeba ডেডিকেটেড একাউন্ট লগইন',
-                          style: TextStyle(
-                            fontSize: isSmallScreen ? 18 : 21,
-                            fontWeight: FontWeight.w900,
-                            color: textDark,
-                            letterSpacing: -0.3,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-
-                        const SizedBox(height: 6),
-
-                        // Subtitle Description
-                        Text(
-                          'আপনার নির্দিষ্ট পোটালে (রোগী, ডাক্তার, HBP, সুপারভাইজার বা এডমিন) প্রবেশ করুন।',
-                          style: TextStyle(
-                            fontSize: isSmallScreen ? 12 : 13,
-                            color: textMuted,
-                            height: 1.4,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-
-                        const SizedBox(height: 24),
-
-                        // Section 1 Header
-                        const Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            '১. আপনার পোর্টাল ভূমিকা (Role) নির্বাচন করুন:',
-                            style: TextStyle(
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.w800,
-                              color: textDark,
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 10),
-
-                        // Adaptive 5 Role Selector Pills Container
-                        _buildAdaptiveRoleBar(isSmallScreen),
-
-                        const SizedBox(height: 22),
-
-                        // Adaptive Quick Auto-fill Credentials Box Card
-                        _buildAdaptiveCredentialsCard(isSmallScreen),
-
-                        const SizedBox(height: 22),
-
-                        // Section 2 Header: ইমেইল বা মোবাইল নম্বর
-                        const Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            '২. ইমেইল বা মোবাইল নম্বর *',
-                            style: TextStyle(
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.w800,
-                              color: textDark,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-
-                        // Email Input Box (Rounded Pill Style)
-                        Container(
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF8FAFC),
-                            borderRadius: BorderRadius.circular(24),
-                            border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
-                          ),
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-                          child: TextField(
-                            controller: _inputController,
-                            keyboardType: TextInputType.emailAddress,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                              color: textDark,
-                            ),
-                            decoration: const InputDecoration(
-                              icon: Icon(Icons.mail_outline_rounded, color: primaryBlue, size: 20),
-                              hintText: 'ইমেইল বা মোবাইল নম্বর প্রদান করুন',
-                              hintStyle: TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
-                              border: InputBorder.none,
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 18),
-
-                        // Section 3 Header: পাসওয়ার্ড
-                        const Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            '৩. পাসওয়ার্ড *',
-                            style: TextStyle(
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.w800,
-                              color: textDark,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-
-                        // Password Input Box (Rounded Pill Style)
-                        Container(
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF8FAFC),
-                            borderRadius: BorderRadius.circular(24),
-                            border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
-                          ),
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-                          child: TextField(
-                            controller: _passwordController,
-                            obscureText: !_isPasswordVisible,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                              color: textDark,
-                              letterSpacing: 1.5,
-                            ),
-                            decoration: InputDecoration(
-                              icon: const Icon(Icons.lock_outline_rounded, color: primaryBlue, size: 20),
-                              hintText: '••••••••••',
-                              hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF94A3B8), letterSpacing: 0),
-                              border: InputBorder.none,
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _isPasswordVisible ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                                  color: textMuted,
-                                  size: 20,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    _isPasswordVisible = !_isPasswordVisible;
-                                  });
-                                },
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 26),
-
-                        // Submit Direct Login Button (Full Green Pill Button)
-                        SizedBox(
-                          width: double.infinity,
-                          height: 52,
-                          child: ElevatedButton(
-                            onPressed: _isLoggingIn ? null : _handleLogin,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: brandGreen,
-                              foregroundColor: Colors.white,
-                              elevation: 4,
-                              shadowColor: brandGreen.withValues(alpha: 0.4),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(28),
-                              ),
-                            ),
-                            child: _isLoggingIn
-                                ? const SizedBox(
-                                    height: 22,
-                                    width: 22,
-                                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
-                                  )
-                                : Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Icon(Icons.login_rounded, size: 20),
-                                      const SizedBox(width: 8),
-                                      Flexible(
-                                        child: Text(
-                                          '$roleNameUpper পোর্টালে ডাইরেক্ট লগইন করুন',
-                                          style: TextStyle(
-                                            fontSize: isSmallScreen ? 13 : 14.5,
-                                            fontWeight: FontWeight.bold,
-                                            letterSpacing: 0.2,
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      const Icon(Icons.arrow_forward_rounded, size: 20),
-                                    ],
-                                  ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 20),
-
-                        // Register Account Link
-                        Row(
+                return SizedBox(
+                  width: containerWidth,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // Top Logo Image
+                      Image.asset(
+                        'assets/images/logo.png',
+                        height: isSmallScreen ? 48 : 56,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) => Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text(
-                              "একাউন্ট নেই? ",
+                            const Icon(Icons.local_hospital_rounded, size: 36, color: brandGreen),
+                            const SizedBox(width: 8),
+                            Text(
+                              'মেডিসেবা',
                               style: TextStyle(
-                                fontSize: 13.5,
-                                color: textMuted,
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => RegisterView(
-                                      homeController: widget.homeController,
-                                      authController: widget.authController,
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: const Text(
-                                "নতুন অ্যাকাউন্ট তৈরি করুন",
-                                style: TextStyle(
-                                  fontSize: 13.5,
-                                  fontWeight: FontWeight.w800,
-                                  color: brandGreenDark,
-                                ),
+                                fontSize: isSmallScreen ? 22 : 26,
+                                fontWeight: FontWeight.w900,
+                                color: const Color(0xFFED1C24),
                               ),
                             ),
                           ],
                         ),
-                      ],
-                    ),
-                  );
-                },
-              ),
+                      ),
+
+                      const SizedBox(height: 6),
+
+                      // Tagline under logo
+                      Text(
+                        '“সেবা নিন ঘরে বসে, সুস্থ থাকুন নির্বিঘ্নে”',
+                        style: TextStyle(
+                          fontSize: isSmallScreen ? 11.5 : 12.5,
+                          fontWeight: FontWeight.w700,
+                          color: brandGreenDark,
+                          letterSpacing: 0.1,
+                        ),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // Main Heading Title
+                      Text(
+                        'MediSeba ডেডিকেটেড একাউন্ট লগইন',
+                        style: TextStyle(
+                          fontSize: isSmallScreen ? 18 : 21,
+                          fontWeight: FontWeight.w900,
+                          color: textDark,
+                          letterSpacing: -0.3,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+
+                      const SizedBox(height: 6),
+
+                      // Subtitle Description
+                      Text(
+                        'আপনার নির্দিষ্ট পোটালে (রোগী, ডাক্তার, HBP, সুপারভাইজার বা এডমিন) প্রবেশ করুন।',
+                        style: TextStyle(
+                          fontSize: isSmallScreen ? 12 : 13,
+                          color: textMuted,
+                          height: 1.4,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Section 1 Header
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          '১. আপনার পোর্টাল ভূমিকা (Role) নির্বাচন করুন:',
+                          style: TextStyle(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w800,
+                            color: textDark,
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 10),
+
+                      // Adaptive 5 Role Selector Pills Container
+                      _buildAdaptiveRoleBar(isSmallScreen),
+
+                      const SizedBox(height: 22),
+
+                      // Adaptive Quick Auto-fill Credentials Box Card
+                      _buildAdaptiveCredentialsCard(isSmallScreen),
+
+                      const SizedBox(height: 22),
+
+                      // Section 2 Header: ইমেইল বা মোবাইল নম্বর
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          '২. ইমেইল বা মোবাইল নম্বর *',
+                          style: TextStyle(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w800,
+                            color: textDark,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+
+                      // Email Input Box (Rounded Pill Style)
+                      Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF8FAFC),
+                          borderRadius: BorderRadius.circular(28),
+                          border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                        child: TextField(
+                          controller: _inputController,
+                          keyboardType: TextInputType.emailAddress,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: textDark,
+                          ),
+                          decoration: const InputDecoration(
+                            icon: Icon(Icons.mail_outline_rounded, color: primaryBlue, size: 20),
+                            hintText: 'ইমেইল বা মোবাইল নম্বর প্রদান করুন',
+                            hintStyle: TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
+                            border: InputBorder.none,
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 18),
+
+                      // Section 3 Header: পাসওয়ার্ড
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          '৩. পাসওয়ার্ড *',
+                          style: TextStyle(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w800,
+                            color: textDark,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+
+                      // Password Input Box (Rounded Pill Style)
+                      Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF8FAFC),
+                          borderRadius: BorderRadius.circular(28),
+                          border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                        child: TextField(
+                          controller: _passwordController,
+                          obscureText: !_isPasswordVisible,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: textDark,
+                            letterSpacing: 1.5,
+                          ),
+                          decoration: InputDecoration(
+                            icon: const Icon(Icons.lock_outline_rounded, color: primaryBlue, size: 20),
+                            hintText: '••••••••••',
+                            hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF94A3B8), letterSpacing: 0),
+                            border: InputBorder.none,
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _isPasswordVisible ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                                color: textMuted,
+                                size: 20,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _isPasswordVisible = !_isPasswordVisible;
+                                });
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 26),
+
+                      // Submit Direct Login Button (Full Green Pill Button)
+                      SizedBox(
+                        width: double.infinity,
+                        height: 52,
+                        child: ElevatedButton(
+                          onPressed: _isLoggingIn ? null : _handleLogin,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: brandGreen,
+                            foregroundColor: Colors.white,
+                            elevation: 4,
+                            shadowColor: brandGreen.withValues(alpha: 0.4),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(28),
+                            ),
+                          ),
+                          child: _isLoggingIn
+                              ? const SizedBox(
+                                  height: 22,
+                                  width: 22,
+                                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                                )
+                              : Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(Icons.login_rounded, size: 20),
+                                    const SizedBox(width: 8),
+                                    Flexible(
+                                      child: Text(
+                                        '$roleNameUpper পোর্টালে ডাইরেক্ট লগইন করুন',
+                                        style: TextStyle(
+                                          fontSize: isSmallScreen ? 13 : 14.5,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 0.2,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    const Icon(Icons.arrow_forward_rounded, size: 20),
+                                  ],
+                                ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Light Horizontal Divider
+                      const Divider(
+                        color: Color(0xFFF1F5F9),
+                        thickness: 1.2,
+                      ),
+
+                      const SizedBox(height: 14),
+
+                      // Footer Row: Left Option (Back to Home) & Right Option (Sign Up)
+                      Wrap(
+                        alignment: WrapAlignment.spaceBetween,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 12,
+                        runSpacing: 10,
+                        children: [
+                          // Left Option: ← হোমপেজে ফিরে যান
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => HomeView(
+                                    homeController: widget.homeController,
+                                    authController: widget.authController,
+                                    languageController: widget.languageController,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.arrow_back_rounded, size: 16, color: textMuted),
+                                SizedBox(width: 4),
+                                Text(
+                                  'হোমপেজে ফিরে যান',
+                                  style: TextStyle(
+                                    fontSize: 13.5,
+                                    fontWeight: FontWeight.w600,
+                                    color: textMuted,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // Right Option: অ্যাকাউন্ট নেই? সাইন-আপ করুন
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => RegisterView(
+                                    homeController: widget.homeController,
+                                    authController: widget.authController,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: const Text.rich(
+                              TextSpan(
+                                text: 'অ্যাকাউন্ট নেই? ',
+                                style: TextStyle(
+                                  fontSize: 13.5,
+                                  fontWeight: FontWeight.w500,
+                                  color: Color(0xFF334155),
+                                ),
+                                children: [
+                                  TextSpan(
+                                    text: 'সাইন-আপ করুন',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                      color: brandGreenDark,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
           ),
         ),
@@ -691,7 +698,6 @@ class _LoginViewState extends State<LoginView> {
           LayoutBuilder(
             builder: (context, cardConstraints) {
               final double availableWidth = cardConstraints.maxWidth;
-              // On mobile (< 400px), 2 columns; on tablet/desktop, 3 columns
               final int columns = availableWidth < 380 ? 2 : 3;
               final double cardWidth = (availableWidth - (columns - 1) * 8) / columns;
 
