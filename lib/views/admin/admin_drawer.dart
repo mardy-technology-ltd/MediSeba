@@ -3,6 +3,7 @@ import 'admin_dashboard_view.dart';
 import 'admin_inbox_view.dart';
 import 'admin_packages_audit_view.dart';
 import 'admin_job_circulars_view.dart';
+import 'admin_sales_team_view.dart';
 import 'admin_doctors_management_view.dart';
 import 'admin_patient_records_view.dart';
 import 'admin_appointments_management_view.dart';
@@ -225,6 +226,9 @@ class AdminDrawer extends StatelessWidget {
         break;
       case 3:
         nextScreen = const AdminJobCircularsView();
+        break;
+      case 4:
+        nextScreen = const AdminSalesTeamView();
         break;
       case 5:
         nextScreen = const AdminDoctorsManagementView();
