@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'admin_drawer.dart';
+import '../../widgets/live_chat_widget.dart';
 import '../../controllers/home_controller.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/language_controller.dart';
@@ -90,40 +91,7 @@ class _AdminSettingsViewState extends State<AdminSettingsView> {
           ),
         ),
       ),
-      floatingActionButton: Stack(
-        alignment: Alignment.topRight,
-        children: [
-          FloatingActionButton(
-            backgroundColor: darkGreen,
-            elevation: 6,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('লাইভ সাপোর্ট চ্যাট ওপেন হয়েছে'),
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-            },
-            child: const Icon(Icons.chat_bubble_rounded, color: Colors.white, size: 24),
-          ),
-          Positioned(
-            top: 2,
-            right: 2,
-            child: Container(
-              padding: const EdgeInsets.all(4),
-              decoration: const BoxDecoration(
-                color: Color(0xFFEF4444),
-                shape: BoxShape.circle,
-              ),
-              child: const Text(
-                '1',
-                style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-        ],
-      ),
+      floatingActionButton: const LiveChatFabWidget(),
     );
   }
 
