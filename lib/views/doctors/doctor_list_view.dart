@@ -6,17 +6,24 @@ import '../../controllers/doctor_controller.dart';
 import '../../controllers/language_controller.dart';
 import '../appointments/book_appointment_view.dart';
 import '../payment/payment_view.dart';
+import '../../controllers/auth_controller.dart';
+import '../../controllers/home_controller.dart';
+import '../../widgets/auth_guard.dart';
 import 'widgets/doctor_card.dart';
 
 class DoctorListView extends StatefulWidget {
   final bool showAppBar;
   final LanguageController? languageController;
+  final AuthController? authController;
+  final HomeController? homeController;
   final String? initialSearchQuery;
 
   const DoctorListView({
     super.key,
     this.showAppBar = true,
     this.languageController,
+    this.authController,
+    this.homeController,
     this.initialSearchQuery,
   });
 
@@ -195,21 +202,33 @@ class _DoctorListViewState extends State<DoctorListView> {
                       return DoctorCard(
                         doctor: doctor,
                         onTap: () {
-                          if (doctor.isAvailableToday) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PaymentView(doctor: doctor),
-                              ),
-                            );
-                          } else {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => BookAppointmentView(doctor: doctor),
-                              ),
-                            );
-                          }
+                          final authCtrl = widget.authController ?? AuthController();
+                          final homeCtrl = widget.homeController ?? HomeController();
+                          AuthGuard.check(
+                            context: context,
+                            authController: authCtrl,
+                            homeController: homeCtrl,
+                            languageController: _langController,
+                            title: 'অ্যাপয়েন্টমেন্ট বুকিং করতে লগইন করুন',
+                            message: 'ডাক্তারের কনসালটেশন বা চেম্বার অ্যাপয়েন্টমেন্ট সম্পন্ন করতে লগইন করুন।',
+                            onAuthenticated: () {
+                              if (doctor.isAvailableToday) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PaymentView(doctor: doctor),
+                                  ),
+                                );
+                              } else {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => BookAppointmentView(doctor: doctor),
+                                  ),
+                                );
+                              }
+                            },
+                          );
                         },
                       );
                     },

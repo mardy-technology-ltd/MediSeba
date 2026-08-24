@@ -25,6 +25,7 @@ import '../blog/blog_view.dart';
 import '../contact/contact_us_view.dart';
 import '../matriseba/matriseba_view.dart';
 import '../customer_support/customer_support_view.dart';
+import '../../widgets/auth_guard.dart';
 
 class HomeView extends StatefulWidget {
   final HomeController homeController;
@@ -140,16 +141,26 @@ class _HomeViewState extends State<HomeView> {
 
                   return GestureDetector(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ProfileView(
-                            authController: widget.authController,
-                            homeController: widget.homeController,
-                            showAppBarLeading: true,
-                            languageController: _langController,
-                          ),
-                        ),
+                      AuthGuard.check(
+                        context: context,
+                        authController: widget.authController,
+                        homeController: widget.homeController,
+                        languageController: _langController,
+                        title: 'প্রোফাইলে প্রবেশ করতে লগইন করুন',
+                        message: 'আপনার প্রোফাইল তথ্য, রসিদ ও হেলথ রেকর্ডস দেখতে অনুগ্রহ করে লগইন করুন।',
+                        onAuthenticated: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ProfileView(
+                                authController: widget.authController,
+                                homeController: widget.homeController,
+                                showAppBarLeading: true,
+                                languageController: _langController,
+                              ),
+                            ),
+                          );
+                        },
                       );
                     },
                     child: Container(
@@ -1553,13 +1564,23 @@ class _HomeViewState extends State<HomeView> {
                     title: isBangla ? 'পেশেন্ট পোর্টাল' : 'Patient Portal',
                     onTap: () {
                       Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => PatientPortalView(
-                            languageController: _langController,
-                          ),
-                        ),
+                      AuthGuard.check(
+                        context: context,
+                        authController: widget.authController,
+                        homeController: widget.homeController,
+                        languageController: _langController,
+                        title: 'পেশেন্ট পোর্টালে প্রবেশ করতে লগইন করুন',
+                        message: 'আপনার ডিজিটাল প্রেসক্রিপশন ও হেলথ রেকর্ডস সুরক্ষিত রাখতে লগইন করুন।',
+                        onAuthenticated: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => PatientPortalView(
+                                languageController: _langController,
+                              ),
+                            ),
+                          );
+                        },
                       );
                     },
                   ),
