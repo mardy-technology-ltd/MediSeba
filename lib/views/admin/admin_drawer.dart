@@ -8,6 +8,7 @@ import 'admin_doctors_management_view.dart';
 import 'admin_patient_records_view.dart';
 import 'admin_appointments_management_view.dart';
 import 'admin_medicine_inventory_view.dart';
+import 'admin_prescriptions_view.dart';
 
 class AdminDrawer extends StatelessWidget {
   final int selectedIndex;
@@ -241,6 +242,9 @@ class AdminDrawer extends StatelessWidget {
         break;
       case 8:
         nextScreen = const AdminMedicineInventoryView();
+        break;
+      case 9:
+        nextScreen = const AdminPrescriptionsView();
         break;
     }
 
