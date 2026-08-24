@@ -58,35 +58,147 @@ class _LoginViewState extends State<LoginView> {
       return;
     }
 
+    if (_selectedRole == LoginRole.admin) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            elevation: 10,
+            backgroundColor: Colors.white,
+            child: Padding(
+              padding: const EdgeInsets.all(22.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFFEF3C7), // Amber light tint
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.construction_rounded,
+                      color: Color(0xFFD97706), // Amber dark
+                      size: 36,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'কাজটি ডেভেলপমেন্টে আছে (Step 7)',
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w900,
+                      color: Color(0xFF0F172A),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'অ্যাডমিন পোর্টালের এই সেকশনটি বর্তমানে ডেভেলপমেন্ট ফেজ Step 7-এ চলমান রয়েছে। আপনি অ্যাডমিন ড্যাশবোর্ড ডেমো প্যানেলে প্রবেশ করে ইউআই পর্যবেক্ষণ করতে পারেন।',
+                    style: TextStyle(
+                      fontSize: 12.5,
+                      color: Color(0xFF64748B),
+                      height: 1.4,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Color(0xFFCBD5E1)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text(
+                            'বন্ধ করুন',
+                            style: TextStyle(color: Color(0xFF475569), fontWeight: FontWeight.w700),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF005C45),
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                          onPressed: () {
+                            Navigator.pop(context); // Close dialog
+                            _proceedAdminLogin();
+                          },
+                          child: const Text(
+                            'ডেমো দেখুন',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+      return;
+    }
+
+    _proceedNormalLogin();
+  }
+
+  void _proceedAdminLogin() async {
     setState(() {
       _isLoggingIn = true;
     });
 
-    await widget.authController.login(input, password);
+    await widget.authController.login(_inputController.text.trim(), _passwordController.text);
 
     if (mounted) {
       setState(() {
         _isLoggingIn = false;
       });
 
-      Widget targetView = HomeView(
-        homeController: widget.homeController,
-        authController: widget.authController,
-        languageController: widget.languageController,
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AdminDashboardView(
+            homeController: widget.homeController,
+            authController: widget.authController,
+            languageController: widget.languageController,
+          ),
+        ),
       );
+    }
+  }
 
-      if (_selectedRole == LoginRole.admin) {
-        targetView = AdminDashboardView(
-          homeController: widget.homeController,
-          authController: widget.authController,
-          languageController: widget.languageController,
-        );
-      }
+  void _proceedNormalLogin() async {
+    setState(() {
+      _isLoggingIn = true;
+    });
+
+    await widget.authController.login(_inputController.text.trim(), _passwordController.text);
+
+    if (mounted) {
+      setState(() {
+        _isLoggingIn = false;
+      });
 
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => targetView,
+          builder: (context) => HomeView(
+            homeController: widget.homeController,
+            authController: widget.authController,
+            languageController: widget.languageController,
+          ),
         ),
       );
     }
