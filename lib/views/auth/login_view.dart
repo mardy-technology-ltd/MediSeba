@@ -267,7 +267,7 @@ class _LoginViewState extends State<LoginView> {
         child: Center(
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
+            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 16.0),
             child: LayoutBuilder(
               builder: (context, constraints) {
                 final double containerWidth = constraints.maxWidth > 580 ? 560 : constraints.maxWidth;
@@ -276,8 +276,8 @@ class _LoginViewState extends State<LoginView> {
                 return Container(
                   width: containerWidth,
                   padding: EdgeInsets.symmetric(
-                    horizontal: isSmallScreen ? 16.0 : 24.0,
-                    vertical: isSmallScreen ? 20.0 : 26.0,
+                    horizontal: isSmallScreen ? 14.0 : 24.0,
+                    vertical: isSmallScreen ? 18.0 : 26.0,
                   ),
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -296,7 +296,7 @@ class _LoginViewState extends State<LoginView> {
                       // Top Logo Image
                       Image.asset(
                         'assets/images/logo.png',
-                        height: isSmallScreen ? 46 : 54,
+                        height: isSmallScreen ? 44 : 54,
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stackTrace) => Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -321,20 +321,20 @@ class _LoginViewState extends State<LoginView> {
                       Text(
                         '“সেবা নিন ঘরে বসে, সুস্থ থাকুন নির্বিঘ্নে”',
                         style: TextStyle(
-                          fontSize: isSmallScreen ? 11.5 : 12.5,
+                          fontSize: isSmallScreen ? 11 : 12.5,
                           fontWeight: FontWeight.w700,
                           color: brandGreenDark,
                           letterSpacing: 0.1,
                         ),
                       ),
 
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 18),
 
                       // Main Heading Title
                       Text(
                         'MediSeba ডেডিকেটেড একাউন্ট লগইন',
                         style: TextStyle(
-                          fontSize: isSmallScreen ? 18 : 21,
+                          fontSize: isSmallScreen ? 17.5 : 21,
                           fontWeight: FontWeight.w900,
                           color: textDark,
                           letterSpacing: -0.3,
@@ -348,19 +348,19 @@ class _LoginViewState extends State<LoginView> {
                       Text(
                         'আপনার নির্দিষ্ট পোটালে (রোগী, ডাক্তার, HBP, সুপারভাইজার বা এডমিন) প্রবেশ করুন।',
                         style: TextStyle(
-                          fontSize: isSmallScreen ? 12 : 13,
+                          fontSize: isSmallScreen ? 11.5 : 13,
                           color: textMuted,
                           height: 1.4,
                         ),
                         textAlign: TextAlign.center,
                       ),
 
-                      const SizedBox(height: 22),
+                      const SizedBox(height: 20),
 
-                      // Adaptive Quick Auto-fill Credentials Card (Integrated Role Selector 9 Cards)
+                      // Adaptive Quick Auto-fill Credentials Card (Integrated 9 Roles Grid)
                       _buildAdaptiveCredentialsCard(isSmallScreen),
 
-                      const SizedBox(height: 22),
+                      const SizedBox(height: 20),
 
                       // Section 2 Header: ইমেইল বা মোবাইল নম্বর
                       const Align(
@@ -401,7 +401,7 @@ class _LoginViewState extends State<LoginView> {
                         ),
                       ),
 
-                      const SizedBox(height: 18),
+                      const SizedBox(height: 16),
 
                       // Section 3 Header: পাসওয়ার্ড
                       const Align(
@@ -455,7 +455,7 @@ class _LoginViewState extends State<LoginView> {
                         ),
                       ),
 
-                      const SizedBox(height: 26),
+                      const SizedBox(height: 24),
 
                       // Submit Direct Login Button (Full Green Pill Button)
                       SizedBox(
@@ -487,7 +487,7 @@ class _LoginViewState extends State<LoginView> {
                                       child: Text(
                                         '$roleNameUpper পোর্টালে ডাইরেক্ট লগইন করুন',
                                         style: TextStyle(
-                                          fontSize: isSmallScreen ? 13 : 14.5,
+                                          fontSize: isSmallScreen ? 12.5 : 14.5,
                                           fontWeight: FontWeight.bold,
                                           letterSpacing: 0.2,
                                         ),
@@ -502,7 +502,7 @@ class _LoginViewState extends State<LoginView> {
                         ),
                       ),
 
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 20),
 
                       // Light Horizontal Divider
                       const Divider(
@@ -510,14 +510,11 @@ class _LoginViewState extends State<LoginView> {
                         thickness: 1.2,
                       ),
 
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 12),
 
                       // Footer Row: Left Option (Back to Home) & Right Option (Sign Up)
-                      Wrap(
-                        alignment: WrapAlignment.spaceBetween,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        spacing: 12,
-                        runSpacing: 10,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           // Left Option: ← হোমপেজে ফিরে যান
                           GestureDetector(
@@ -536,12 +533,12 @@ class _LoginViewState extends State<LoginView> {
                             child: const Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.arrow_back_rounded, size: 16, color: textMuted),
+                                Icon(Icons.arrow_back_rounded, size: 15, color: textMuted),
                                 SizedBox(width: 4),
                                 Text(
                                   'হোমপেজে ফিরে যান',
                                   style: TextStyle(
-                                    fontSize: 13.5,
+                                    fontSize: 12.5,
                                     fontWeight: FontWeight.w600,
                                     color: textMuted,
                                   ),
@@ -567,7 +564,7 @@ class _LoginViewState extends State<LoginView> {
                               TextSpan(
                                 text: 'অ্যাকাউন্ট নেই? ',
                                 style: TextStyle(
-                                  fontSize: 13.5,
+                                  fontSize: 12.5,
                                   fontWeight: FontWeight.w500,
                                   color: Color(0xFF334155),
                                 ),
@@ -599,7 +596,7 @@ class _LoginViewState extends State<LoginView> {
   // Adaptive Quick Auto-fill Credentials Box Card (Integrated 9 Roles Grid)
   Widget _buildAdaptiveCredentialsCard(bool isSmallScreen) {
     return Container(
-      padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
+      padding: EdgeInsets.all(isSmallScreen ? 10 : 14),
       decoration: BoxDecoration(
         color: const Color(0xFFF8FAFC),
         borderRadius: BorderRadius.circular(20),
@@ -608,30 +605,27 @@ class _LoginViewState extends State<LoginView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header Wrap
-          Wrap(
-            alignment: WrapAlignment.spaceBetween,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 8,
-            runSpacing: 6,
+          // Header Row with Expanded text to prevent overflow
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.vpn_key_outlined, size: 17, color: Color(0xFF00A859)),
-                  SizedBox(width: 6),
-                  Text(
-                    'আপনার অ্যাকাউন্ট রোল বা ভূমিকা সিলেক্ট করুন (১-ক্লিকে ফিল):',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w800,
-                      color: textDark,
-                    ),
+              const Icon(Icons.vpn_key_outlined, size: 16, color: Color(0xFF00A859)),
+              const SizedBox(width: 6),
+              const Expanded(
+                child: Text(
+                  'আপনার অ্যাকাউন্ট রোল বা ভূমিকা সিলেক্ট করুন (১-ক্লিকে ফিল):',
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w800,
+                    color: textDark,
                   ),
-                ],
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
+              const SizedBox(width: 6),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: const Color(0xFFD1FAE5),
                   borderRadius: BorderRadius.circular(12),
@@ -639,7 +633,7 @@ class _LoginViewState extends State<LoginView> {
                 child: const Text(
                   '১-ক্লিক অটো ফিল',
                   style: TextStyle(
-                    fontSize: 11,
+                    fontSize: 10.5,
                     fontWeight: FontWeight.w800,
                     color: Color(0xFF059669),
                   ),
@@ -648,13 +642,14 @@ class _LoginViewState extends State<LoginView> {
             ],
           ),
 
-          const SizedBox(height: 14),
+          const SizedBox(height: 12),
 
-          // Responsive Wrap for 9 Credential Cards (3 columns grid matching image)
+          // Responsive Wrap for 9 Credential Cards
           LayoutBuilder(
             builder: (context, cardConstraints) {
               final double availableWidth = cardConstraints.maxWidth;
-              final int columns = availableWidth < 360 ? 2 : 3;
+              // On mobile (< 460px), 2 columns; on desktop/tablet (>= 460px), 3 columns
+              final int columns = availableWidth < 460 ? 2 : 3;
               final double cardWidth = (availableWidth - (columns - 1) * 8) / columns;
 
               final List<Map<String, dynamic>> items = [
@@ -687,7 +682,7 @@ class _LoginViewState extends State<LoginView> {
                       onTap: () => _onRoleChanged(role),
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 180),
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 9),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                         decoration: BoxDecoration(
                           color: isSelected ? const Color(0xFFF0FDFA) : Colors.white,
                           borderRadius: BorderRadius.circular(14),
@@ -764,14 +759,14 @@ class _LoginViewState extends State<LoginView> {
             },
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
 
           // Default Password Footnote
           const Center(
             child: Text.rich(
               TextSpan(
                 text: 'ডিফল্ট পাসওয়ার্ড: ',
-                style: TextStyle(fontSize: 12, color: textMuted),
+                style: TextStyle(fontSize: 11.5, color: textMuted),
                 children: [
                   TextSpan(
                     text: 'password123',
