@@ -40,7 +40,7 @@ class AuthRepository {
         'Accept': 'application/json',
       };
       final Map<String, dynamic> payload = {
-        'email': emailOrPhone,
+        'login': emailOrPhone,
         'password': password,
       };
 
@@ -74,7 +74,7 @@ class AuthRepository {
           // Construct or parse UserModel
           if (userJson != null) {
             final Map<String, dynamic> map = Map<String, dynamic>.from(userJson as Map);
-            final String uid = map['id']?.toString() ?? map['uid']?.toString() ?? 'user_id';
+            final String uid = map['id']?.toString() ?? map['uuid']?.toString() ?? 'user_id';
             _currentUserData = UserModel(
               uid: uid,
               name: map['name']?.toString() ?? 'User',
@@ -101,6 +101,14 @@ class AuthRepository {
             );
           }
           await CacheService.put('auth_user', _currentUserData!.toMap());
+
+          debugPrint('🔑 [LOGIN SUCCESS] =====================================');
+          debugPrint('👉 TOKEN: $_token');
+          debugPrint('👉 USER NAME: ${_currentUserData?.name}');
+          debugPrint('👉 USER PHONE: ${_currentUserData?.phone}');
+          debugPrint('👉 USER UID: ${_currentUserData?.uid}');
+          debugPrint('========================================================');
+
           return true;
         }
       }
