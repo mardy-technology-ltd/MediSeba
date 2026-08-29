@@ -1,20 +1,28 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
-import '../repositories/firebase_auth_repository.dart';
+import '../repositories/auth_repository.dart';
 import '../repositories/cloudinary_repository.dart';
 import '../models/user_model.dart';
 
+class AuthUser {
+  final String uid;
+  final String? email;
+  final String? displayName;
+  final String? photoURL;
+
+  AuthUser({required this.uid, this.email, this.displayName, this.photoURL});
+}
+
 class AuthController extends ChangeNotifier {
-  final FirebaseAuthRepository _authRepository = FirebaseAuthRepository();
+  final AuthRepository _authRepository = AuthRepository();
   
-  User? _currentUser;
+  AuthUser? _currentUser;
   UserModel? _currentUserData;
   bool _isLoading = false;
   String? _errorMessage;
 
-  User? get currentUser => _currentUser;
+  AuthUser? get currentUser => _currentUser;
   UserModel? get currentUserData => _currentUserData;
   bool get isLoggedIn => _currentUser != null;
   bool get isLoading => _isLoading;
@@ -30,7 +38,7 @@ class AuthController extends ChangeNotifier {
 
     // 2. Name (20%)
     final name = _currentUserData?.name ?? _currentUser?.displayName ?? '';
-    if (name.isNotEmpty && name != 'User' && name != 'Google User') {
+    if (name.isNotEmpty && name != 'User') {
       percentage += 20.0;
     }
 
@@ -41,13 +49,11 @@ class AuthController extends ChangeNotifier {
     }
 
     // 4. Phone Number (20%)
-    // Check if user has a valid phone number (not an email pretending to be phone)
     final phone = _currentUserData?.phone ?? '';
     final isRealPhone = phone.isNotEmpty && 
                         !phone.contains('@') && 
                         (RegExp(r'^01[3-9]\d{8}$').hasMatch(phone.replaceAll(RegExp(r'\s+'), '')) || phone.length >= 10);
     
-    // Also if email is not ending in @mediseba.com but phone is set, or user logged in via phone
     if (isRealPhone) {
       percentage += 20.0;
     }
@@ -68,15 +74,17 @@ class AuthController extends ChangeNotifier {
   }
 
   Future<void> _checkCurrentUser() async {
-    _currentUser = _authRepository.currentUser;
-    if (_currentUser != null) {
-      await _fetchUserData(_currentUser!.uid);
+    final token = _authRepository.token;
+    final userData = _authRepository.currentUserData;
+    if (token != null && userData != null) {
+      _currentUserData = userData;
+      _currentUser = AuthUser(
+        uid: userData.uid,
+        email: userData.phone.contains('@') ? userData.phone : '${userData.phone}@mediseba.com',
+        displayName: userData.name,
+        photoURL: userData.profileImageUrl,
+      );
     }
-    notifyListeners();
-  }
-
-  Future<void> _fetchUserData(String uid) async {
-    _currentUserData = await _authRepository.getUserData(uid);
     notifyListeners();
   }
 
@@ -91,24 +99,8 @@ class AuthController extends ChangeNotifier {
   }
 
   Future<bool> loginWithGoogle() async {
-    _setLoading(true);
-    _setError(null);
-
-    try {
-      final user = await _authRepository.signInWithGoogle();
-      if (user == null) {
-        _setLoading(false);
-        return false; // User cancelled
-      }
-      _currentUser = user;
-      await _fetchUserData(user.uid);
-      _setLoading(false);
-      return true;
-    } catch (e) {
-      _setError(e.toString().replaceAll('Exception: ', ''));
-      _setLoading(false);
-      return false;
-    }
+    // Stubbed since REST API is primary, return false.
+    return false;
   }
 
   Future<bool> login(String phone, String password) async {
@@ -116,10 +108,18 @@ class AuthController extends ChangeNotifier {
     _setError(null);
     
     try {
-      final user = await _authRepository.login(phone, password);
-      _currentUser = user;
-      if (user != null) {
-        await _fetchUserData(user.uid);
+      final success = await _authRepository.login(phone, password);
+      if (success) {
+        final userData = _authRepository.currentUserData;
+        if (userData != null) {
+          _currentUserData = userData;
+          _currentUser = AuthUser(
+            uid: userData.uid,
+            email: userData.phone.contains('@') ? userData.phone : '${userData.phone}@mediseba.com',
+            displayName: userData.name,
+            photoURL: userData.profileImageUrl,
+          );
+        }
       }
       _setLoading(false);
       return true;
@@ -144,7 +144,7 @@ class AuthController extends ChangeNotifier {
     _setError(null);
     
     try {
-      final user = await _authRepository.signUp(
+      final success = await _authRepository.signUp(
         name: name,
         phone: phone,
         password: password,
@@ -154,9 +154,17 @@ class AuthController extends ChangeNotifier {
         union: union,
         referId: referId,
       );
-      _currentUser = user;
-      if (user != null) {
-        await _fetchUserData(user.uid);
+      if (success) {
+        final userData = _authRepository.currentUserData;
+        if (userData != null) {
+          _currentUserData = userData;
+          _currentUser = AuthUser(
+            uid: userData.uid,
+            email: userData.phone.contains('@') ? userData.phone : '${userData.phone}@mediseba.com',
+            displayName: userData.name,
+            photoURL: userData.profileImageUrl,
+          );
+        }
       }
       _setLoading(false);
       return true;
@@ -181,12 +189,12 @@ class AuthController extends ChangeNotifier {
       final ImagePicker picker = ImagePicker();
       final XFile? image = await picker.pickImage(
         source: ImageSource.gallery,
-        imageQuality: 70, // Compress image
+        imageQuality: 70,
         maxWidth: 800,
         maxHeight: 800,
       );
 
-      if (image == null) return false; // User canceled
+      if (image == null) return false;
 
       _setLoading(true);
       _setError(null);
@@ -195,11 +203,19 @@ class AuthController extends ChangeNotifier {
       final cloudinaryRepo = CloudinaryRepository();
       final String secureUrl = await cloudinaryRepo.uploadImage(File(image.path));
 
-      // Save URL to Firestore
+      // Save URL to local database/caching via repository
       await _authRepository.updateUserProfileImage(_currentUser!.uid, secureUrl);
       
       // Update local state
-      await _fetchUserData(_currentUser!.uid);
+      _currentUserData = _authRepository.currentUserData;
+      if (_currentUserData != null) {
+        _currentUser = AuthUser(
+          uid: _currentUserData!.uid,
+          email: _currentUserData!.phone.contains('@') ? _currentUserData!.phone : '${_currentUserData!.phone}@mediseba.com',
+          displayName: _currentUserData!.name,
+          photoURL: _currentUserData!.profileImageUrl,
+        );
+      }
 
       _setLoading(false);
       return true;
@@ -251,7 +267,15 @@ class AuthController extends ChangeNotifier {
       );
 
       // Refresh local user data
-      await _fetchUserData(_currentUser!.uid);
+      _currentUserData = _authRepository.currentUserData;
+      if (_currentUserData != null) {
+        _currentUser = AuthUser(
+          uid: _currentUserData!.uid,
+          email: _currentUserData!.phone.contains('@') ? _currentUserData!.phone : '${_currentUserData!.phone}@mediseba.com',
+          displayName: _currentUserData!.name,
+          photoURL: _currentUserData!.profileImageUrl,
+        );
+      }
 
       _setLoading(false);
       return true;
