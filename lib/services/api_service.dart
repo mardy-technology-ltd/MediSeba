@@ -330,11 +330,13 @@ class ApiService {
   /// 1. Fetch Sales Agents list
   static Future<List<Map<String, dynamic>>?> getSalesAgents({String? role, required String token}) async {
     try {
-      debugPrint('Fetching sales agents...');
       String url = 'https://api.mediseba.org/api/v1/sales-agents';
       if (role != null && role.isNotEmpty) {
         url += '?role=$role';
       }
+      debugPrint('🚀 [API REQ] GET: $url');
+      debugPrint('Headers: {"Authorization": "Bearer $token"}');
+
       final response = await http.get(
         Uri.parse(url),
         headers: {
@@ -344,6 +346,9 @@ class ApiService {
         },
       ).timeout(const Duration(seconds: 8));
 
+      debugPrint('👈 [API RES] STATUS: ${response.statusCode}');
+      debugPrint('👈 [API RES] BODY: ${response.body}');
+
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
         if (body['success'] == true) {
@@ -352,7 +357,7 @@ class ApiService {
         }
       }
     } catch (e) {
-      debugPrint('ApiService.getSalesAgents exception: $e');
+      debugPrint('❌ ApiService.getSalesAgents exception: $e');
     }
     return null;
   }
@@ -360,15 +365,21 @@ class ApiService {
   /// 2. Fetch Supervisors dropdown list
   static Future<List<Map<String, dynamic>>?> getSupervisors(String token) async {
     try {
-      debugPrint('Fetching supervisors list...');
+      const url = 'https://api.mediseba.org/api/v1/sales-agents/supervisors';
+      debugPrint('🚀 [API REQ] GET: $url');
+      debugPrint('Headers: {"Authorization": "Bearer $token"}');
+
       final response = await http.get(
-        Uri.parse('https://api.mediseba.org/api/v1/sales-agents/supervisors'),
+        Uri.parse(url),
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
           'User-Agent': 'MediSebaApp/1.0',
         },
       ).timeout(const Duration(seconds: 8));
+
+      debugPrint('👈 [API RES] STATUS: ${response.statusCode}');
+      debugPrint('👈 [API RES] BODY: ${response.body}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
@@ -378,7 +389,7 @@ class ApiService {
         }
       }
     } catch (e) {
-      debugPrint('ApiService.getSupervisors exception: $e');
+      debugPrint('❌ ApiService.getSupervisors exception: $e');
     }
     return null;
   }
@@ -394,31 +405,40 @@ class ApiService {
     required String token,
   }) async {
     try {
-      debugPrint('Creating sales agent $name...');
+      const url = 'https://api.mediseba.org/api/v1/sales-agents';
+      final payload = {
+        'name': name,
+        'email': email,
+        'phone': phone,
+        'password': password,
+        'role': role,
+        if (supervisorId != null) 'supervisor_id': supervisorId,
+      };
+
+      debugPrint('🚀 [API REQ] POST: $url');
+      debugPrint('Headers: {"Authorization": "Bearer $token"}');
+      debugPrint('Body: ${jsonEncode(payload)}');
+
       final response = await http.post(
-        Uri.parse('https://api.mediseba.org/api/v1/sales-agents'),
+        Uri.parse(url),
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
           'User-Agent': 'MediSebaApp/1.0',
         },
-        body: jsonEncode({
-          'name': name,
-          'email': email,
-          'phone': phone,
-          'password': password,
-          'role': role,
-          if (supervisorId != null) 'supervisor_id': supervisorId,
-        }),
+        body: jsonEncode(payload),
       ).timeout(const Duration(seconds: 8));
+
+      debugPrint('👈 [API RES] STATUS: ${response.statusCode}');
+      debugPrint('👈 [API RES] BODY: ${response.body}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final Map<String, dynamic> body = jsonDecode(response.body);
         return body['success'] == true;
       }
     } catch (e) {
-      debugPrint('ApiService.createSalesAgent exception: $e');
+      debugPrint('❌ ApiService.createSalesAgent exception: $e');
     }
     return false;
   }
@@ -430,26 +450,35 @@ class ApiService {
     required String token,
   }) async {
     try {
-      debugPrint('Assigning supervisor $supervisorId to user $userId...');
+      final url = 'https://api.mediseba.org/api/v1/sales-agents/$userId/assign-supervisor';
+      final payload = {
+        'supervisor_id': supervisorId,
+      };
+
+      debugPrint('🚀 [API REQ] PATCH: $url');
+      debugPrint('Headers: {"Authorization": "Bearer $token"}');
+      debugPrint('Body: ${jsonEncode(payload)}');
+
       final response = await http.patch(
-        Uri.parse('https://api.mediseba.org/api/v1/sales-agents/$userId/assign-supervisor'),
+        Uri.parse(url),
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
           'User-Agent': 'MediSebaApp/1.0',
         },
-        body: jsonEncode({
-          'supervisor_id': supervisorId,
-        }),
+        body: jsonEncode(payload),
       ).timeout(const Duration(seconds: 8));
+
+      debugPrint('👈 [API RES] STATUS: ${response.statusCode}');
+      debugPrint('👈 [API RES] BODY: ${response.body}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
         return body['success'] == true;
       }
     } catch (e) {
-      debugPrint('ApiService.assignSupervisor exception: $e');
+      debugPrint('❌ ApiService.assignSupervisor exception: $e');
     }
     return false;
   }
@@ -461,26 +490,35 @@ class ApiService {
     required String token,
   }) async {
     try {
-      debugPrint('Updating role to $role for user $userId...');
+      final url = 'https://api.mediseba.org/api/v1/sales-agents/$userId/role';
+      final payload = {
+        'role': role,
+      };
+
+      debugPrint('🚀 [API REQ] PATCH: $url');
+      debugPrint('Headers: {"Authorization": "Bearer $token"}');
+      debugPrint('Body: ${jsonEncode(payload)}');
+
       final response = await http.patch(
-        Uri.parse('https://api.mediseba.org/api/v1/sales-agents/$userId/role'),
+        Uri.parse(url),
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
           'User-Agent': 'MediSebaApp/1.0',
         },
-        body: jsonEncode({
-          'role': role,
-        }),
+        body: jsonEncode(payload),
       ).timeout(const Duration(seconds: 8));
+
+      debugPrint('👈 [API RES] STATUS: ${response.statusCode}');
+      debugPrint('👈 [API RES] BODY: ${response.body}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
         return body['success'] == true;
       }
     } catch (e) {
-      debugPrint('ApiService.updateAgentRole exception: $e');
+      debugPrint('❌ ApiService.updateAgentRole exception: $e');
     }
     return false;
   }
@@ -491,26 +529,35 @@ class ApiService {
     required String token,
   }) async {
     try {
-      debugPrint('Deleting sales agent $userId...');
+      const url = 'https://api.mediseba.org/api/v1/sales-agents';
+      final payload = {
+        'user_id': userId,
+      };
+
+      debugPrint('🚀 [API REQ] DELETE: $url');
+      debugPrint('Headers: {"Authorization": "Bearer $token"}');
+      debugPrint('Body: ${jsonEncode(payload)}');
+
       final response = await http.delete(
-        Uri.parse('https://api.mediseba.org/api/v1/sales-agents'),
+        Uri.parse(url),
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
           'User-Agent': 'MediSebaApp/1.0',
         },
-        body: jsonEncode({
-          'user_id': userId,
-        }),
+        body: jsonEncode(payload),
       ).timeout(const Duration(seconds: 8));
+
+      debugPrint('👈 [API RES] STATUS: ${response.statusCode}');
+      debugPrint('👈 [API RES] BODY: ${response.body}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
         return body['success'] == true;
       }
     } catch (e) {
-      debugPrint('ApiService.deleteSalesAgent exception: $e');
+      debugPrint('❌ ApiService.deleteSalesAgent exception: $e');
     }
     return false;
   }
@@ -524,29 +571,38 @@ class ApiService {
     required String token,
   }) async {
     try {
-      debugPrint('HBP Registering patient $name...');
+      const url = 'https://api.mediseba.org/api/v1/hbp/register-patient';
+      final payload = {
+        'name': name,
+        'phone': phone,
+        'age': age,
+        'gender': gender,
+      };
+
+      debugPrint('🚀 [API REQ] POST: $url');
+      debugPrint('Headers: {"Authorization": "Bearer $token"}');
+      debugPrint('Body: ${jsonEncode(payload)}');
+
       final response = await http.post(
-        Uri.parse('https://api.mediseba.org/api/v1/hbp/register-patient'),
+        Uri.parse(url),
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
           'User-Agent': 'MediSebaApp/1.0',
         },
-        body: jsonEncode({
-          'name': name,
-          'phone': phone,
-          'age': age,
-          'gender': gender,
-        }),
+        body: jsonEncode(payload),
       ).timeout(const Duration(seconds: 8));
+
+      debugPrint('👈 [API RES] STATUS: ${response.statusCode}');
+      debugPrint('👈 [API RES] BODY: ${response.body}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final Map<String, dynamic> body = jsonDecode(response.body);
         return body['success'] == true;
       }
     } catch (e) {
-      debugPrint('ApiService.hbpRegisterPatient exception: $e');
+      debugPrint('❌ ApiService.hbpRegisterPatient exception: $e');
     }
     return false;
   }
