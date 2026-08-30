@@ -1599,301 +1599,349 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  // Sidebar Drawer (bKash Menu Inspired Design)
+  // Sidebar Drawer (Redesigned Glassmorphic Modern Sidebar)
   Widget _buildSidebarDrawer(BuildContext context) {
     final isBangla = _langController.isBangla;
 
     return Drawer(
       width: MediaQuery.of(context).size.width * 0.82,
-      backgroundColor: Colors.white,
-      elevation: 16,
+      backgroundColor: Colors.white.withValues(alpha: 0.75),
+      elevation: 0,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.zero,
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(30),
+          bottomRight: Radius.circular(30),
+        ),
       ),
-      child: SafeArea(
-        child: Column(
-          children: [
-            // Top Header Bar: Title + bKash Style Language Toggle Switch (Eng | বাং)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  // MediSeba Logo Image
-                  Image.asset(
-                    'assets/images/logo.png',
-                    height: 40,
-                    fit: BoxFit.contain,
-                  ),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border(
+              right: BorderSide(color: Colors.white.withValues(alpha: 0.4), width: 1.5),
+            ),
+          ),
+          child: SafeArea(
+            child: Column(
+              children: [
+                // Top Header Bar: Title + Segmented Language Toggle Switch (Eng | বাং)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // MediSeba Logo Image
+                      Image.asset(
+                        'assets/images/logo.png',
+                        height: 40,
+                        fit: BoxFit.contain,
+                      ),
 
-                  // bKash Style Segmented Language Toggle Button (Eng | বাং)
-                  Container(
-                    padding: const EdgeInsets.all(3),
+                      // Glassmorphic Segmented Language Toggle Button (Eng | বাং)
+                      Container(
+                        padding: const EdgeInsets.all(3),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.5),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.white.withValues(alpha: 0.6), width: 1),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Eng Segment
+                            GestureDetector(
+                              onTap: () {
+                                _langController.setLanguage(AppLanguage.english);
+                              },
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                decoration: BoxDecoration(
+                                  color: !isBangla ? brandGreen : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(7),
+                                  boxShadow: !isBangla
+                                      ? [
+                                          BoxShadow(
+                                            color: brandGreen.withValues(alpha: 0.25),
+                                            blurRadius: 4,
+                                            offset: const Offset(0, 1),
+                                          ),
+                                        ]
+                                      : null,
+                                ),
+                                child: Text(
+                                  'Eng',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                    color: !isBangla ? Colors.white : const Color(0xFF64748B),
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            // বাং Segment
+                            GestureDetector(
+                              onTap: () {
+                                _langController.setLanguage(AppLanguage.bangla);
+                              },
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                decoration: BoxDecoration(
+                                  color: isBangla ? brandGreen : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(7),
+                                  boxShadow: isBangla
+                                      ? [
+                                          BoxShadow(
+                                            color: brandGreen.withValues(alpha: 0.25),
+                                            blurRadius: 4,
+                                            offset: const Offset(0, 1),
+                                          ),
+                                        ]
+                                      : null,
+                                ),
+                                child: Text(
+                                  'বাং',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                    color: isBangla ? Colors.white : const Color(0xFF64748B),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                // Assistant Banner Card (Glassmorphic High-Tech Card)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF1F5F9),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: const Color(0xFFCBD5E1), width: 1),
+                      color: Colors.white.withValues(alpha: 0.45),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.7), width: 1.2),
+                      boxShadow: [
+                        BoxShadow(
+                          color: brandGreen.withValues(alpha: 0.02),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
                     ),
                     child: Row(
-                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Eng Segment
-                        GestureDetector(
-                          onTap: () {
-                            _langController.setLanguage(AppLanguage.english);
-                          },
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                            decoration: BoxDecoration(
-                              color: !isBangla ? brandGreen : Colors.transparent,
-                              borderRadius: BorderRadius.circular(7),
+                        Container(
+                          width: 42,
+                          height: 42,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [brandGreen, Color(0xFF0F9D58)],
                             ),
-                            child: Text(
-                              'Eng',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                                color: !isBangla ? Colors.white : const Color(0xFF64748B),
-                              ),
-                            ),
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: brandGreen.withValues(alpha: 0.25),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 2)),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.medical_services_rounded,
+                            color: Colors.white,
+                            size: 20,
                           ),
                         ),
-
-                        // বাং Segment
-                        GestureDetector(
-                          onTap: () {
-                            _langController.setLanguage(AppLanguage.bangla);
-                          },
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                            decoration: BoxDecoration(
-                              color: isBangla ? brandGreen : Colors.transparent,
-                              borderRadius: BorderRadius.circular(7),
-                            ),
-                            child: Text(
-                              'বাং',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                                color: isBangla ? Colors.white : const Color(0xFF64748B),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    isBangla ? 'মেডিসেবা' : 'MediSeba',
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w900,
+                                      color: Color(0xFF1E293B),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFED1C24),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: const Text(
+                                      '২৪/৭',
+                                      style: TextStyle(
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.w800,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
+                              const SizedBox(height: 2),
+                              Text(
+                                isBangla ? 'ডিজিটাল হেলথ ও জরুরি সেবা' : 'Digital Health & Emergency Services',
+                                style: const TextStyle(
+                                  fontSize: 11.5,
+                                  color: Color(0xFF64748B),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
                   ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 8),
-
-            // Assistant Banner Card (bKash Beta Assistant style card)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: const Color(0xFF008744).withValues(alpha: 0.3), width: 1.2),
                 ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 42,
-                      height: 42,
-                      decoration: BoxDecoration(
-                        color: brandGreen,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(
-                        Icons.medical_services_rounded,
-                        color: Colors.white,
-                        size: 22,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Text(
-                                isBangla ? 'মেডিসেবা' : 'MediSeba',
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w800,
-                                  color: Color(0xFF1E293B),
-                                ),
-                              ),
-                              const SizedBox(width: 6),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFED1C24),
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: const Text(
-                                  '২৪/৭',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.white,
+
+                const SizedBox(height: 16),
+
+                // Menu List (Glow Sidebar List Items)
+                Expanded(
+                  child: ListView(
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                    children: [
+                      _buildBkashMenuItem(
+                        icon: Icons.assignment_ind_outlined,
+                        title: isBangla ? 'পেশেন্ট পোর্টাল' : 'Patient Portal',
+                        onTap: () {
+                          Navigator.pop(context);
+                          AuthGuard.check(
+                            context: context,
+                            authController: widget.authController,
+                            homeController: widget.homeController,
+                            languageController: _langController,
+                            title: 'পেশেন্ট পোর্টালে প্রবেশ করতে লগইন করুন',
+                            message: 'আপনার ডিজিটাল প্রেসক্রিপশন ও হেলথ রেকর্ডস সুরক্ষিত রাখতে লগইন করুন।',
+                            onAuthenticated: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => PatientPortalView(
+                                    languageController: _langController,
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            isBangla ? 'ডিজিটাল হেলথ ও জরুরি সেবা' : 'Digital Health & Emergency Services',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Color(0xFF64748B),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // bKash-style Menu List
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                children: [
-                  _buildBkashMenuItem(
-                    icon: Icons.assignment_ind_outlined,
-                    title: isBangla ? 'পেশেন্ট পোর্টাল' : 'Patient Portal',
-                    onTap: () {
-                      Navigator.pop(context);
-                      AuthGuard.check(
-                        context: context,
-                        authController: widget.authController,
-                        homeController: widget.homeController,
-                        languageController: _langController,
-                        title: 'পেশেন্ট পোর্টালে প্রবেশ করতে লগইন করুন',
-                        message: 'আপনার ডিজিটাল প্রেসক্রিপশন ও হেলথ রেকর্ডস সুরক্ষিত রাখতে লগইন করুন।',
-                        onAuthenticated: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => PatientPortalView(
-                                languageController: _langController,
-                              ),
-                            ),
+                              );
+                            },
                           );
                         },
-                      );
-                    },
+                      ),
+                      _buildBkashMenuItem(
+                        icon: Icons.handshake_outlined,
+                        title: isBangla ? 'পার্টনার' : 'Partner',
+                        onTap: () {
+                          Navigator.pop(context);
+                          showPartnerBottomSheet(context, languageController: _langController);
+                        },
+                      ),
+                      _buildBkashMenuItem(
+                        icon: Icons.work_outline_rounded,
+                        title: isBangla ? 'ক্যারিয়ার' : 'Career',
+                        onTap: () {
+                          Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => CareerView(languageController: _langController)),
+                          );
+                        },
+                      ),
+                      _buildBkashMenuItem(
+                        icon: Icons.article_outlined,
+                        title: isBangla ? 'ব্লগ' : 'Blog',
+                        onTap: () {
+                          Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => BlogView(languageController: _langController)),
+                          );
+                        },
+                      ),
+                      _buildBkashMenuItem(
+                        icon: Icons.call_outlined,
+                        title: isBangla ? 'যোগাযোগ' : 'Contact Us',
+                        onTap: () {
+                          Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => ContactUsView(languageController: _langController)),
+                          );
+                        },
+                      ),
+                      _buildBkashMenuItem(
+                        icon: Icons.headset_mic_outlined,
+                        title: isBangla ? 'গ্রাহক সেবা' : 'Customer Helpline',
+                        onTap: () {
+                          Navigator.pop(context);
+                          showHelplineBottomSheet(context);
+                        },
+                      ),
+                      _buildBkashMenuItem(
+                        icon: Icons.public_outlined,
+                        title: isBangla ? 'সোশ্যাল মিডিয়া' : 'Social Media',
+                        onTap: () {
+                          Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const SocialMediaView()),
+                          );
+                        },
+                      ),
+                      _buildBkashMenuItem(
+                        icon: Icons.info_outline_rounded,
+                        title: isBangla ? 'আমাদের সম্পর্কে' : 'About Us',
+                        onTap: () {
+                          Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => AboutUsView(languageController: _langController)),
+                          );
+                        },
+                      ),
+                      _buildBkashMenuItem(
+                        icon: Icons.share_outlined,
+                        title: isBangla ? 'রেফার ও শেয়ার' : 'Share App',
+                        onTap: () {
+                          Navigator.pop(context);
+                          showShareAppDialog(context);
+                        },
+                      ),
+                    ],
                   ),
-                  _buildBkashMenuItem(
-                    icon: Icons.handshake_outlined,
-                    title: isBangla ? 'পার্টনার' : 'Partner',
-                    onTap: () {
-                      Navigator.pop(context);
-                      showPartnerBottomSheet(context, languageController: _langController);
-                    },
-                  ),
-                  _buildBkashMenuItem(
-                    icon: Icons.work_outline_rounded,
-                    title: isBangla ? 'ক্যারিয়ার' : 'Career',
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => CareerView(languageController: _langController)),
-                      );
-                    },
-                  ),
-                  _buildBkashMenuItem(
-                    icon: Icons.article_outlined,
-                    title: isBangla ? 'ব্লগ' : 'Blog',
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => BlogView(languageController: _langController)),
-                      );
-                    },
-                  ),
-                  _buildBkashMenuItem(
-                    icon: Icons.call_outlined,
-                    title: isBangla ? 'যোগাযোগ' : 'Contact Us',
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => ContactUsView(languageController: _langController)),
-                      );
-                    },
-                  ),
-                  _buildBkashMenuItem(
-                    icon: Icons.headset_mic_outlined,
-                    title: isBangla ? 'গ্রাহক সেবা' : 'Customer Helpline',
-                    onTap: () {
-                      Navigator.pop(context);
-                      showHelplineBottomSheet(context);
-                    },
-                  ),
-                  _buildBkashMenuItem(
-                    icon: Icons.public_outlined,
-                    title: isBangla ? 'সোশ্যাল মিডিয়া' : 'Social Media',
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const SocialMediaView()),
-                      );
-                    },
-                  ),
-                  _buildBkashMenuItem(
-                    icon: Icons.info_outline_rounded,
-                    title: isBangla ? 'আমাদের সম্পর্কে' : 'About Us',
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => AboutUsView(languageController: _langController)),
-                      );
-                    },
-                  ),
-                  _buildBkashMenuItem(
-                    icon: Icons.share_outlined,
-                    title: isBangla ? 'রেফার ও শেয়ার' : 'Share App',
-                    onTap: () {
-                      Navigator.pop(context);
-                      showShareAppDialog(context);
-                    },
-                  ),
-                ],
-              ),
-            ),
-
-            // Footer Version
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12.0, top: 8.0),
-              child: Text(
-                isBangla ? 'ভার্সন: ১.০.০' : 'Version: 1.0.0',
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF94A3B8),
                 ),
-              ),
+
+                // Footer Version
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12.0, top: 8.0),
+                  child: Text(
+                    isBangla ? 'ভার্সন: ১.০.০' : 'Version: 1.0.0',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF94A3B8),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -1910,20 +1958,21 @@ class _HomeViewState extends State<HomeView> {
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: const Color(0xFFF8FAFC),
+          color: brandGreen.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: brandGreen.withValues(alpha: 0.15), width: 0.8),
         ),
         child: Icon(
           icon,
-          color: const Color(0xFF334155),
-          size: 22,
+          color: brandGreen,
+          size: 20,
         ),
       ),
       title: Text(
         title,
         style: const TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.w600,
+          fontSize: 14.5,
+          fontWeight: FontWeight.w700,
           color: Color(0xFF1E293B),
         ),
       ),
@@ -1933,13 +1982,14 @@ class _HomeViewState extends State<HomeView> {
               decoration: BoxDecoration(
                 color: const Color(0xFFFFEBEE),
                 borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: const Color(0xFFEF4444).withValues(alpha: 0.2), width: 0.8),
               ),
               child: Text(
                 badgeText,
                 style: const TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFFED1C24),
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFFEF4444),
                 ),
               ),
             )
