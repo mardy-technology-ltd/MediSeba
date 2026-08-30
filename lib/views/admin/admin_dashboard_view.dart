@@ -1,9 +1,20 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'admin_drawer.dart';
+import 'admin_inbox_view.dart';
+import 'admin_packages_audit_view.dart';
+import 'admin_job_circulars_view.dart';
+import 'admin_sales_team_view.dart';
+import 'admin_doctors_management_view.dart';
+import 'admin_patient_records_view.dart';
+import 'admin_appointments_management_view.dart';
+import 'admin_medicine_inventory_view.dart';
 import '../../widgets/live_chat_widget.dart';
 import '../../controllers/home_controller.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/language_controller.dart';
+import '../../services/api_service.dart';
+import '../../services/cache_service.dart';
 
 class AdminDashboardView extends StatefulWidget {
   final HomeController? homeController;
@@ -27,81 +38,126 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
   static const textDark = Color(0xFF0F172A);
   static const textMuted = Color(0xFF64748B);
 
-  String _selectedGraphFilter = 'গত ৬ মাস';
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  
+  bool _isLoading = true;
+  Map<String, dynamic>? _dashboardData;
+  String? _error;
 
-  final List<Map<String, dynamic>> _kpiStats = [
-    {
-      'title': 'সক্রিয় ডাক্তার',
-      'value': '12 জন',
-      'icon': Icons.medical_services_outlined,
-      'color': const Color(0xFF10B981),
-      'bg': const Color(0xFFECFDF5),
-    },
-    {
-      'title': 'নিবন্ধিত রোগী',
-      'value': '49 জন',
-      'icon': Icons.people_outline_rounded,
-      'color': const Color(0xFF3B82F6),
-      'bg': const Color(0xFFEFF6FF),
-    },
-    {
-      'title': 'মোট অ্যাপয়েন্টমেন্ট',
-      'value': '84 টি',
-      'icon': Icons.calendar_month_outlined,
-      'color': const Color(0xFF8B5CF6),
-      'bg': const Color(0xFFF5F3FF),
-    },
-    {
-      'title': 'মোট রেভিনিউ',
-      'value': '৳ 42,000',
-      'icon': Icons.attach_money_rounded,
-      'color': const Color(0xFFD97706),
-      'bg': const Color(0xFFFEF3C7),
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _fetchDashboardData();
+  }
 
-  final List<Map<String, dynamic>> _monthlyRevenueData = [
-    {'month': 'মার্চ', 'amount': '৳ 18.0k', 'heightRatio': 0.43},
-    {'month': 'এপ্রিল', 'amount': '৳ 24.0k', 'heightRatio': 0.57},
-    {'month': 'মে', 'amount': '৳ 31.0k', 'heightRatio': 0.74},
-    {'month': 'জুন', 'amount': '৳ 28.0k', 'heightRatio': 0.67},
-    {'month': 'জুলাই', 'amount': '৳ 36.0k', 'heightRatio': 0.86},
-    {'month': 'আগস্ট (চলতি)', 'amount': '৳ 42.0k', 'heightRatio': 1.00},
-  ];
+  Future<void> _fetchDashboardData() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
 
-  final List<Map<String, dynamic>> _recentAppointments = [
-    {
-      'id': 'APT-20260804-884920',
-      'patient': 'Mohammad Ali',
-      'doctor': 'Dr. Tanvir Hasan',
-      'fee': '৳ ১,২০০',
-      'dateTime': 'আজ, ১০:০০ AM',
-      'status': 'কনফার্মড',
-      'statusColor': const Color(0xFF059669),
-      'statusBg': const Color(0xFFD1FAE5),
-    },
-    {
-      'id': 'APT-20260804-492810',
-      'patient': 'Tania Rahman',
-      'doctor': 'Dr. Ahmed Rahman',
-      'fee': '৳ ১,০০০',
-      'dateTime': 'আজ, ১১:০০ AM',
-      'status': 'সম্পন্ন',
-      'statusColor': const Color(0xFF2563EB),
-      'statusBg': const Color(0xFFDBEAFE),
-    },
-    {
-      'id': 'APT-20260804-104928',
-      'patient': 'Kabir Hossain',
-      'doctor': 'Dr. Farzana Islam',
-      'fee': '৳ ১,২০০',
-      'dateTime': 'আজ, ০২:১৫ PM',
-      'status': 'অপেক্ষমাণ',
-      'statusColor': const Color(0xFFD97706),
-      'statusBg': const Color(0xFFFEF3C7),
-    },
-  ];
+    try {
+      final token = CacheService.get('auth_token') as String? ?? '';
+      final data = await ApiService.getAdminDashboard(token);
+      if (data != null) {
+        setState(() {
+          _dashboardData = data;
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _error = 'ড্যাশবোর্ড ডেটা লোড করতে ব্যর্থ হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।';
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _error = 'ত্রুটি ঘটেছে: $e';
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _navigateToSection(int index) {
+    Widget? screen;
+    switch (index) {
+      case 1:
+        screen = const AdminInboxView();
+        break;
+      case 2:
+        screen = const AdminPackagesAuditView();
+        break;
+      case 3:
+        screen = const AdminJobCircularsView();
+        break;
+      case 4:
+        screen = const AdminSalesTeamView();
+        break;
+      case 5:
+        screen = const AdminDoctorsManagementView();
+        break;
+      case 6:
+        screen = const AdminPatientRecordsView();
+        break;
+      case 7:
+        screen = const AdminAppointmentsManagementView();
+        break;
+      case 8:
+        screen = const AdminMedicineInventoryView();
+        break;
+    }
+    if (screen != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => screen!),
+      );
+    }
+  }
+
+  String _formatStatus(String status) {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return 'অপেক্ষমাণ';
+      case 'confirmed':
+        return 'কনফার্মড';
+      case 'completed':
+        return 'সম্পন্ন';
+      case 'cancelled':
+        return 'বাতিল';
+      default:
+        return status;
+    }
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return const Color(0xFFD97706);
+      case 'confirmed':
+        return const Color(0xFF059669);
+      case 'completed':
+        return const Color(0xFF2563EB);
+      case 'cancelled':
+        return const Color(0xFFEF4444);
+      default:
+        return const Color(0xFF64748B);
+    }
+  }
+
+  Color _getStatusBgColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return const Color(0xFFFEF3C7);
+      case 'confirmed':
+        return const Color(0xFFD1FAE5);
+      case 'completed':
+        return const Color(0xFFDBEAFE);
+      case 'cancelled':
+        return const Color(0xFFFEE2E2);
+      default:
+        return const Color(0xFFF1F5F9);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -111,66 +167,77 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
       appBar: _buildTopAppBar(context),
       drawer: const AdminDrawer(selectedIndex: 0),
       body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 1. Executive Analytics Hero Banner (Teal Dark Green Card)
-              _buildHeroBanner(),
+        child: RefreshIndicator(
+          onRefresh: _fetchDashboardData,
+          color: brandGreen,
+          child: _isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(color: brandGreen),
+                )
+              : _error != null
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.error_outline_rounded, color: Colors.redAccent, size: 48),
+                            const SizedBox(height: 12),
+                            Text(
+                              _error!,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: textDark),
+                            ),
+                            const SizedBox(height: 16),
+                            ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: brandGreen,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                              ),
+                              onPressed: _fetchDashboardData,
+                              icon: const Icon(Icons.refresh_rounded, size: 18),
+                              label: const Text('আবার চেষ্টা করুন', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  : SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // 1. Executive Analytics Hero Banner (Navy blue dashboard overview)
+                          _buildHeroBanner(),
 
-              const SizedBox(height: 14),
+                          const SizedBox(height: 14),
 
-              // 2. Stat Cards Grid (4 Cards: Active Doctors, Patients, Appointments, Revenue)
-              _buildKPIStatsGrid(),
+                          // 2. Stat KPI Cards Grid (6 items matching screenshot)
+                          _buildKPIStatsGrid(),
 
-              const SizedBox(height: 14),
+                          const SizedBox(height: 14),
 
-              // 3. Sales Team Hierarchy Banner (Deep Navy Card)
-              _buildFlagshipSalesBanner(),
+                          // 3. Action Panel Buttons (Hierarchy, Packages, Pharmacy, Partner)
+                          _buildActionPanels(),
 
-              const SizedBox(height: 14),
+                          const SizedBox(height: 14),
 
-              // 4. Analytics Row: Left Revenue Graph + Right Booking Share
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  if (constraints.maxWidth > 768) {
-                    return Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(flex: 3, child: _buildRevenueGraphCard()),
-                        const SizedBox(width: 14),
-                        Expanded(flex: 2, child: _buildBookingShareCard()),
-                      ],
-                    );
-                  } else {
-                    return Column(
-                      children: [
-                        _buildRevenueGraphCard(),
-                        const SizedBox(height: 14),
-                        _buildBookingShareCard(),
-                      ],
-                    );
-                  }
-                },
-              ),
+                          // 4. Recent Appointments Live Record Table
+                          _buildRecentAppointmentsSection(),
 
-              const SizedBox(height: 14),
-
-              // 5. Recent Telemedicine Appointments Table / Cards
-              _buildRecentAppointmentsSection(),
-
-              const SizedBox(height: 24),
-            ],
-          ),
+                          const SizedBox(height: 24),
+                        ],
+                      ),
+                    ),
         ),
       ),
       floatingActionButton: const LiveChatFabWidget(),
     );
   }
 
-  /// Top App Bar matching web visual header with full responsive adaptivity
   PreferredSizeWidget _buildTopAppBar(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final bool isSmallScreen = screenWidth < 400;
@@ -220,21 +287,13 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
         ],
       ),
       actions: [
-        // Cash Refresh Button
         IconButton(
           constraints: const BoxConstraints(minWidth: 36),
           padding: EdgeInsets.zero,
           tooltip: 'ক্যাশ রিফ্রেশ',
           icon: const Icon(Icons.sync_rounded, color: Color(0xFF64748B), size: 20),
-          onPressed: () {
-            setState(() {});
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('ক্যাশ রিফ্রেশ সম্পন্ন হয়েছে'), behavior: SnackBarBehavior.floating),
-            );
-          },
+          onPressed: _fetchDashboardData,
         ),
-
-        // Notifications Bell
         Stack(
           alignment: Alignment.center,
           children: [
@@ -265,8 +324,6 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
             ),
           ],
         ),
-
-        // Profile Avatar Menu Pill
         Container(
           margin: const EdgeInsets.only(right: 8, left: 2),
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
@@ -291,17 +348,19 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
     );
   }
 
-  /// 1. Executive Analytics Hero Banner (Teal Dark Green Card)
   Widget _buildHeroBanner() {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isMobile = screenWidth < 480;
+
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: darkGreen,
+        color: const Color(0xFF0F172A),
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: darkGreen.withValues(alpha: 0.22),
+            color: const Color(0xFF0F172A).withValues(alpha: 0.15),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -310,195 +369,298 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Top Badge & Action Button
-          Wrap(
-            alignment: WrapAlignment.spaceBetween,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 6,
-            runSpacing: 6,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.16),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+          // Badge
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+            ),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.security_rounded, color: Color(0xFF10B981), size: 12),
+                SizedBox(width: 4),
+                Text(
+                  'SYSTEM OVERVIEW & METRICS',
+                  style: TextStyle(color: Color(0xFF94A3B8), fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 0.5),
                 ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 12),
-                    SizedBox(width: 4),
-                    Text(
-                      'মেডিসেবা এক্সিকিউটিভ অ্যানালিটিক্স',
-                      style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w700),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Action Button Right (+ চেইন অ্যাকাউন্ট তৈরি)
-              InkWell(
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('চেইন অ্যাকাউন্ট তৈরি স্ক্রিন খুলছে...'), behavior: SnackBarBehavior.floating),
-                  );
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.person_add_alt_outlined, color: darkGreen, size: 13),
-                      SizedBox(width: 4),
-                      Text(
-                        '+ চেইন অ্যাকাউন্ট তৈরি',
-                        style: TextStyle(color: darkGreen, fontSize: 10, fontWeight: FontWeight.w800),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
 
           const SizedBox(height: 12),
 
-          // Main Header Title with Refresh Button
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'ড্যাশবোর্ড ওভারভিউ & লাইভ চার্ট অ্যানালিটিক্স',
-                      style: TextStyle(
-                        fontSize: 16.5,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white,
-                        letterSpacing: -0.2,
-                      ),
-                    ),
-                    SizedBox(height: 3),
-                    Text(
-                      'Stripe & Vercel স্টাইল গ্রোয়িং গ্রাফ চার্ট, রিয়েল-টাইম রেভিনিউ ট্র্যাকিং এবং বুকিং অ্যানালিটিক্স।',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Colors.white70,
-                        height: 1.35,
-                      ),
-                    ),
-                  ],
+          if (isMobile)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'মেডিসেবা সুপার অ্যাডমিন ড্যাশবোর্ড',
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                    letterSpacing: -0.2,
+                  ),
                 ),
-              ),
-              IconButton(
-                constraints: const BoxConstraints(minWidth: 32),
-                padding: EdgeInsets.zero,
-                icon: const Icon(Icons.sync_rounded, color: Colors.white, size: 18),
-                onPressed: () {
-                  setState(() {});
-                },
-              ),
-            ],
-          ),
+                const SizedBox(height: 4),
+                const Text(
+                  'লাইভ ডাটাবেস ম্যাট্রিক্স, সেলস ও ওভারঅল চ্যানেল পারফরম্যান্স',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Color(0xFF94A3B8),
+                    height: 1.35,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                InkWell(
+                  onTap: _fetchDashboardData,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+                    ),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.sync_rounded, color: Colors.white, size: 14),
+                        SizedBox(width: 4),
+                        Text(
+                          'লাইভ ডেটা রিফ্রেশ',
+                          style: TextStyle(color: Colors.white, fontSize: 10.5, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            )
+          else
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'মেডিসেবা সুপার অ্যাডমিন ড্যাশবোর্ড',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.white,
+                          letterSpacing: -0.2,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        'লাইভ ডাটাবেস ম্যাট্রিক্স, সেলস ও ওভারঅল চ্যানেল পারফরম্যান্স',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Color(0xFF94A3B8),
+                          height: 1.35,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                InkWell(
+                  onTap: _fetchDashboardData,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.sync_rounded, color: Colors.white, size: 14),
+                        SizedBox(width: 4),
+                        Text(
+                          'লাইভ ডেটা রিফ্রেশ',
+                          style: TextStyle(color: Colors.white, fontSize: 10.5, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
         ],
       ),
     );
   }
 
-  /// 2. Stat Cards Grid (4 Cards: Active Doctors, Patients, Appointments, Revenue)
   Widget _buildKPIStatsGrid() {
+    final List<Map<String, dynamic>> kpis = [
+      {
+        'title': 'সেলস টিম',
+        'value': '${_dashboardData?['total_sales_agents'] ?? 0} জন',
+        'icon': Icons.people_outline_rounded,
+        'color': const Color(0xFF3B82F6),
+        'bg': const Color(0xFFEFF6FF),
+        'index': 4,
+      },
+      {
+        'title': 'রেজিস্টার্ড ডাক্তার',
+        'value': '${_dashboardData?['total_doctors'] ?? 0} জন',
+        'icon': Icons.medical_services_outlined,
+        'color': const Color(0xFF10B981),
+        'bg': const Color(0xFFECFDF5),
+        'index': 5,
+      },
+      {
+        'title': 'মোট পেশেন্ট',
+        'value': '${_dashboardData?['total_patients'] ?? 0} জন',
+        'icon': Icons.person_search_outlined,
+        'color': const Color(0xFF0EA5E9),
+        'bg': const Color(0xFFF0F9FF),
+        'index': 6,
+      },
+      {
+        'title': 'অ্যাপয়েন্টমেন্ট',
+        'value': '${_dashboardData?['total_appointments'] ?? 0} টি',
+        'icon': Icons.calendar_month_outlined,
+        'color': const Color(0xFF8B5CF6),
+        'bg': const Color(0xFFF5F3FF),
+        'index': 7,
+      },
+      {
+        'title': 'জব সার্কুলার',
+        'value': '${_dashboardData?['total_jobs'] ?? 0} টি',
+        'icon': Icons.business_center_outlined,
+        'color': const Color(0xFFF59E0B),
+        'bg': const Color(0xFFFFFBEB),
+        'index': 3,
+      },
+      {
+        'title': 'মোট রেভিনিউ',
+        'value': '৳ ${_dashboardData?['total_revenue_bdt'] ?? 0}',
+        'icon': Icons.payments_outlined,
+        'color': const Color(0xFFEF4444),
+        'bg': const Color(0xFFFEF2F2),
+        'index': 2,
+      },
+    ];
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final double width = constraints.maxWidth;
-        final int crossAxisCount = width > 640 ? 4 : (width < 340 ? 1 : 2);
-        final double childAspectRatio = width > 640 ? 1.6 : (width < 340 ? 3.0 : 1.35);
+        final int crossAxisCount = width > 640 ? 3 : (width < 340 ? 1 : 2);
+        // Generous vertical space to ensure no wrapping or overflow
+        final double childAspectRatio = width > 640 ? 1.4 : (width < 340 ? 2.5 : 1.15);
 
         return GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: crossAxisCount,
-            crossAxisSpacing: 8,
-            mainAxisSpacing: 8,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
             childAspectRatio: childAspectRatio,
           ),
-          itemCount: _kpiStats.length,
+          itemCount: kpis.length,
           itemBuilder: (context, index) {
-            final stat = _kpiStats[index];
-            final String title = (stat['title'] ?? '').toString();
-            final String value = (stat['value'] ?? '').toString();
-            final IconData icon = (stat['icon'] as IconData?) ?? Icons.analytics_outlined;
-            final Color iconColor = (stat['color'] as Color?) ?? brandGreen;
-            final Color bgColor = (stat['bg'] as Color?) ?? const Color(0xFFECFDF5);
+            final stat = kpis[index];
+            final String title = stat['title'].toString();
+            final String value = stat['value'].toString();
+            final IconData icon = stat['icon'] as IconData;
+            final Color iconColor = stat['color'] as Color;
+            final Color bgColor = stat['bg'] as Color;
+            final int targetIndex = stat['index'] as int;
 
-            return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.02),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: bgColor,
-                      borderRadius: BorderRadius.circular(10),
+            return GestureDetector(
+              onTap: () => _navigateToSection(targetIndex),
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.02),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
                     ),
-                    child: Icon(
-                      icon,
-                      color: iconColor,
-                      size: 20,
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Top Circular Icon
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: bgColor,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        icon,
+                        color: iconColor,
+                        size: 16,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Column(
+                    
+                    // Metadata spacing
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
                           title,
                           style: const TextStyle(
-                            fontSize: 10.5,
-                            fontWeight: FontWeight.w600,
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w700,
                             color: Color(0xFF64748B),
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 2),
-                        FittedBox(
-                          fit: BoxFit.scaleDown,
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            value,
-                            style: const TextStyle(
-                              fontSize: 16.5,
-                              fontWeight: FontWeight.w900,
-                              color: Color(0xFF0F172A),
-                            ),
+                        Text(
+                          value,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                            color: iconColor,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
-                  ),
-                ],
+                    
+                    // Bottom Link Action Align Left
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'ম্যানেজ করুন',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w800,
+                            color: iconColor.withValues(alpha: 0.8),
+                          ),
+                        ),
+                        const SizedBox(width: 2),
+                        Icon(
+                          Icons.arrow_forward_rounded,
+                          size: 10.5,
+                          color: iconColor.withValues(alpha: 0.8),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             );
           },
@@ -507,399 +669,117 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
     );
   }
 
-  /// 3. Sales Team Hierarchy Banner (Deep Navy Card)
-  Widget _buildFlagshipSalesBanner() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: const Color(0xFF0F172A),
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
+  Widget _buildActionPanels() {
+    final panels = [
+      {
+        'label': 'HIERARCHY MANAGEMENT',
+        'title': 'সেলস এজেন্টস প্যানেল',
+        'colors': [const Color(0xFF6366F1), const Color(0xFF4F46E5)],
+        'index': 4,
+      },
+      {
+        'label': 'HEALTH PACKAGES',
+        'title': 'প্যাকেজ ও রেভিনিউ প্যানেল',
+        'colors': [const Color(0xFF00A859), const Color(0xFF005C45)],
+        'index': 2,
+      },
+      {
+        'label': 'PHARMACY INVENTORY',
+        'title': 'ওষুধ স্টোর প্যানেল',
+        'colors': [const Color(0xFF2563EB), const Color(0xFF1D4ED8)],
+        'index': 8,
+      },
+      {
+        'label': 'PARTNER MESSAGES',
+        'title': 'ইনবক্স ও পার্টনার ইনকুয়েরি',
+        'colors': [const Color(0xFF9333EA), const Color(0xFF7E22CE)],
+        'index': 1,
+      },
+    ];
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        childAspectRatio: 1.6,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      itemCount: panels.length,
+      itemBuilder: (context, index) {
+        final panel = panels[index];
+        final String label = panel['label'] as String;
+        final String title = panel['title'] as String;
+        final List<Color> colors = panel['colors'] as List<Color>;
+        final int targetIndex = panel['index'] as int;
+
+        return GestureDetector(
+          onTap: () => _navigateToSection(targetIndex),
+          child: Container(
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.trending_up_rounded, color: Color(0xFF818CF8), size: 12),
-                SizedBox(width: 4),
-                Text(
-                  'ফিল্ড লেভেল সেলস টিম (HBP & Supervisor)',
-                  style: TextStyle(color: Color(0xFFC7D2FE), fontSize: 10, fontWeight: FontWeight.w700),
+              gradient: LinearGradient(
+                colors: colors,
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: colors.last.withValues(alpha: 0.22),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
                 ),
               ],
             ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'সেলস টিম হায়ারার্কি ও পারফরম্যান্স ম্যানেজমেন্ট',
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w900,
-              color: Colors.white,
-              letterSpacing: -0.2,
-            ),
-          ),
-          const SizedBox(height: 4),
-          const Text(
-            'এইচআরপি টার্গেট (৬৫০ সেলস / ৩০% স্যালারি প্রমোশন), সুপারভাইজারের ফেক সেল ফিল্টার ও ইউজার আইডি পাসওয়ার্ড তৈরি করুন।',
-            style: TextStyle(
-              fontSize: 11,
-              color: Color(0xFF94A3B8),
-              height: 1.35,
-            ),
-          ),
-          const SizedBox(height: 12),
-          ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF4F46E5),
-              foregroundColor: Colors.white,
-              elevation: 2,
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            ),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('সেলস এজেন্ট তৈরি ও ম্যানেজমেন্ট খুলছে...'), behavior: SnackBarBehavior.floating),
-              );
-            },
-            icon: const Icon(Icons.person_add_alt_rounded, size: 15),
-            label: const Row(
-              mainAxisSize: MainAxisSize.min,
+            child: Stack(
               children: [
-                Text(
-                  'সেলস এজেন্ট তৈরি ও ম্যানেজ করুন',
-                  style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(width: 4),
-                Icon(Icons.arrow_forward_rounded, size: 13),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// 4. Left Chart Card: Revenue Growth Bar Graph Card
-  Widget _buildRevenueGraphCard() {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header Wrap
-          Wrap(
-            alignment: WrapAlignment.spaceBetween,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 6,
-            runSpacing: 6,
-            children: [
-              const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.bar_chart_rounded, color: Color(0xFF10B981), size: 18),
-                      SizedBox(width: 5),
-                      Text(
-                        'রেভিনিউ প্রবৃদ্ধি & কাস্টম চার্ট',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w800,
-                          color: textDark,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 2),
-                  Text(
-                    'সময়সীমা পরিবর্তন করে রিয়েল-টাইমে আয় দেখুন',
-                    style: TextStyle(fontSize: 9.5, color: textMuted),
-                  ),
-                ],
-              ),
-              // Filter Chips
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: ['গত ৭ দিন', 'গত ৩০ দিন', 'গত ৬ মাস'].map((filter) {
-                    final isSelected = _selectedGraphFilter == filter;
-                    return Padding(
-                      padding: const EdgeInsets.only(left: 3.0),
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _selectedGraphFilter = filter;
-                          });
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3.5),
-                          decoration: BoxDecoration(
-                            color: isSelected ? const Color(0xFFCCFBF1) : const Color(0xFFF8FAFC),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color: isSelected ? brandGreen : const Color(0xFFE2E8F0),
-                              width: isSelected ? 1.3 : 1.0,
-                            ),
-                          ),
-                          child: Text(
-                            filter,
-                            style: TextStyle(
-                              fontSize: 9,
-                              fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                              color: isSelected ? darkGreen : textMuted,
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 16),
-
-          // Bar Chart Visual
-          SizedBox(
-            height: 140,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: _monthlyRevenueData.map((data) {
-                final double heightRatio = (data['heightRatio'] as num?)?.toDouble() ?? 0.5;
-                final String month = (data['month'] ?? '').toString();
-                final String amount = (data['amount'] ?? '').toString();
-                final barHeight = 85.0 * heightRatio;
-                final isCurrent = month.contains('আগস্ট');
-
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        amount,
-                        style: TextStyle(
-                          fontSize: 9,
-                          fontWeight: FontWeight.bold,
-                          color: isCurrent ? darkGreen : const Color(0xFF475569),
-                        ),
+                    Text(
+                      label,
+                      style: TextStyle(
+                        fontSize: 8.5,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white.withValues(alpha: 0.7),
+                        letterSpacing: 0.5,
                       ),
                     ),
                     const SizedBox(height: 4),
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      width: 18,
-                      height: barHeight,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: isCurrent
-                              ? [const Color(0xFF10B981), const Color(0xFF00A859)]
-                              : [const Color(0xFF059669), const Color(0xFF047857)],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                        ),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                    ),
-                    const SizedBox(height: 5),
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        month,
-                        style: TextStyle(
-                          fontSize: 9,
-                          fontWeight: isCurrent ? FontWeight.bold : FontWeight.w500,
-                          color: isCurrent ? textDark : textMuted,
-                        ),
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.white,
+                        height: 1.25,
                       ),
                     ),
                   ],
-                );
-              }).toList(),
-            ),
-          ),
-
-          const SizedBox(height: 10),
-          const Divider(color: Color(0xFFF1F5F9)),
-          const SizedBox(height: 4),
-
-          // Footnote Summary
-          Wrap(
-            alignment: WrapAlignment.spaceBetween,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 6,
-            runSpacing: 4,
-            children: const [
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.bolt_rounded, color: brandGreen, size: 14),
-                  SizedBox(width: 3),
-                  Text(
-                    'প্ল্যাটফর্ম কমিশন গ্রোথ হার: +২৭.৪%',
-                    style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w800, color: Color(0xFF059669)),
-                  ),
-                ],
-              ),
-              Text(
-                'সর্বশেষ আপডেট: আজ',
-                style: TextStyle(fontSize: 9.5, color: textMuted),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// 5. Right Chart Card: Booking Share Analytics (`সর্বাধিক বুকিং শেয়ার`)
-  Widget _buildBookingShareCard() {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Row(
-            children: [
-              Icon(Icons.pie_chart_outline_rounded, color: Color(0xFF0284C7), size: 18),
-              SizedBox(width: 5),
-              Text(
-                'সর্বাধিক বুকিং শেয়ার',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: textDark),
-              ),
-            ],
-          ),
-          const SizedBox(height: 2),
-          const Text(
-            'ডাক্তার ঘর vs ফিজিক্যাল চেম্বার',
-            style: TextStyle(fontSize: 9.5, color: textMuted),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Telemedicine (Doctor Ghar) 58% Progress Bar
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('📺 ডাক্তার ঘর (ভিডিও কল)', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: textDark)),
-                  Text('58%', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w900, color: Color(0xFF059669))),
-                ],
-              ),
-              const SizedBox(height: 5),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(6),
-                child: const LinearProgressIndicator(
-                  value: 0.58,
-                  minHeight: 8,
-                  backgroundColor: Color(0xFFF1F5F9),
-                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF10B981)),
                 ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 14),
-
-          // Chamber Physical Serial 42% Progress Bar
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('🏢 চেম্বার সিরিয়াল (শারীরিক)', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: textDark)),
-                  Text('42%', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w900, color: Color(0xFF0284C7))),
-                ],
-              ),
-              const SizedBox(height: 5),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(6),
-                child: const LinearProgressIndicator(
-                  value: 0.42,
-                  minHeight: 8,
-                  backgroundColor: Color(0xFFF1F5F9),
-                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0284C7)),
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 16),
-
-          // Bottom Success Callout Box
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-            decoration: BoxDecoration(
-              color: const Color(0xFFECFDF5),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: const Color(0xFFA7F3D0)),
-            ),
-            child: const Row(
-              children: [
-                Icon(Icons.check_circle_rounded, color: Color(0xFF059669), size: 15),
-                SizedBox(width: 5),
-                Expanded(
-                  child: Text(
-                    'গত ৩০ দিনে ৯৬% সফল কনসাল্টেশন সম্পন্ন হয়েছে!',
-                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Color(0xFF047857)),
+                const Positioned(
+                  top: 0,
+                  right: 0,
+                  child: Icon(
+                    Icons.north_east_rounded,
+                    color: Colors.white24,
+                    size: 16,
                   ),
                 ),
               ],
             ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
-  /// 6. Recent Telemedicine Appointments Section (Responsive Data Table / Mobile Card Grid)
   Widget _buildRecentAppointmentsSection() {
+    final recentList = _dashboardData?['recent_appointments'] as List? ?? [];
+
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -921,246 +801,290 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Expanded(
-                child: Text(
-                  'সাম্প্রতিক টেলিমেডিসিন অ্যাপয়েন্টমেন্ট তালিকা',
-                  style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w900, color: textDark),
-                  overflow: TextOverflow.ellipsis,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'সাম্প্রতিক অ্যাপয়েন্টমেন্ট সমূহের লাইভ রেকর্ড',
+                      style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w900, color: textDark),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(height: 2),
+                    Text(
+                      'ডাটাবেসে সম্প্রতি রেজিস্টার্ড বুকিং',
+                      style: TextStyle(fontSize: 10, color: textMuted),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(width: 6),
               GestureDetector(
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('সকল অ্যাপয়েন্টমেন্ট তালিকা দেখাচ্ছে'), behavior: SnackBarBehavior.floating),
-                  );
-                },
+                onTap: () => _navigateToSection(7),
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text('সবগুলো', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: brandGreen)),
+                    Text('সব অ্যাপয়েন্টমেন্ট দেখুন', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: brandGreen)),
                     SizedBox(width: 2),
-                    Icon(Icons.north_east_rounded, size: 12, color: brandGreen),
+                    Icon(Icons.arrow_forward_rounded, size: 12, color: brandGreen),
                   ],
                 ),
               ),
             ],
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
 
-          // LayoutBuilder to check screen width for Table vs Mobile Cards
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final bool isMobileScreen = constraints.maxWidth < 560;
-
-              if (isMobileScreen) {
-                // Mobile Clean Card View for Appointments
-                return Column(
-                  children: _recentAppointments.map((item) {
-                    final String id = (item['id'] ?? '').toString();
-                    final String patient = (item['patient'] ?? '').toString();
-                    final String doctor = (item['doctor'] ?? '').toString();
-                    final String fee = (item['fee'] ?? '').toString();
-                    final String dateTime = (item['dateTime'] ?? '').toString();
-                    final String status = (item['status'] ?? '').toString();
-                    final Color statusColor = (item['statusColor'] as Color?) ?? const Color(0xFF059669);
-                    final Color statusBg = (item['statusBg'] as Color?) ?? const Color(0xFFD1FAE5);
-
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF8FAFC),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: const Color(0xFFE2E8F0)),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                id,
-                                style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: Color(0xFF0284C7)),
-                              ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                                decoration: BoxDecoration(
-                                  color: statusBg,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Text(
-                                  status,
-                                  style: TextStyle(
-                                    fontSize: 9.5,
-                                    fontWeight: FontWeight.bold,
-                                    color: statusColor,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 6),
-                          Row(
-                            children: [
-                              const Icon(Icons.person_outline_rounded, size: 14, color: textMuted),
-                              const SizedBox(width: 4),
-                              Text(
-                                patient,
-                                style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: textDark),
-                              ),
-                              const SizedBox(width: 8),
-                              const Icon(Icons.arrow_forward_rounded, size: 12, color: textMuted),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  doctor,
-                                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: textDark),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                dateTime,
-                                style: const TextStyle(fontSize: 10, color: textMuted),
-                              ),
-                              Text(
-                                fee,
-                                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: textDark),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    );
-                  }).toList(),
-                );
-              } else {
-                // Desktop / Tablet Full Data Table View
-                return Column(
+          if (recentList.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24.0),
+              child: Center(
+                child: Column(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF8FAFC),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Row(
-                        children: [
-                          Expanded(flex: 3, child: Text('আইডি', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textMuted))),
-                          Expanded(flex: 3, child: Text('রোগীর নাম', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textMuted))),
-                          Expanded(flex: 3, child: Text('ডাক্তারের নাম', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textMuted))),
-                          Expanded(flex: 2, child: Text('ফি', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textMuted))),
-                          Expanded(flex: 3, child: Text('তারিখ & সময়', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textMuted))),
-                          Expanded(flex: 2, child: Text('স্ট্যাটাস', textAlign: TextAlign.right, style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textMuted))),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    ListView.separated(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: _recentAppointments.length,
-                      separatorBuilder: (context, index) => const Divider(color: Color(0xFFF1F5F9), height: 10),
-                      itemBuilder: (context, index) {
-                        final item = _recentAppointments[index];
-                        final String id = (item['id'] ?? '').toString();
-                        final String patient = (item['patient'] ?? '').toString();
-                        final String doctor = (item['doctor'] ?? '').toString();
-                        final String fee = (item['fee'] ?? '').toString();
-                        final String dateTime = (item['dateTime'] ?? '').toString();
-                        final String status = (item['status'] ?? '').toString();
-                        final Color statusColor = (item['statusColor'] as Color?) ?? const Color(0xFF059669);
-                        final Color statusBg = (item['statusBg'] as Color?) ?? const Color(0xFFD1FAE5);
-
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                flex: 3,
-                                child: Text(
-                                  id,
-                                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF0284C7)),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              Expanded(
-                                flex: 3,
-                                child: Text(
-                                  patient,
-                                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: textDark),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              Expanded(
-                                flex: 3,
-                                child: Text(
-                                  doctor,
-                                  style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600, color: textDark),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              Expanded(
-                                flex: 2,
-                                child: Text(
-                                  fee,
-                                  style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textDark),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              Expanded(
-                                flex: 3,
-                                child: Text(
-                                  dateTime,
-                                  style: const TextStyle(fontSize: 10, color: textMuted),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              Expanded(
-                                flex: 2,
-                                child: Align(
-                                  alignment: Alignment.centerRight,
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: statusBg,
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Text(
-                                      status,
-                                      style: TextStyle(
-                                        fontSize: 9.5,
-                                        fontWeight: FontWeight.bold,
-                                        color: statusColor,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
+                    Icon(Icons.calendar_today_outlined, color: textMuted.withValues(alpha: 0.5), size: 36),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'ডাটাবেসে এখনো কোনো অ্যাপয়েন্টমেন্ট তৈরি হয়নি।',
+                      style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: textMuted),
                     ),
                   ],
-                );
-              }
-            },
-          ),
+                ),
+              ),
+            )
+          else
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final bool isMobileScreen = constraints.maxWidth < 560;
+
+                if (isMobileScreen) {
+                  return Column(
+                    children: recentList.map((item) {
+                      final String id = (item['appointment_no'] ?? '').toString();
+                      final String patient = (item['patient_name'] ?? '').toString();
+                      final String doctor = (item['doctor'] ?? '').toString();
+                      final String fee = '৳${item['consultation_fee'] ?? 0}';
+                      final String date = item['appointment_date'] ?? '';
+                      final String time = item['appointment_time'] ?? '';
+                      final String status = item['status'] ?? 'pending';
+
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 10),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF8FAFC),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // ID and Status Row
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  id,
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w800,
+                                    color: Color(0xFF0284C7),
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                  decoration: BoxDecoration(
+                                    color: _getStatusBgColor(status),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    _formatStatus(status),
+                                    style: TextStyle(
+                                      fontSize: 9.5,
+                                      fontWeight: FontWeight.w900,
+                                      color: _getStatusColor(status),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 8.0),
+                              child: Divider(color: Color(0xFFE2E8F0), height: 1),
+                            ),
+                            // Patient Info
+                            Row(
+                              children: [
+                                const Icon(Icons.person_outline_rounded, size: 14, color: textMuted),
+                                const SizedBox(width: 6),
+                                const Text('রোগী: ', style: TextStyle(fontSize: 11, color: textMuted, fontWeight: FontWeight.w500)),
+                                Expanded(
+                                  child: Text(
+                                    patient,
+                                    style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: textDark),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            // Doctor Info
+                            Row(
+                              children: [
+                                const Icon(Icons.medical_services_outlined, size: 14, color: textMuted),
+                                const SizedBox(width: 6),
+                                const Text('ডাক্তার: ', style: TextStyle(fontSize: 11, color: textMuted, fontWeight: FontWeight.w500)),
+                                Expanded(
+                                  child: Text(
+                                    doctor,
+                                    style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: textDark),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            // Date & Fee
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    const Icon(Icons.calendar_month_outlined, size: 14, color: textMuted),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      '$date • $time',
+                                      style: const TextStyle(fontSize: 10.5, color: textMuted, fontWeight: FontWeight.w500),
+                                    ),
+                                  ],
+                                ),
+                                Text(
+                                  fee,
+                                  style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w900, color: textDark),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  );
+                } else {
+                  return Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF8FAFC),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Row(
+                          children: [
+                            Expanded(flex: 3, child: Text('আইডি', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textMuted))),
+                            Expanded(flex: 3, child: Text('রোগীর নাম', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textMuted))),
+                            Expanded(flex: 3, child: Text('ডাক্তারের নাম', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textMuted))),
+                            Expanded(flex: 2, child: Text('ফি', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textMuted))),
+                            Expanded(flex: 3, child: Text('তারিখ & সময়', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textMuted))),
+                            Expanded(flex: 2, child: Text('স্ট্যাটাস', textAlign: TextAlign.right, style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textMuted))),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: recentList.length,
+                        separatorBuilder: (context, index) => const Divider(color: Color(0xFFF1F5F9), height: 10),
+                        itemBuilder: (context, index) {
+                          final item = recentList[index];
+                          final String id = (item['appointment_no'] ?? '').toString();
+                          final String patient = (item['patient_name'] ?? '').toString();
+                          final String doctor = (item['doctor'] ?? '').toString();
+                          final String fee = '৳${item['consultation_fee'] ?? 0}';
+                          final String date = item['appointment_date'] ?? '';
+                          final String time = item['appointment_time'] ?? '';
+                          final String status = item['status'] ?? 'pending';
+
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  flex: 3,
+                                  child: Text(
+                                    id,
+                                    style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF0284C7)),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 3,
+                                  child: Text(
+                                    patient,
+                                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: textDark),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 3,
+                                  child: Text(
+                                    doctor,
+                                    style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600, color: textDark),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(
+                                    fee,
+                                    style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textDark),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 3,
+                                  child: Text(
+                                    '$date $time',
+                                    style: const TextStyle(fontSize: 10, color: textMuted),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 2,
+                                  child: Align(
+                                    alignment: Alignment.centerRight,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: _getStatusBgColor(status),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Text(
+                                        _formatStatus(status),
+                                        style: TextStyle(
+                                          fontSize: 9.5,
+                                          fontWeight: FontWeight.bold,
+                                          color: _getStatusColor(status),
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  );
+                }
+              },
+            ),
         ],
       ),
     );

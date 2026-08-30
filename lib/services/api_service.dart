@@ -301,4 +301,29 @@ class ApiService {
 
     return [];
   }
+
+  /// Fetch Admin Dashboard metrics
+  static Future<Map<String, dynamic>?> getAdminDashboard(String token) async {
+    try {
+      debugPrint('Fetching admin dashboard data from API...');
+      final response = await http.get(
+        Uri.parse('https://api.mediseba.org/api/v1/admin/dashboard'),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+          'User-Agent': 'MediSebaApp/1.0',
+        },
+      ).timeout(const Duration(seconds: 8));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> body = jsonDecode(response.body);
+        if (body['success'] == true) {
+          return body['data'] as Map<String, dynamic>?;
+        }
+      }
+    } catch (e) {
+      debugPrint('ApiService.getAdminDashboard exception: $e');
+    }
+    return null;
+  }
 }
