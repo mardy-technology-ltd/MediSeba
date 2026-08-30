@@ -4,6 +4,8 @@ import '../../widgets/live_chat_widget.dart';
 import '../../controllers/home_controller.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/language_controller.dart';
+import '../../services/api_service.dart';
+import '../../services/cache_service.dart';
 
 class AdminSalesTeamView extends StatefulWidget {
   final HomeController? homeController;
@@ -33,96 +35,26 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
   String _searchQuery = '';
   String _selectedRoleFilter = 'সকল';
 
-  late List<Map<String, dynamic>> _usersList;
+  bool _isLoading = true;
+  String? _error;
+  
+  List<Map<String, dynamic>> _usersList = [];
+  List<Map<String, dynamic>> _supervisorsList = [];
 
   final List<String> _availableRoles = [
     'Sales Director',
     'Head of Sales',
     'Marketing Manager',
+    'Asst. Marketing Manager',
     'Area Manager',
     'Supervisor',
     'HBP Field Agent',
-    'Verified Doctor',
-    'Patient',
   ];
 
   @override
   void initState() {
     super.initState();
-    _usersList = [
-      {
-        'id': '1',
-        'name': 'ফারহান আহমেদ',
-        'contact': '01700000001 | director@mediseba.com',
-        'role': 'Sales Director',
-        'boss': '-- কোনো রিপোর্টিং বস নেই (Top Boss / None) --',
-        'date': '2026-08-01 10:00',
-        'isSelected': false,
-      },
-      {
-        'id': '2',
-        'name': 'মোঃ রফিকুল ইসলাম',
-        'contact': '01700000002 | headsales@mediseba.com',
-        'role': 'Head of Sales',
-        'boss': 'ফারহান আহমেদ (Sales Director)',
-        'date': '2026-08-01 10:30',
-        'isSelected': false,
-      },
-      {
-        'id': '3',
-        'name': 'নাসরিন আক্তার',
-        'contact': '01700000003 | marketing@mediseba.com',
-        'role': 'Marketing Manager',
-        'boss': 'মোঃ রফিকুল ইসলাম (Head of Sales)',
-        'date': '2026-08-01 11:00',
-        'isSelected': false,
-      },
-      {
-        'id': '4',
-        'name': 'শাহরিয়ার কবির',
-        'contact': '01700000004 | areamanager@mediseba.com',
-        'role': 'Area Manager',
-        'boss': 'নাসরিন আক্তার (Marketing Manager)',
-        'date': '2026-08-01 11:30',
-        'isSelected': false,
-      },
-      {
-        'id': '5',
-        'name': 'তানভীর আহমেদ',
-        'contact': '01700000005 | tanvir@mediseba.com',
-        'role': 'Supervisor',
-        'boss': 'শাহরিয়ার কবির (Area Manager)',
-        'date': '2026-08-01 12:00',
-        'isSelected': false,
-      },
-      {
-        'id': '6',
-        'name': 'আব্দুর রহিম',
-        'contact': '01700000006 | rahim@mediseba.com',
-        'role': 'HBP Field Agent',
-        'boss': 'তানভীর আহমেদ (Supervisor)',
-        'date': '2026-08-01 12:30',
-        'isSelected': false,
-      },
-      {
-        'id': '7',
-        'name': 'Dr. Tanvir Hasan',
-        'contact': '01700000007 | doctor@mediseba.org',
-        'role': 'Verified Doctor',
-        'boss': '-- কোনো রিপোর্টিং বস নেই (Top Boss / None) --',
-        'date': '2026-08-01 13:00',
-        'isSelected': false,
-      },
-      {
-        'id': '8',
-        'name': 'Samiul Islam',
-        'contact': '01700000008 | patient@mediseba.org',
-        'role': 'Patient',
-        'boss': '-- কোনো রিপোর্টিং বস নেই (Top Boss / None) --',
-        'date': '2026-08-01 13:30',
-        'isSelected': false,
-      },
-    ];
+    _loadData();
   }
 
   @override
@@ -131,32 +63,257 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
     super.dispose();
   }
 
-  /// Get list of reporting bosses dynamically from current sales leaders
-  List<String> get _dynamicReportingBosses {
-    final List<String> bosses = [
-      '-- কোনো রিপোর্টিং বস নেই (Top Boss / None) --',
-    ];
-    for (var u in _usersList) {
-      final role = (u['role'] ?? '').toString();
-      final name = (u['name'] ?? '').toString();
-      if (role == 'Sales Director' ||
-          role == 'Head of Sales' ||
-          role == 'Marketing Manager' ||
-          role == 'Area Manager' ||
-          role == 'Supervisor') {
-        bosses.add('$name ($role)');
-      }
+  /// Map UI Role to Backend API Role value
+  String _mapRoleUiToApi(String uiRole) {
+    switch (uiRole) {
+      case 'Sales Director':
+        return 'sales-director';
+      case 'Head of Sales':
+        return 'head-of-sales';
+      case 'Marketing Manager':
+        return 'marketing-manager';
+      case 'Asst. Marketing Manager':
+        return 'asst-marketing-manager';
+      case 'Area Manager':
+        return 'area-manager';
+      case 'Supervisor':
+        return 'supervisor';
+      case 'HBP Field Agent':
+        return 'hbp';
+      default:
+        return uiRole;
     }
-    return bosses;
+  }
+
+  /// Map Backend API Role to UI Role display label
+  String _mapRoleApiToUi(String apiRole) {
+    switch (apiRole.toLowerCase()) {
+      case 'sales-director':
+        return 'Sales Director';
+      case 'head-of-sales':
+        return 'Head of Sales';
+      case 'marketing-manager':
+        return 'Marketing Manager';
+      case 'asst-marketing-manager':
+        return 'Asst. Marketing Manager';
+      case 'area-manager':
+        return 'Area Manager';
+      case 'supervisor':
+        return 'Supervisor';
+      case 'hbp':
+        return 'HBP Field Agent';
+      default:
+        return apiRole;
+    }
+  }
+
+  /// Fetch users and supervisors lists from API
+  Future<void> _loadData() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    try {
+      final token = CacheService.get('auth_token') as String? ?? '';
+      
+      // 1. Fetch sales agents
+      final agents = await ApiService.getSalesAgents(token: token);
+      
+      // 2. Fetch supervisors list
+      final supervisors = await ApiService.getSupervisors(token);
+      
+      if (agents != null) {
+        setState(() {
+          _usersList = agents.map((u) {
+            final String rawRole = (u['role'] ?? '').toString();
+            final String dateStr = (u['created_at'] ?? '').toString();
+            String formattedDate = dateStr;
+            if (dateStr.length > 16) {
+              formattedDate = dateStr.substring(0, 16).replaceAll('T', ' ');
+            }
+            
+            return {
+              'id': (u['id'] ?? '').toString(),
+              'name': (u['name'] ?? '').toString(),
+              'phone': (u['phone'] ?? '').toString(),
+              'email': (u['email'] ?? '').toString(),
+              'role': _mapRoleApiToUi(rawRole),
+              'boss': (u['supervisor_name'] ?? '-- কোনো রিপোর্টিং বস নেই (Top Executive) --').toString(),
+              'supervisor_id': u['supervisor_id'],
+              'date': formattedDate,
+              'isSelected': false,
+            };
+          }).toList();
+
+          _supervisorsList = supervisors ?? [];
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _error = 'ডাটা লোড করতে ব্যর্থ হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।';
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _error = 'ত্রুটি ঘটেছে: $e';
+        _isLoading = false;
+      });
+    }
+  }
+
+  /// Create Sales Agent API Action
+  Future<void> _createUser({
+    required String name,
+    required String email,
+    required String phone,
+    required String password,
+    required String role,
+    int? supervisorId,
+  }) async {
+    setState(() => _isLoading = true);
+    final token = CacheService.get('auth_token') as String? ?? '';
+    final apiRole = _mapRoleUiToApi(role);
+    
+    final success = await ApiService.createSalesAgent(
+      name: name,
+      email: email,
+      phone: phone,
+      password: password,
+      role: apiRole,
+      supervisorId: supervisorId,
+      token: token,
+    );
+
+    if (success) {
+      await _loadData();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$name এর জন্য নতুন প্রোফাইল তৈরি হয়েছে!'), behavior: SnackBarBehavior.floating),
+      );
+    } else {
+      setState(() => _isLoading = false);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('অ্যাকাউন্ট তৈরি করতে ব্যর্থ হয়েছে। তথ্য চেক করুন।'), behavior: SnackBarBehavior.floating),
+      );
+    }
+  }
+
+  /// Update User (Role & Supervisor) API Action
+  Future<void> _updateUser({
+    required int userId,
+    required String name,
+    required String currentRole,
+    required String newRole,
+    required int? currentSupervisorId,
+    required int? newSupervisorId,
+  }) async {
+    setState(() => _isLoading = true);
+    final token = CacheService.get('auth_token') as String? ?? '';
+    bool roleSuccess = true;
+    bool supervisorSuccess = true;
+
+    // Call role update if changed
+    if (currentRole != newRole) {
+      roleSuccess = await ApiService.updateAgentRole(
+        userId: userId,
+        role: _mapRoleUiToApi(newRole),
+        token: token,
+      );
+    }
+
+    // Call supervisor update if changed
+    if (currentSupervisorId != newSupervisorId && newSupervisorId != null) {
+      supervisorSuccess = await ApiService.assignSupervisor(
+        userId: userId,
+        supervisorId: newSupervisorId,
+        token: token,
+      );
+    }
+
+    if (roleSuccess && supervisorSuccess) {
+      await _loadData();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$name এর তথ্য সফলভাবে আপডেট করা হয়েছে!'), behavior: SnackBarBehavior.floating),
+      );
+    } else {
+      await _loadData();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('কিছু তথ্য আপডেট করা সম্ভব হয়নি। আবার চেষ্টা করুন।'), behavior: SnackBarBehavior.floating),
+      );
+    }
+  }
+
+  /// Delete User API Action
+  Future<void> _deleteUser(int userId, String name) async {
+    setState(() => _isLoading = true);
+    final token = CacheService.get('auth_token') as String? ?? '';
+    final success = await ApiService.deleteSalesAgent(userId: userId, token: token);
+    
+    if (success) {
+      await _loadData();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('"$name" সফলভাবে তালিকা থেকে মুছে ফেলা হয়েছে।'), behavior: SnackBarBehavior.floating),
+      );
+    } else {
+      setState(() => _isLoading = false);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('ইউজার মুছে ফেলতে ব্যর্থ হয়েছে।'), behavior: SnackBarBehavior.floating),
+      );
+    }
+  }
+
+  /// Get role color code
+  Color _getRoleColor(String role) {
+    switch (role) {
+      case 'Sales Director':
+        return const Color(0xFF7C3AED);
+      case 'Head of Sales':
+        return const Color(0xFF0284C7);
+      case 'Marketing Manager':
+        return const Color(0xFF0D9488);
+      case 'Asst. Marketing Manager':
+        return const Color(0xFFEC4899);
+      case 'Area Manager':
+        return const Color(0xFF4F46E5);
+      case 'Supervisor':
+        return const Color(0xFFD97706);
+      case 'HBP Field Agent':
+        return const Color(0xFF10B981);
+      default:
+        return const Color(0xFF64748B);
+    }
+  }
+
+  /// Get role background color for badge
+  Color _getRoleBgColor(String role) {
+    return _getRoleColor(role).withValues(alpha: 0.08);
+  }
+
+  /// Get list of reporting bosses dynamically from supervisors
+  List<Map<String, dynamic>> get _dynamicReportingBossesList {
+    final List<Map<String, dynamic>> list = [
+      {'id': 0, 'name': '-- কোনো রিপোর্টিং বস নেই (Top Executive) --'},
+    ];
+    for (var s in _supervisorsList) {
+      final int id = int.tryParse(s['id']?.toString() ?? '') ?? 0;
+      final String name = (s['name'] ?? '').toString();
+      final String email = (s['email'] ?? '').toString();
+      list.add({'id': id, 'name': '$name ($email)'});
+    }
+    return list;
   }
 
   /// Get role count dynamically
   int _getRoleCount(String roleKey) {
     if (roleKey == 'সকল') {
-      return _usersList.where((u) {
-        final r = (u['role'] ?? '').toString();
-        return r != 'Verified Doctor' && r != 'Patient';
-      }).length;
+      return _usersList.length;
     }
     return _usersList.where((u) => (u['role'] ?? '').toString() == roleKey).length;
   }
@@ -165,10 +322,13 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
   Widget build(BuildContext context) {
     final filteredUsers = _usersList.where((u) {
       final name = (u['name'] ?? '').toString().toLowerCase();
-      final contact = (u['contact'] ?? '').toString().toLowerCase();
+      final phone = (u['phone'] ?? '').toString().toLowerCase();
+      final email = (u['email'] ?? '').toString().toLowerCase();
       final role = (u['role'] ?? '').toString();
 
-      final matchesQuery = name.contains(_searchQuery.toLowerCase()) || contact.contains(_searchQuery.toLowerCase());
+      final matchesQuery = name.contains(_searchQuery.toLowerCase()) || 
+                           phone.contains(_searchQuery.toLowerCase()) || 
+                           email.contains(_searchQuery.toLowerCase());
       final matchesRole = _selectedRoleFilter == 'সকল' || role == _selectedRoleFilter;
 
       return matchesQuery && matchesRole;
@@ -180,33 +340,71 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
       appBar: _buildTopAppBar(context),
       drawer: const AdminDrawer(selectedIndex: 4),
       body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 1. Hero Banner (Deep Navy Slate)
-              _buildHeroBanner(),
+        child: RefreshIndicator(
+          onRefresh: _loadData,
+          color: brandGreen,
+          child: _isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(color: brandGreen),
+                )
+              : _error != null
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.error_outline_rounded, color: Colors.redAccent, size: 48),
+                            const SizedBox(height: 12),
+                            Text(
+                              _error!,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: textDark),
+                            ),
+                            const SizedBox(height: 16),
+                            ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: brandGreen,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                              ),
+                              onPressed: _loadData,
+                              icon: const Icon(Icons.refresh_rounded, size: 18),
+                              label: const Text('আবার চেষ্টা করুন', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  : SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // 1. Hero Banner (Deep Navy Slate with hierarchy flow)
+                          _buildHeroBanner(),
 
-              const SizedBox(height: 14),
+                          const SizedBox(height: 14),
 
-              // 2. 6 Role Stat Cards Grid
-              _buildRoleStatCardsGrid(),
+                          // 2. Roles Horizontal Scroll metrics row
+                          _buildRoleStatRow(),
 
-              const SizedBox(height: 14),
+                          const SizedBox(height: 14),
 
-              // 3. Filter & Realtime Search Card
-              _buildFilterSearchCard(),
+                          // 3. Filter & Realtime Search Card
+                          _buildFilterSearchCard(),
 
-              const SizedBox(height: 14),
+                          const SizedBox(height: 14),
 
-              // 4. Hierarchy & Reporting Boss Table / Mobile Card Grid
-              _buildHierarchyTableCard(filteredUsers),
+                          // 4. Hierarchy & Reporting Boss Table / Mobile Card Grid
+                          _buildHierarchyTableCard(filteredUsers),
 
-              const SizedBox(height: 24),
-            ],
-          ),
+                          const SizedBox(height: 24),
+                        ],
+                      ),
+                    ),
         ),
       ),
       floatingActionButton: const LiveChatFabWidget(),
@@ -233,9 +431,9 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
           const SizedBox(width: 4),
           Expanded(
             child: Text(
-              'সেলস টিম ও হায়ারার্কি',
+              'নিবন্ধিত সকল ইউজার ও হায়ারার্কি',
               style: TextStyle(
-                fontSize: isSmallScreen ? 13.5 : 15.5,
+                fontSize: isSmallScreen ? 13.5 : 15.0,
                 fontWeight: FontWeight.w900,
                 color: textDark,
               ),
@@ -252,12 +450,7 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
           padding: EdgeInsets.zero,
           tooltip: 'ক্যাশ রিফ্রেশ',
           icon: const Icon(Icons.sync_rounded, color: Color(0xFF64748B), size: 19),
-          onPressed: () {
-            setState(() {});
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('ক্যাশ রিফ্রেশ সম্পন্ন হয়েছে'), behavior: SnackBarBehavior.floating),
-            );
-          },
+          onPressed: _loadData,
         ),
 
         // Notifications Bell
@@ -317,8 +510,11 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
     );
   }
 
-  /// 1. Hero Banner (Deep Navy Slate)
+  /// 1. Hero Banner (Deep Navy Slate with hierarchy flow)
   Widget _buildHeroBanner() {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isMobile = screenWidth < 480;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -336,57 +532,38 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Wrap(
-            alignment: WrapAlignment.spaceBetween,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 6,
-            runSpacing: 6,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                  color: Colors.white.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
                 ),
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.shield_rounded, color: Color(0xFF818CF8), size: 12),
+                    Icon(Icons.hub_rounded, color: Color(0xFF818CF8), size: 12),
                     SizedBox(width: 4),
                     Text(
-                      'SUPER ADMIN MANAGEMENT',
-                      style: TextStyle(color: Color(0xFFC7D2FE), fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.5),
+                      'FULL SYSTEM INTEGRATION',
+                      style: TextStyle(color: Color(0xFFC7D2FE), fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 0.5),
                     ),
                   ],
                 ),
               ),
-
-              // Action Button Right (+ নতুন একাউন্ট তৈরি করুন)
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF4F46E5),
-                  foregroundColor: Colors.white,
-                  elevation: 2,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-                ),
-                onPressed: _showCreateUserModal,
-                icon: const Icon(Icons.person_add_alt_1_rounded, size: 14),
-                label: const Text(
-                  '+ নতুন একাউন্ট তৈরি করুন (Create Profile)',
-                  style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w800),
-                ),
-              ),
+              if (!isMobile) _buildCreateProfileButton(),
             ],
           ),
 
           const SizedBox(height: 12),
 
           const Text(
-            'সেলস টিম & হায়ারার্কি ম্যানেজমেন্ট প্যানেল',
+            '👥 সেলস টিম ও হায়ারার্কি ম্যানেজমেন্ট প্যানেল',
             style: TextStyle(
-              fontSize: 17.5,
+              fontSize: 18,
               fontWeight: FontWeight.w900,
               color: Colors.white,
               letterSpacing: -0.2,
@@ -394,160 +571,218 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
           ),
           const SizedBox(height: 4),
           const Text(
-            'HBP, Supervisor, Area Manager, Marketing Manager, Head of Sales ও Sales Director আইডি সৃষ্টি ও অ্যাসাইনমেন্ট',
+            'Sales Director ➔ Head of Sales ➔ Marketing Manager ➔ Asst. Marketing Manager ➔ Area Manager ➔ Supervisor ➔ HBP Field Agent (লাইভ MySQL সিঙ্ক)',
             style: TextStyle(
-              fontSize: 11.5,
+              fontSize: 10.5,
               color: Color(0xFF94A3B8),
               height: 1.35,
             ),
           ),
+
+          const SizedBox(height: 12),
+          // Horizontally scrollable visual hierarchy timeline
+          _buildHierarchyPipeline(),
+
+          if (isMobile) ...[
+            const SizedBox(height: 12),
+            SizedBox(width: double.infinity, child: _buildCreateProfileButton()),
+          ],
         ],
       ),
     );
   }
 
-  /// 2. 6 Role Stat Cards Grid
-  Widget _buildRoleStatCardsGrid() {
+  Widget _buildCreateProfileButton() {
+    return ElevatedButton.icon(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: brandGreen,
+        foregroundColor: Colors.white,
+        elevation: 1,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      onPressed: _showCreateUserModal,
+      icon: const Icon(Icons.person_add_alt_1_rounded, size: 15),
+      label: const Text(
+        '+ নতুন অ্যাকাউন্ট তৈরি করুন (Create Profile)',
+        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900),
+      ),
+    );
+  }
+
+  Widget _buildHierarchyPipeline() {
+    final pipeline = [
+      'Sales Director',
+      'Head of Sales',
+      'Marketing Manager',
+      'Asst. Marketing Manager',
+      'Area Manager',
+      'Supervisor',
+      'HBP Field Agent',
+    ];
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      physics: const BouncingScrollPhysics(),
+      child: Row(
+        children: pipeline.asMap().entries.map((entry) {
+          final idx = entry.key;
+          final role = entry.value;
+          return Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: _getRoleBgColor(role),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: _getRoleColor(role).withValues(alpha: 0.3)),
+                ),
+                child: Text(
+                  role,
+                  style: TextStyle(
+                    fontSize: 9.5,
+                    fontWeight: FontWeight.w900,
+                    color: _getRoleColor(role),
+                  ),
+                ),
+              ),
+              if (idx < pipeline.length - 1)
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 4.0),
+                  child: Icon(Icons.chevron_right_rounded, color: Colors.white24, size: 14),
+                ),
+            ],
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  /// 2. Roles Scroll metrics row
+  Widget _buildRoleStatRow() {
     final statCards = [
       {
-        'title': '✨ HBP এজেন্টস',
-        'count': '${_getRoleCount('HBP Field Agent')} জন',
-        'icon': Icons.stars_rounded,
-        'iconColor': const Color(0xFF059669),
+        'title': 'HBP এজেন্ট',
+        'count': '${_getRoleCount('HBP Field Agent')}',
         'roleKey': 'HBP Field Agent',
       },
       {
-        'title': '🛡️ সুপারভাইজার',
-        'count': '${_getRoleCount('Supervisor')} জন',
-        'icon': Icons.shield_outlined,
-        'iconColor': const Color(0xFFD97706),
+        'title': 'সুপারভাইজার',
+        'count': '${_getRoleCount('Supervisor')}',
         'roleKey': 'Supervisor',
       },
       {
-        'title': '🏢 এরিয়া ম্যানেজার',
-        'count': '${_getRoleCount('Area Manager')} জন',
-        'icon': Icons.business_outlined,
-        'iconColor': const Color(0xFF4F46E5),
-        'roleKey': 'Area Manager',
-      },
-      {
-        'title': '📈 মার্কেটিং ম্যানেজার',
-        'count': '${_getRoleCount('Marketing Manager')} জন',
-        'icon': Icons.edit_note_rounded,
-        'iconColor': const Color(0xFF0891B2),
+        'title': 'মার্কেটিং ম্যানেজার',
+        'count': '${_getRoleCount('Marketing Manager')}',
         'roleKey': 'Marketing Manager',
       },
       {
-        'title': '👔 হেড অব সেলস',
-        'count': '${_getRoleCount('Head of Sales')} জন',
-        'icon': Icons.bar_chart_rounded,
-        'iconColor': const Color(0xFF0284C7),
+        'title': 'Asst. মার্কেটিং ম্যানেজার',
+        'count': '${_getRoleCount('Asst. Marketing Manager')}',
+        'roleKey': 'Asst. Marketing Manager',
+      },
+      {
+        'title': 'এরিয়া ম্যানেজার',
+        'count': '${_getRoleCount('Area Manager')}',
+        'roleKey': 'Area Manager',
+      },
+      {
+        'title': 'হেড অব সেলস',
+        'count': '${_getRoleCount('Head of Sales')}',
         'roleKey': 'Head of Sales',
       },
       {
-        'title': '📊 সেলস ডিরেক্টর',
-        'count': '${_getRoleCount('Sales Director')} জন',
-        'icon': Icons.account_balance_outlined,
-        'iconColor': const Color(0xFF7C3AED),
+        'title': 'সেলস ডিরেক্টর',
+        'count': '${_getRoleCount('Sales Director')}',
         'roleKey': 'Sales Director',
       },
     ];
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final double width = constraints.maxWidth;
-        final int crossAxisCount = width > 700 ? 6 : (width > 450 ? 3 : 2);
-        final double childAspectRatio = width > 700 ? 1.4 : 1.35;
+    return SizedBox(
+      height: 64,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        itemCount: statCards.length,
+        separatorBuilder: (context, index) => const SizedBox(width: 8),
+        itemBuilder: (context, index) {
+          final card = statCards[index];
+          final String title = card['title']!;
+          final String count = card['count']!;
+          final String roleKey = card['roleKey']!;
+          final bool isSelected = _selectedRoleFilter == roleKey;
+          final Color themeColor = _getRoleColor(roleKey);
 
-        return GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: crossAxisCount,
-            crossAxisSpacing: 8,
-            mainAxisSpacing: 8,
-            childAspectRatio: childAspectRatio,
-          ),
-          itemCount: statCards.length,
-          itemBuilder: (context, index) {
-            final card = statCards[index];
-            final String title = (card['title'] ?? '').toString();
-            final String count = (card['count'] ?? '').toString();
-            final String roleKey = (card['roleKey'] ?? '').toString();
-
-            final bool isSelected = _selectedRoleFilter == roleKey;
-
-            return GestureDetector(
-              onTap: () {
-                setState(() {
-                  _selectedRoleFilter = isSelected ? 'সকল' : roleKey;
-                });
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: isSelected ? brandGreen : const Color(0xFFE2E8F0),
-                    width: isSelected ? 1.8 : 1.0,
+          return GestureDetector(
+            onTap: () {
+              setState(() {
+                _selectedRoleFilter = isSelected ? 'সকল' : roleKey;
+              });
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: isSelected ? themeColor : const Color(0xFFE2E8F0),
+                  width: isSelected ? 2.0 : 1.0,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: isSelected ? themeColor.withValues(alpha: 0.12) : Colors.black.withValues(alpha: 0.01),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: isSelected ? brandGreen.withValues(alpha: 0.12) : Colors.black.withValues(alpha: 0.02),
-                      blurRadius: isSelected ? 8 : 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: textMuted),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      count,
-                      style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: textDark),
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'ফিল্টার করুন',
-                          style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: isSelected ? brandGreen : const Color(0xFFD97706)),
-                        ),
-                        const SizedBox(width: 2),
-                        Icon(Icons.arrow_forward_rounded, size: 10, color: isSelected ? brandGreen : const Color(0xFFD97706)),
-                      ],
-                    ),
-                  ],
-                ),
+                ],
               ),
-            );
-          },
-        );
-      },
+              child: Row(
+                children: [
+                  Container(
+                    width: 3.5,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: themeColor,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: textMuted),
+                      ),
+                      const SizedBox(height: 1),
+                      Text(
+                        count,
+                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: textDark),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 
   /// 3. Filter & Realtime Search Card
   Widget _buildFilterSearchCard() {
     final filterOptions = [
-      {'label': '🌐 সকল সেলস সদস্য', 'count': '${_getRoleCount('সকল')}', 'role': 'সকল'},
-      {'label': '✨ HBP ফিল্ড এজেন্ট', 'count': '${_getRoleCount('HBP Field Agent')}', 'role': 'HBP Field Agent'},
-      {'label': '🛡️ সুপারভাইজার', 'count': '${_getRoleCount('Supervisor')}', 'role': 'Supervisor'},
-      {'label': '🏢 এরিয়া ম্যানেজার', 'count': '${_getRoleCount('Area Manager')}', 'role': 'Area Manager'},
-      {'label': '📈 মার্কেটিং ম্যানেজার', 'count': '${_getRoleCount('Marketing Manager')}', 'role': 'Marketing Manager'},
-      {'label': '👔 হেড অব সেলস', 'count': '${_getRoleCount('Head of Sales')}', 'role': 'Head of Sales'},
-      {'label': '📊 সেলস ডিরেক্টর', 'count': '${_getRoleCount('Sales Director')}', 'role': 'Sales Director'},
+      {'label': 'সকল সেলস মেম্বার', 'count': '${_getRoleCount('সকল')}', 'role': 'সকল'},
+      {'label': 'HBP Field Agent', 'count': '${_getRoleCount('HBP Field Agent')}', 'role': 'HBP Field Agent'},
+      {'label': 'Supervisor', 'count': '${_getRoleCount('Supervisor')}', 'role': 'Supervisor'},
+      {'label': 'Area Manager', 'count': '${_getRoleCount('Area Manager')}', 'role': 'Area Manager'},
+      {'label': 'Asst. Marketing Manager', 'count': '${_getRoleCount('Asst. Marketing Manager')}', 'role': 'Asst. Marketing Manager'},
+      {'label': 'Marketing Manager', 'count': '${_getRoleCount('Marketing Manager')}', 'role': 'Marketing Manager'},
+      {'label': 'Head of Sales', 'count': '${_getRoleCount('Head of Sales')}', 'role': 'Head of Sales'},
+      {'label': 'Sales Director', 'count': '${_getRoleCount('Sales Director')}', 'role': 'Sales Director'},
     ];
 
     return Container(
@@ -567,65 +802,34 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header Row
-          Wrap(
-            alignment: WrapAlignment.spaceBetween,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.filter_list_rounded, color: Color(0xFF4F46E5), size: 18),
-                      SizedBox(width: 6),
-                      Text(
-                        'রোল অনুসারে ফিল্টার ও রিয়েল-টাইম সার্চ',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: textDark),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 2),
-                  Text(
-                    'মেম্বারদের দ্রুত খুঁজে বের করতে ট্যাব বেছে নিন অথবা ফিল্ডে টাইপ করুন',
-                    style: TextStyle(fontSize: 10, color: textMuted),
-                  ),
-                ],
+          // Search Box with prefix magnifying glass
+          TextField(
+            controller: _searchController,
+            onChanged: (val) {
+              setState(() {
+                _searchQuery = val;
+              });
+            },
+            style: const TextStyle(fontSize: 12.5),
+            decoration: InputDecoration(
+              hintText: '🔍 নাম, ফোন বা ইমেইল দিয়ে খুঁজুন...',
+              hintStyle: const TextStyle(fontSize: 11, color: textMuted),
+              contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
+              filled: true,
+              fillColor: const Color(0xFFF8FAFC),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
               ),
-
-              // Search Box matching web placeholder
-              SizedBox(
-                width: 230,
-                height: 36,
-                child: TextField(
-                  controller: _searchController,
-                  onChanged: (val) {
-                    setState(() {
-                      _searchQuery = val;
-                    });
-                  },
-                  style: const TextStyle(fontSize: 11.5),
-                  decoration: InputDecoration(
-                    hintText: '🔍 নাম, ফোন, ইমেইল বা বস দিয়ে খুঁজুন...',
-                    hintStyle: const TextStyle(fontSize: 10.5, color: textMuted),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
-                    filled: true,
-                    fillColor: const Color(0xFFF8FAFC),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
-                    ),
-                  ),
-                ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
               ),
-            ],
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: brandGreen, width: 1.5),
+              ),
+            ),
           ),
 
           const SizedBox(height: 12),
@@ -633,12 +837,14 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
           // Filter Chips Scroll View
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
             child: Row(
               children: filterOptions.map((opt) {
                 final String label = opt['label']!;
                 final String count = opt['count']!;
                 final String role = opt['role']!;
                 final bool isSelected = _selectedRoleFilter == role;
+                final Color themeColor = role == 'সকল' ? const Color(0xFF4F46E5) : _getRoleColor(role);
 
                 return Padding(
                   padding: const EdgeInsets.only(right: 6),
@@ -651,10 +857,10 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                       decoration: BoxDecoration(
-                        color: isSelected ? const Color(0xFF4F46E5) : const Color(0xFFF1F5F9),
+                        color: isSelected ? themeColor : const Color(0xFFF1F5F9),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: isSelected ? const Color(0xFF4F46E5) : const Color(0xFFE2E8F0),
+                          color: isSelected ? themeColor : const Color(0xFFE2E8F0),
                         ),
                       ),
                       child: Row(
@@ -678,10 +884,9 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
                             child: Text(
                               count,
                               style: TextStyle(
-                                fontSize: 9.5,
-                                fontWeight: FontWeight.bold,
-                                color: isSelected ? Colors.white : textDark,
-                              ),
+                                  fontSize: 9.5,
+                                  fontWeight: FontWeight.bold,
+                                  color: isSelected ? Colors.white : textDark),
                             ),
                           ),
                         ],
@@ -721,8 +926,8 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
             children: [
               const Expanded(
                 child: Text(
-                  '👥 নিবন্ধিত সকল ইউজার ও হায়ারার্কি রিপোর্টিং বস তালিকা',
-                  style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w900, color: textDark),
+                  '👥 নিবন্ধিত সদস্য ও হায়ারার্কি রিপোর্টিং বস তালিকা',
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: textDark),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -734,7 +939,7 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  'ফিল্টারকৃত সদস্য: ${users.length} জন',
+                  'মোট: ${users.length} জন',
                   style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: textMuted),
                 ),
               ),
@@ -764,133 +969,125 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
                 return Column(
                   children: users.map((u) {
                     final String name = (u['name'] ?? '').toString();
-                    final String contact = (u['contact'] ?? '').toString();
+                    final String phone = (u['phone'] ?? '').toString();
+                    final String email = (u['email'] ?? '').toString();
                     final String role = (u['role'] ?? '').toString();
                     final String boss = (u['boss'] ?? '').toString();
                     final String date = (u['date'] ?? '').toString();
-                    final bool isSelected = (u['isSelected'] as bool?) ?? false;
-
-                    final bossesList = _dynamicReportingBosses;
 
                     return Container(
                       margin: const EdgeInsets.only(bottom: 10),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: const Color(0xFFF8FAFC),
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: isSelected ? brandGreen : const Color(0xFFE2E8F0)),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: const Color(0xFFE2E8F0)),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // Top Name and Role Badge Row
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Checkbox(
-                                value: isSelected,
-                                activeColor: brandGreen,
-                                onChanged: (val) {
-                                  setState(() {
-                                    u['isSelected'] = val ?? false;
-                                  });
-                                },
-                              ),
                               Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(name, style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w900, color: textDark)),
-                                    const SizedBox(height: 1),
-                                    Text(contact, style: const TextStyle(fontSize: 10, color: textMuted)),
-                                  ],
+                                child: Text(
+                                  name,
+                                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: textDark),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
+                                decoration: BoxDecoration(
+                                  color: _getRoleBgColor(role),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: _getRoleColor(role).withValues(alpha: 0.15)),
+                                ),
+                                child: Text(
+                                  role,
+                                  style: TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w900,
+                                    color: _getRoleColor(role),
+                                  ),
                                 ),
                               ),
                             ],
                           ),
-                          const Divider(color: Color(0xFFE2E8F0)),
-                          const SizedBox(height: 4),
-
-                          // Role Selector Dropdown
-                          const Text('পদবী (UPDATE ROLE):', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: textMuted)),
-                          const SizedBox(height: 2),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: const Color(0xFFCBD5E1)),
-                            ),
-                            child: DropdownButtonHideUnderline(
-                              child: DropdownButton<String>(
-                                value: _availableRoles.contains(role) ? role : _availableRoles.last,
-                                isExpanded: true,
-                                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: textDark),
-                                items: _availableRoles.map((r) {
-                                  return DropdownMenuItem<String>(
-                                    value: r,
-                                    child: Text(r),
-                                  );
-                                }).toList(),
-                                onChanged: (newRole) {
-                                  if (newRole != null) {
-                                    setState(() {
-                                      u['role'] = newRole;
-                                    });
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text('$name এর পদবী [$newRole] এ আপডেট করা হয়েছে'),
-                                        behavior: SnackBarBehavior.floating,
-                                      ),
-                                    );
-                                  }
-                                },
-                              ),
-                            ),
+                          const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 8.0),
+                            child: Divider(color: Color(0xFFE2E8F0), height: 1),
                           ),
 
-                          const SizedBox(height: 8),
-
-                          // Reporting Boss Selector Dropdown
-                          const Text('রিপোর্টিং বস (REPORTING BOSS SELECTION):', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: textMuted)),
-                          const SizedBox(height: 2),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: const Color(0xFFCBD5E1)),
-                            ),
-                            child: DropdownButtonHideUnderline(
-                              child: DropdownButton<String>(
-                                value: bossesList.contains(boss) ? boss : bossesList.first,
-                                isExpanded: true,
-                                style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600, color: textDark),
-                                items: bossesList.map((b) {
-                                  return DropdownMenuItem<String>(
-                                    value: b,
-                                    child: Text(b, overflow: TextOverflow.ellipsis),
-                                  );
-                                }).toList(),
-                                onChanged: (newBoss) {
-                                  if (newBoss != null) {
-                                    setState(() {
-                                      u['boss'] = newBoss;
-                                    });
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text('$name এর রিপোর্টিং বস পরিবর্তন করা হয়েছে'),
-                                        behavior: SnackBarBehavior.floating,
-                                      ),
-                                    );
-                                  }
-                                },
+                          // Contact Info Row
+                          Row(
+                            children: [
+                              const Icon(Icons.phone_android_rounded, size: 13, color: textMuted),
+                              const SizedBox(width: 4),
+                              Text(phone, style: const TextStyle(fontSize: 10.5, color: textMuted, fontWeight: FontWeight.w500)),
+                              const SizedBox(width: 8),
+                              const Icon(Icons.email_outlined, size: 13, color: textMuted),
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: Text(
+                                  email,
+                                  style: const TextStyle(fontSize: 10.5, color: textMuted, fontWeight: FontWeight.w500),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
-                            ),
+                            ],
                           ),
-
                           const SizedBox(height: 6),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: Text('তৈরির তারিখ: $date', style: const TextStyle(fontSize: 9.5, color: textMuted)),
+
+                          // Reporting Boss Row
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.account_tree_outlined, size: 13, color: textMuted),
+                              const SizedBox(width: 4),
+                              const Text(
+                                'রিপোর্টিং বস: ',
+                                style: TextStyle(fontSize: 11, color: textMuted, fontWeight: FontWeight.bold),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  boss,
+                                  style: const TextStyle(fontSize: 11, color: textDark, fontWeight: FontWeight.w600),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+
+                          // Footer with Creation Date and CRUD actions
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'তৈরির তারিখ: $date',
+                                style: const TextStyle(fontSize: 9.5, color: textMuted, fontWeight: FontWeight.w500),
+                              ),
+                              Row(
+                                children: [
+                                  IconButton(
+                                    constraints: const BoxConstraints(),
+                                    padding: const EdgeInsets.all(4),
+                                    icon: const Icon(Icons.edit_outlined, color: Colors.blueAccent, size: 16),
+                                    onPressed: () => _showEditUserModal(u),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  IconButton(
+                                    constraints: const BoxConstraints(),
+                                    padding: const EdgeInsets.all(4),
+                                    icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent, size: 16),
+                                    onPressed: () => _confirmDeleteUser(u),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -909,11 +1106,11 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
                       ),
                       child: const Row(
                         children: [
-                          SizedBox(width: 30),
-                          Expanded(flex: 3, child: Text('নাম ও যোগাযোগের তথ্য', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textMuted))),
-                          Expanded(flex: 3, child: Text('পদবী (UPDATE ROLE)', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textMuted))),
-                          Expanded(flex: 4, child: Text('রিপোর্টিং বস (REPORTING BOSS SELECTION)', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textMuted))),
-                          Expanded(flex: 2, child: Text('তৈরির তারিখ', textAlign: TextAlign.right, style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textMuted))),
+                          Expanded(flex: 3, child: Text('নাম ও যোগাযোগের তথ্য', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: textMuted))),
+                          Expanded(flex: 2, child: Text('পদবী (ROLE)', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: textMuted))),
+                          Expanded(flex: 4, child: Text('রিপোর্টিং বস (SUPERVISOR/MANAGER)', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: textMuted))),
+                          Expanded(flex: 2, child: Text('তৈরির তারিখ', textAlign: TextAlign.right, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: textMuted))),
+                          SizedBox(width: 80),
                         ],
                       ),
                     ),
@@ -926,128 +1123,71 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
                       itemBuilder: (context, index) {
                         final u = users[index];
                         final String name = (u['name'] ?? '').toString();
-                        final String contact = (u['contact'] ?? '').toString();
+                        final String phone = (u['phone'] ?? '').toString();
+                        final String email = (u['email'] ?? '').toString();
                         final String role = (u['role'] ?? '').toString();
                         final String boss = (u['boss'] ?? '').toString();
                         final String date = (u['date'] ?? '').toString();
-                        final bool isSelected = (u['isSelected'] as bool?) ?? false;
-
-                        final bossesList = _dynamicReportingBosses;
 
                         return Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
                           child: Row(
                             children: [
-                              SizedBox(
-                                width: 30,
-                                child: Checkbox(
-                                  value: isSelected,
-                                  activeColor: brandGreen,
-                                  onChanged: (val) {
-                                    setState(() {
-                                      u['isSelected'] = val ?? false;
-                                    });
-                                  },
-                                ),
-                              ),
                               Expanded(
                                 flex: 3,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(name, style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800, color: textDark)),
-                                    Text(contact, style: const TextStyle(fontSize: 9.5, color: textMuted)),
+                                    Text('$phone | $email', style: const TextStyle(fontSize: 9.5, color: textMuted)),
                                   ],
                                 ),
                               ),
-
-                              // Role Dropdown
                               Expanded(
-                                flex: 3,
+                                flex: 2,
                                 child: Container(
-                                  height: 36,
-                                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFF8FAFC),
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                                    color: _getRoleBgColor(role),
+                                    borderRadius: BorderRadius.circular(6),
                                   ),
-                                  child: DropdownButtonHideUnderline(
-                                    child: DropdownButton<String>(
-                                      value: _availableRoles.contains(role) ? role : _availableRoles.last,
-                                      isExpanded: true,
-                                      style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: textDark),
-                                      items: _availableRoles.map((r) {
-                                        return DropdownMenuItem<String>(
-                                          value: r,
-                                          child: Text(r, overflow: TextOverflow.ellipsis),
-                                        );
-                                      }).toList(),
-                                      onChanged: (newRole) {
-                                        if (newRole != null) {
-                                          setState(() {
-                                            u['role'] = newRole;
-                                          });
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(
-                                              content: Text('$name এর পদবী [$newRole] এ আপডেট করা হয়েছে'),
-                                              behavior: SnackBarBehavior.floating,
-                                            ),
-                                          );
-                                        }
-                                      },
-                                    ),
+                                  child: Text(
+                                    role,
+                                    style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: _getRoleColor(role)),
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 8),
-
-                              // Reporting Boss Dropdown
                               Expanded(
                                 flex: 4,
-                                child: Container(
-                                  height: 36,
-                                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFF8FAFC),
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: const Color(0xFFE2E8F0)),
-                                  ),
-                                  child: DropdownButtonHideUnderline(
-                                    child: DropdownButton<String>(
-                                      value: bossesList.contains(boss) ? boss : bossesList.first,
-                                      isExpanded: true,
-                                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: textDark),
-                                      items: bossesList.map((b) {
-                                        return DropdownMenuItem<String>(
-                                          value: b,
-                                          child: Text(b, overflow: TextOverflow.ellipsis),
-                                        );
-                                      }).toList(),
-                                      onChanged: (newBoss) {
-                                        if (newBoss != null) {
-                                          setState(() {
-                                            u['boss'] = newBoss;
-                                          });
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(
-                                              content: Text('$name এর রিপোর্টিং বস পরিবর্তন করা হয়েছে'),
-                                              behavior: SnackBarBehavior.floating,
-                                            ),
-                                          );
-                                        }
-                                      },
-                                    ),
-                                  ),
+                                child: Text(
+                                  boss,
+                                  style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600, color: textDark),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-
                               Expanded(
                                 flex: 2,
                                 child: Text(
                                   date,
                                   textAlign: TextAlign.right,
                                   style: const TextStyle(fontSize: 9.5, color: textMuted),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              SizedBox(
+                                width: 70,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(Icons.edit_outlined, color: Colors.blueAccent, size: 16),
+                                      onPressed: () => _showEditUserModal(u),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent, size: 16),
+                                      onPressed: () => _confirmDeleteUser(u),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
@@ -1070,8 +1210,9 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
     final nameCtrl = TextEditingController();
     final phoneCtrl = TextEditingController();
     final emailCtrl = TextEditingController();
+    final passCtrl = TextEditingController(text: '123456'); // Default password matching backend mockup
     String selectedRole = 'HBP Field Agent';
-    String selectedBoss = _dynamicReportingBosses.first;
+    int selectedBossId = 0;
 
     showModalBottomSheet(
       context: context,
@@ -1083,7 +1224,7 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setModalState) {
-            final bosses = _dynamicReportingBosses;
+            final bosses = _dynamicReportingBossesList;
 
             return Padding(
               padding: EdgeInsets.only(
@@ -1101,25 +1242,25 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
                     children: [
                       const Row(
                         children: [
-                          Icon(Icons.person_add_alt_1_rounded, color: Color(0xFF4F46E5), size: 22),
+                          Icon(Icons.person_add_alt_1_rounded, color: brandGreen, size: 20),
                           SizedBox(width: 8),
                           Text(
                             'নতুন অ্যাকাউন্ট তৈরি করুন',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: textDark),
+                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: textDark),
                           ),
                         ],
                       ),
                       IconButton(
-                        icon: const Icon(Icons.close_rounded, size: 22),
+                        icon: const Icon(Icons.close_rounded, size: 20),
                         onPressed: () => Navigator.pop(context),
                       ),
                     ],
                   ),
                   const Divider(color: Color(0xFFE2E8F0)),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 8),
 
                   // Name Input
-                  const Text('পূর্ণ নাম', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: textMuted)),
+                  const Text('পূর্ণ নাম', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: textMuted)),
                   const SizedBox(height: 4),
                   TextField(
                     controller: nameCtrl,
@@ -1127,49 +1268,62 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
                     decoration: InputDecoration(
                       hintText: 'যেমন: ফারহান আহমেদ',
                       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                     ),
                   ),
                   const SizedBox(height: 10),
 
                   // Phone Input
-                  const Text('মোবাইল নাম্বার', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: textMuted)),
+                  const Text('মোবাইল নাম্বার', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: textMuted)),
                   const SizedBox(height: 4),
                   TextField(
                     controller: phoneCtrl,
                     keyboardType: TextInputType.phone,
                     style: const TextStyle(fontSize: 12.5),
                     decoration: InputDecoration(
-                      hintText: '01700000000',
+                      hintText: 'যেমন: 01700000000',
                       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                     ),
                   ),
                   const SizedBox(height: 10),
 
                   // Email Input
-                  const Text('ইমেইল অ্যাড্রেস', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: textMuted)),
+                  const Text('ইমেইল অ্যাড্রেস', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: textMuted)),
                   const SizedBox(height: 4),
                   TextField(
                     controller: emailCtrl,
                     keyboardType: TextInputType.emailAddress,
                     style: const TextStyle(fontSize: 12.5),
                     decoration: InputDecoration(
-                      hintText: 'agent@mediseba.com',
+                      hintText: 'যেমন: agent@mediseba.com',
                       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Password Input
+                  const Text('পাসওয়ার্ড', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: textMuted)),
+                  const SizedBox(height: 4),
+                  TextField(
+                    controller: passCtrl,
+                    style: const TextStyle(fontSize: 12.5),
+                    decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                     ),
                   ),
                   const SizedBox(height: 10),
 
                   // Role Dropdown Selection
-                  const Text('পদবী নির্বাচন করুন (Update Role)', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: textMuted)),
+                  const Text('পদবী নির্বাচন করুন', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: textMuted)),
                   const SizedBox(height: 4),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     decoration: BoxDecoration(
                       border: Border.all(color: const Color(0xFFCBD5E1)),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
@@ -1190,24 +1344,27 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
                   const SizedBox(height: 10),
 
                   // Reporting Boss Dropdown Selection
-                  const Text('রিপোর্টিং বস নির্বাচন করুন (Reporting Boss)', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: textMuted)),
+                  const Text('রিপোর্টিং বস নির্বাচন করুন', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: textMuted)),
                   const SizedBox(height: 4),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     decoration: BoxDecoration(
                       border: Border.all(color: const Color(0xFFCBD5E1)),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                     child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        value: bosses.contains(selectedBoss) ? selectedBoss : bosses.first,
+                      child: DropdownButton<int>(
+                        value: selectedBossId,
                         isExpanded: true,
                         style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: textDark),
-                        items: bosses.map((b) => DropdownMenuItem(value: b, child: Text(b, overflow: TextOverflow.ellipsis))).toList(),
+                        items: bosses.map((b) => DropdownMenuItem<int>(
+                          value: b['id'] as int, 
+                          child: Text(b['name'].toString(), overflow: TextOverflow.ellipsis)
+                        )).toList(),
                         onChanged: (val) {
                           if (val != null) {
                             setModalState(() {
-                              selectedBoss = val;
+                              selectedBossId = val;
                             });
                           }
                         },
@@ -1219,17 +1376,18 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
                   // Submit Button
                   SizedBox(
                     width: double.infinity,
-                    height: 44,
+                    height: 42,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF4F46E5),
+                        backgroundColor: brandGreen,
                         foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
                       onPressed: () {
                         final name = nameCtrl.text.trim();
                         final phone = phoneCtrl.text.trim();
                         final email = emailCtrl.text.trim();
+                        final password = passCtrl.text.trim();
 
                         if (name.isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -1238,30 +1396,31 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
                           return;
                         }
 
-                        final contactStr = '${phone.isNotEmpty ? phone : "01700000000"} | ${email.isNotEmpty ? email : "agent@mediseba.com"}';
-                        final nowStr = DateTime.now().toString().substring(0, 16);
+                        if (phone.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('দয়া করে মোবাইল নাম্বার টাইপ করুন'), behavior: SnackBarBehavior.floating),
+                          );
+                          return;
+                        }
 
-                        setState(() {
-                          _usersList.insert(0, {
-                            'id': DateTime.now().millisecondsSinceEpoch.toString(),
-                            'name': name,
-                            'contact': contactStr,
-                            'role': selectedRole,
-                            'boss': selectedBoss,
-                            'date': nowStr,
-                            'isSelected': false,
-                          });
-                        });
+                        if (password.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('দয়া করে পাসওয়ার্ড টাইপ করুন'), behavior: SnackBarBehavior.floating),
+                          );
+                          return;
+                        }
 
                         Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('$name এর জন্য নতুন অ্যাকাউন্ট সফলভাবে সৃষ্টি করা হয়েছে!'),
-                            behavior: SnackBarBehavior.floating,
-                          ),
+                        _createUser(
+                          name: name,
+                          email: email.isNotEmpty ? email : '$phone@mediseba.com',
+                          phone: phone,
+                          password: password,
+                          role: selectedRole,
+                          supervisorId: selectedBossId == 0 ? null : selectedBossId,
                         );
                       },
-                      child: const Text('অ্যাকাউন্ট তৈরি করুন', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                      child: const Text('অ্যাকাউন্ট তৈরি করুন', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ],
@@ -1270,6 +1429,236 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
           },
         );
       },
+    );
+  }
+
+  /// Edit User Modal Sheet
+  void _showEditUserModal(Map<String, dynamic> u) {
+    final nameCtrl = TextEditingController(text: u['name']);
+    final phoneCtrl = TextEditingController(text: u['phone']);
+    final emailCtrl = TextEditingController(text: u['email']);
+    String selectedRole = u['role'];
+    int? currentBossId = u['supervisor_id'];
+    int selectedBossId = currentBossId ?? 0;
+    final int userId = int.tryParse(u['id'] ?? '') ?? 0;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            final bosses = _dynamicReportingBossesList;
+
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 20,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.edit_outlined, color: _getRoleColor(selectedRole), size: 20),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'ইউজার তথ্য পরিবর্তন করুন',
+                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: textDark),
+                          ),
+                        ],
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close_rounded, size: 20),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
+                  const Divider(color: Color(0xFFE2E8F0)),
+                  const SizedBox(height: 8),
+
+                  // Name Input (Disabled/Read-only representation matching API)
+                  const Text('পূর্ণ নাম', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: textMuted)),
+                  const SizedBox(height: 4),
+                  TextField(
+                    controller: nameCtrl,
+                    enabled: false,
+                    style: const TextStyle(fontSize: 12.5, color: textMuted),
+                    decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Phone Input (Disabled/Read-only)
+                  const Text('মোবাইল নাম্বার', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: textMuted)),
+                  const SizedBox(height: 4),
+                  TextField(
+                    controller: phoneCtrl,
+                    enabled: false,
+                    style: const TextStyle(fontSize: 12.5, color: textMuted),
+                    decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Email Input (Disabled/Read-only)
+                  const Text('ইমেইল অ্যাড্রেস', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: textMuted)),
+                  const SizedBox(height: 4),
+                  TextField(
+                    controller: emailCtrl,
+                    enabled: false,
+                    style: const TextStyle(fontSize: 12.5, color: textMuted),
+                    decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Role Dropdown Selection
+                  const Text('পদবী নির্বাচন করুন', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: textMuted)),
+                  const SizedBox(height: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: const Color(0xFFCBD5E1)),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: selectedRole,
+                        isExpanded: true,
+                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: textDark),
+                        items: _availableRoles.map((r) => DropdownMenuItem(value: r, child: Text(r))).toList(),
+                        onChanged: (val) {
+                          if (val != null) {
+                            setModalState(() {
+                              selectedRole = val;
+                            });
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Reporting Boss Dropdown Selection
+                  const Text('রিপোর্টিং বস নির্বাচন করুন', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: textMuted)),
+                  const SizedBox(height: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: const Color(0xFFCBD5E1)),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<int>(
+                        value: selectedBossId,
+                        isExpanded: true,
+                        style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: textDark),
+                        items: bosses.map((b) => DropdownMenuItem<int>(
+                          value: b['id'] as int, 
+                          child: Text(b['name'].toString(), overflow: TextOverflow.ellipsis)
+                        )).toList(),
+                        onChanged: (val) {
+                          if (val != null) {
+                            setModalState(() {
+                              selectedBossId = val;
+                            });
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Submit Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 42,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _getRoleColor(selectedRole),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                      onPressed: () {
+                        final name = nameCtrl.text.trim();
+                        if (name.isEmpty) return;
+
+                        Navigator.pop(context);
+                        _updateUser(
+                          userId: userId,
+                          name: name,
+                          currentRole: u['role'],
+                          newRole: selectedRole,
+                          currentSupervisorId: currentBossId,
+                          newSupervisorId: selectedBossId == 0 ? null : selectedBossId,
+                        );
+                      },
+                      child: const Text('তথ্য সংরক্ষণ করুন', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  /// Confirm Delete Dialog
+  void _confirmDeleteUser(Map<String, dynamic> u) {
+    final int userId = int.tryParse(u['id'] ?? '') ?? 0;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Colors.redAccent, size: 22),
+            SizedBox(width: 8),
+            Text('অ্যাকাউন্ট মুছে ফেলুন', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: textDark)),
+          ],
+        ),
+        content: Text(
+          'আপনি কি নিশ্চিতভাবে "${u['name']}"-এর অ্যাকাউন্ট এবং হায়ারার্কি রেকর্ড মুছে ফেলতে চান?',
+          style: const TextStyle(fontSize: 12.5, color: textDark, height: 1.35),
+        ),
+        actions: [
+          TextButton(
+            child: const Text('বাতিল', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: textMuted)),
+            onPressed: () => Navigator.pop(context),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            child: const Text('মুছে ফেলুন', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold)),
+            onPressed: () {
+              Navigator.pop(context);
+              _deleteUser(userId, u['name']);
+            },
+          ),
+        ],
+      ),
     );
   }
 }

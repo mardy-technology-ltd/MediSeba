@@ -326,4 +326,228 @@ class ApiService {
     }
     return null;
   }
+
+  /// 1. Fetch Sales Agents list
+  static Future<List<Map<String, dynamic>>?> getSalesAgents({String? role, required String token}) async {
+    try {
+      debugPrint('Fetching sales agents...');
+      String url = 'https://api.mediseba.org/api/v1/sales-agents';
+      if (role != null && role.isNotEmpty) {
+        url += '?role=$role';
+      }
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+          'User-Agent': 'MediSebaApp/1.0',
+        },
+      ).timeout(const Duration(seconds: 8));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> body = jsonDecode(response.body);
+        if (body['success'] == true) {
+          final List list = body['data'] ?? [];
+          return list.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+        }
+      }
+    } catch (e) {
+      debugPrint('ApiService.getSalesAgents exception: $e');
+    }
+    return null;
+  }
+
+  /// 2. Fetch Supervisors dropdown list
+  static Future<List<Map<String, dynamic>>?> getSupervisors(String token) async {
+    try {
+      debugPrint('Fetching supervisors list...');
+      final response = await http.get(
+        Uri.parse('https://api.mediseba.org/api/v1/sales-agents/supervisors'),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+          'User-Agent': 'MediSebaApp/1.0',
+        },
+      ).timeout(const Duration(seconds: 8));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> body = jsonDecode(response.body);
+        if (body['success'] == true) {
+          final List list = body['data'] ?? [];
+          return list.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+        }
+      }
+    } catch (e) {
+      debugPrint('ApiService.getSupervisors exception: $e');
+    }
+    return null;
+  }
+
+  /// 3. Create a new Sales Agent
+  static Future<bool> createSalesAgent({
+    required String name,
+    required String email,
+    required String phone,
+    required String password,
+    required String role,
+    int? supervisorId,
+    required String token,
+  }) async {
+    try {
+      debugPrint('Creating sales agent $name...');
+      final response = await http.post(
+        Uri.parse('https://api.mediseba.org/api/v1/sales-agents'),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+          'User-Agent': 'MediSebaApp/1.0',
+        },
+        body: jsonEncode({
+          'name': name,
+          'email': email,
+          'phone': phone,
+          'password': password,
+          'role': role,
+          if (supervisorId != null) 'supervisor_id': supervisorId,
+        }),
+      ).timeout(const Duration(seconds: 8));
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> body = jsonDecode(response.body);
+        return body['success'] == true;
+      }
+    } catch (e) {
+      debugPrint('ApiService.createSalesAgent exception: $e');
+    }
+    return false;
+  }
+
+  /// 4. Assign or change supervisor
+  static Future<bool> assignSupervisor({
+    required int userId,
+    required int supervisorId,
+    required String token,
+  }) async {
+    try {
+      debugPrint('Assigning supervisor $supervisorId to user $userId...');
+      final response = await http.patch(
+        Uri.parse('https://api.mediseba.org/api/v1/sales-agents/$userId/assign-supervisor'),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+          'User-Agent': 'MediSebaApp/1.0',
+        },
+        body: jsonEncode({
+          'supervisor_id': supervisorId,
+        }),
+      ).timeout(const Duration(seconds: 8));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> body = jsonDecode(response.body);
+        return body['success'] == true;
+      }
+    } catch (e) {
+      debugPrint('ApiService.assignSupervisor exception: $e');
+    }
+    return false;
+  }
+
+  /// 5. Update agent role/promotion
+  static Future<bool> updateAgentRole({
+    required int userId,
+    required String role,
+    required String token,
+  }) async {
+    try {
+      debugPrint('Updating role to $role for user $userId...');
+      final response = await http.patch(
+        Uri.parse('https://api.mediseba.org/api/v1/sales-agents/$userId/role'),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+          'User-Agent': 'MediSebaApp/1.0',
+        },
+        body: jsonEncode({
+          'role': role,
+        }),
+      ).timeout(const Duration(seconds: 8));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> body = jsonDecode(response.body);
+        return body['success'] == true;
+      }
+    } catch (e) {
+      debugPrint('ApiService.updateAgentRole exception: $e');
+    }
+    return false;
+  }
+
+  /// 6. Delete Sales Agent
+  static Future<bool> deleteSalesAgent({
+    required int userId,
+    required String token,
+  }) async {
+    try {
+      debugPrint('Deleting sales agent $userId...');
+      final response = await http.delete(
+        Uri.parse('https://api.mediseba.org/api/v1/sales-agents'),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+          'User-Agent': 'MediSebaApp/1.0',
+        },
+        body: jsonEncode({
+          'user_id': userId,
+        }),
+      ).timeout(const Duration(seconds: 8));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> body = jsonDecode(response.body);
+        return body['success'] == true;
+      }
+    } catch (e) {
+      debugPrint('ApiService.deleteSalesAgent exception: $e');
+    }
+    return false;
+  }
+
+  /// 7. HBP Field Agent Patient Registration
+  static Future<bool> hbpRegisterPatient({
+    required String name,
+    required String phone,
+    required int age,
+    required String gender,
+    required String token,
+  }) async {
+    try {
+      debugPrint('HBP Registering patient $name...');
+      final response = await http.post(
+        Uri.parse('https://api.mediseba.org/api/v1/hbp/register-patient'),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+          'User-Agent': 'MediSebaApp/1.0',
+        },
+        body: jsonEncode({
+          'name': name,
+          'phone': phone,
+          'age': age,
+          'gender': gender,
+        }),
+      ).timeout(const Duration(seconds: 8));
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> body = jsonDecode(response.body);
+        return body['success'] == true;
+      }
+    } catch (e) {
+      debugPrint('ApiService.hbpRegisterPatient exception: $e');
+    }
+    return false;
+  }
 }
