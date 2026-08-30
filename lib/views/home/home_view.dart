@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../controllers/home_controller.dart';
 import '../../controllers/auth_controller.dart';
@@ -79,7 +80,6 @@ class _HomeViewState extends State<HomeView> {
   static const brandGreen = Color(0xFF008536);
   static const textDark = Color(0xFF222222);
   static const textMuted = Color(0xFF777777);
-  static const cardBg = Color(0xFFF8FAFC);
 
   @override
   void dispose() {
@@ -128,7 +128,7 @@ class _HomeViewState extends State<HomeView> {
             ),
             title: Image.asset(
               'assets/images/logo.png',
-              height: 42,
+              height: 48,
               fit: BoxFit.contain,
             ),
             actions: [
@@ -245,264 +245,388 @@ class _HomeViewState extends State<HomeView> {
 
   // Home Screen Center Scroll Body (Redesigned UI/UX)
   Widget _buildHomeBodyContent() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 1. Personalized Greeting & Universal Search Header Card
-          _buildUserGreetingAndSearchBar(),
-
-          const SizedBox(height: 20),
-
-          // 2. Category Service Grid Section
-          _buildSectionHeader(
-            title: _langController.tr('আমাদের সেবাসমূহ', 'Our Healthcare Services'),
-            onSeeAllTap: null,
+    return Stack(
+      children: [
+        // Futuristic Ambient Glowing Orbs behind the content
+        Positioned(
+          top: -60,
+          left: -60,
+          child: Container(
+            width: 260,
+            height: 260,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: brandGreen.withValues(alpha: 0.08),
+            ),
           ),
-          const SizedBox(height: 12),
-          _buildCategoryGrid(),
-
-          const SizedBox(height: 22),
-
-          // 4. Banner Slider Carousel
-          _buildHeroBanner(),
-
-          const SizedBox(height: 18),
-
-          // 5. Health Query Banner
-          _buildQueryBanner(),
-
-          const SizedBox(height: 22),
-
-          // 5. Top Doctors Section (Horizontal Scroll Carousel)
-          _buildSectionHeader(
-            title: _langController.tr('বিশেষজ্ঞ ডাক্তারগণ', 'Top Doctors In Your Area'),
-            onSeeAllTap: () {
-              setState(() => _currentBottomNavIndex = 3);
-            },
+        ),
+        Positioned(
+          top: 320,
+          right: -90,
+          child: Container(
+            width: 320,
+            height: 320,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: const Color(0xFF38BDF8).withValues(alpha: 0.08), // Sky Blue Accent
+            ),
           ),
-          const SizedBox(height: 12),
-          _buildHorizontalDoctorsList(),
-
-          const SizedBox(height: 24),
-
-          // 6. Nearby Hospitals Section
-          _buildSectionHeader(
-            title: _langController.tr('নিকটস্থ হাসপাতাল ও ডায়াগনস্টিক', 'Nearby Hospitals & Diagnostics'),
-            onSeeAllTap: () {
-              setState(() => _currentBottomNavIndex = 2);
-            },
+        ),
+        Positioned(
+          bottom: 80,
+          left: -100,
+          child: Container(
+            width: 280,
+            height: 280,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: brandGreen.withValues(alpha: 0.06),
+            ),
           ),
-          const SizedBox(height: 12),
+        ),
 
-          // Hospitals Grid (Responsive Compact Grid)
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final screenWidth = constraints.maxWidth;
-              final crossAxisCount = screenWidth > 600 ? 4 : 2;
-              final aspectRatio = screenWidth > 600
-                  ? 1.15
-                  : (screenWidth < 360 ? 0.88 : 0.96);
+        // Main Content Scroll view
+        SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 1. Personalized Greeting & Universal Search Header Card
+              _buildUserGreetingAndSearchBar(),
 
-              return GridView.count(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: crossAxisCount,
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 10,
-                childAspectRatio: aspectRatio,
-                children: [
-                  _buildHospitalCard(
-                    name: 'পপুলার ডায়াগনস্টিক',
-                    address: 'উত্তরা ব্রাঞ্চ, ঢাকা',
-                    time: '07:00 am - 11:30 pm',
-                    rating: '4.9',
-                    imageUrl:
-                        'https://img.freepik.com/free-photo/empty-emergency-room-with-medical-equipment_23-2149138092.jpg',
-                  ),
-                  _buildHospitalCard(
-                    name: 'ইবনে সিনা হাসপাতাল',
-                    address: 'ধানমন্ডি, ঢাকা',
-                    time: '২৪ ঘণ্টা খোলা',
-                    rating: '4.8',
-                    imageUrl:
-                        'https://img.freepik.com/free-photo/modern-operating-room-hospital_23-2148942918.jpg',
-                  ),
-                  _buildHospitalCard(
-                    name: 'ল্যাবএইড হাসপাতাল',
-                    address: 'গুলশান, ঢাকা',
-                    time: '২৪ ঘণ্টা খোলা',
-                    rating: '4.9',
-                    imageUrl:
-                        'https://img.freepik.com/free-photo/interior-view-operating-room_1170-2254.jpg',
-                  ),
-                  _buildHospitalCard(
-                    name: 'স্কয়ার হাসপাতাল',
-                    address: 'পান্থপথ, ঢাকা',
-                    time: '২৪ ঘণ্টা খোলা',
-                    rating: '5.0',
-                    imageUrl:
-                        'https://img.freepik.com/free-photo/medical-clinic-reception-counter-registration_482257-26804.jpg',
-                  ),
-                ],
-              );
-            },
+              const SizedBox(height: 20),
+
+              // 2. Category Service Grid Section
+              _buildSectionHeader(
+                title: _langController.tr('আমাদের সেবাসমূহ', 'Our Healthcare Services'),
+                onSeeAllTap: null,
+              ),
+              const SizedBox(height: 12),
+              _buildCategoryGrid(),
+
+              const SizedBox(height: 22),
+
+              // 4. Banner Slider Carousel
+              _buildHeroBanner(),
+
+              const SizedBox(height: 18),
+
+              // 5. Health Query Banner
+              _buildQueryBanner(),
+
+              const SizedBox(height: 22),
+
+              // 5. Top Doctors Section (Horizontal Scroll Carousel)
+              _buildSectionHeader(
+                title: _langController.tr('বিশেষজ্ঞ ডাক্তারগণ', 'Top Doctors In Your Area'),
+                onSeeAllTap: () {
+                  setState(() => _currentBottomNavIndex = 3);
+                },
+              ),
+              const SizedBox(height: 12),
+              _buildHorizontalDoctorsList(),
+
+              const SizedBox(height: 24),
+
+              // 6. Nearby Hospitals Section
+              _buildSectionHeader(
+                title: _langController.tr('নিকটস্থ হাসপাতাল ও ডায়াগনস্টিক', 'Nearby Hospitals & Diagnostics'),
+                onSeeAllTap: () {
+                  setState(() => _currentBottomNavIndex = 2);
+                },
+              ),
+              const SizedBox(height: 12),
+
+              // Hospitals Grid (Responsive Compact Grid)
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final screenWidth = constraints.maxWidth;
+                  final crossAxisCount = screenWidth > 600 ? 4 : 2;
+                  final aspectRatio = screenWidth > 600
+                      ? 1.15
+                      : (screenWidth < 360 ? 0.88 : 0.96);
+
+                  return GridView.count(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    crossAxisCount: crossAxisCount,
+                    mainAxisSpacing: 10,
+                    crossAxisSpacing: 10,
+                    childAspectRatio: aspectRatio,
+                    children: [
+                      _buildHospitalCard(
+                        name: 'পপুলার ডায়াগনস্টিক',
+                        address: 'উত্তরা ব্রাঞ্চ, ঢাকা',
+                        time: '07:00 am - 11:30 pm',
+                        rating: '4.9',
+                        imageUrl:
+                            'https://img.freepik.com/free-photo/empty-emergency-room-with-medical-equipment_23-2149138092.jpg',
+                      ),
+                      _buildHospitalCard(
+                        name: 'ইবনে সিনা হাসপাতাল',
+                        address: 'ধানমন্ডি, ঢাকা',
+                        time: '২৪ ঘণ্টা খোলা',
+                        rating: '4.8',
+                        imageUrl:
+                            'https://img.freepik.com/free-photo/modern-operating-room-hospital_23-2148942918.jpg',
+                      ),
+                      _buildHospitalCard(
+                        name: 'ল্যাবএইড হাসপাতাল',
+                        address: 'গুলশান, ঢাকা',
+                        time: '২৪ ঘণ্টা খোলা',
+                        rating: '4.9',
+                        imageUrl:
+                            'https://img.freepik.com/free-photo/interior-view-operating-room_1170-2254.jpg',
+                      ),
+                      _buildHospitalCard(
+                        name: 'স্কয়ার হাসপাতাল',
+                        address: 'পান্থপথ, ঢাকা',
+                        time: '২৪ ঘণ্টা খোলা',
+                        rating: '5.0',
+                        imageUrl:
+                            'https://img.freepik.com/free-photo/medical-clinic-reception-counter-registration_482257-26804.jpg',
+                      ),
+                    ],
+                  );
+                },
+              ),
+
+              const SizedBox(height: 24),
+            ],
           ),
-
-          const SizedBox(height: 24),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
   // 1. User Greeting & Universal Search Bar Header Card
   Widget _buildUserGreetingAndSearchBar() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFE8F5E9), Color(0xFFF1F8E9)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFC8E6C9), width: 1.2),
-        boxShadow: [
-          BoxShadow(
-            color: brandGreen.withValues(alpha: 0.06),
-            blurRadius: 14,
-            offset: const Offset(0, 4),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(24),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.65),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.55), width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: brandGreen.withValues(alpha: 0.04),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Health tracker pill row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          color: brandGreen.withValues(alpha: 0.12),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.shield_rounded, color: brandGreen, size: 13),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        _langController.tr('হেলথ কোর: সুরক্ষিত', 'Health Core: Secured'),
+                        style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                          color: brandGreen,
+                          letterSpacing: 0.3,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF38BDF8).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: const Color(0xFF38BDF8).withValues(alpha: 0.2), width: 0.8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 5,
+                          height: 5,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF38BDF8),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          _langController.tr('লাইভ ট্র্যাকার', 'Live Tracker'),
+                          style: const TextStyle(
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF0284C7),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [brandGreen, brandGreen.withValues(alpha: 0.7)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: brandGreen.withValues(alpha: 0.25),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(Icons.waving_hand_rounded, color: Color(0xFFFBBF24), size: 18),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _langController.tr('👋 শুভ দিন, সুস্থ থাকুন', '👋 Good Day, Stay Healthy'),
+                          style: const TextStyle(
+                            fontSize: 15.5,
+                            fontWeight: FontWeight.w900,
+                            color: textDark,
+                          ),
+                        ),
+                        Text(
+                          _langController.tr(
+                            'আজ আপনার কী ধরনের স্বাস্থ্যসেবা প্রয়োজন?',
+                            'What healthcare service do you need today?',
+                          ),
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: Color(0xFF64748B),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 18),
+
+              // Interactive Universal Search Bar Field
               Container(
-                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: brandGreen.withValues(alpha: 0.3)),
-                ),
-                child: const Icon(Icons.waving_hand_rounded, color: Color(0xFFF59E0B), size: 20),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _langController.tr('👋 শুভ দিন, সুস্থ থাকুন', '👋 Good Day, Stay Healthy'),
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w900,
-                        color: textDark,
-                      ),
-                    ),
-                    Text(
-                      _langController.tr(
-                        'আজ আপনার কী ধরনের স্বাস্থ্যসেবা প্রয়োজন?',
-                        'What healthcare service do you need today?',
-                      ),
-                      style: const TextStyle(
-                        fontSize: 11.5,
-                        color: Color(0xFF475569),
-                        fontWeight: FontWeight.w500,
-                      ),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.04),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
                     ),
                   ],
+                ),
+                child: TextFormField(
+                  controller: _homeSearchController,
+                  textInputAction: TextInputAction.search,
+                  onFieldSubmitted: (_) => _performHomeSearch(),
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: textDark,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: _langController.tr(
+                      'ডাক্তার, বিশেষত্ব, হাসপাতাল বা ওষুধ খুঁজুন...',
+                      'Search doctor, specialty, hospital or medicine...',
+                    ),
+                    hintStyle: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF94A3B8),
+                      fontWeight: FontWeight.w500,
+                    ),
+                    prefixIcon: const Icon(Icons.search_rounded, color: brandGreen, size: 22),
+                    suffixIcon: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (_homeSearchController.text.isNotEmpty)
+                          IconButton(
+                            icon: const Icon(Icons.clear_rounded, color: Colors.grey, size: 18),
+                            onPressed: () {
+                              setState(() {
+                                _homeSearchController.clear();
+                              });
+                            },
+                          ),
+                        InkWell(
+                          onTap: _performHomeSearch,
+                          borderRadius: BorderRadius.circular(12),
+                          child: Container(
+                            margin: const EdgeInsets.only(right: 8),
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [brandGreen, Color(0xFF0F9D58)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: brandGreen.withValues(alpha: 0.3),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 15),
+                          ),
+                        ),
+                      ],
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(color: Colors.grey.shade200, width: 1.5),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: brandGreen, width: 1.8),
+                    ),
+                  ),
                 ),
               ),
             ],
           ),
-
-          const SizedBox(height: 14),
-
-          // Interactive Universal Search Bar Field
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(14),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 6,
-                  offset: Offset(0, 2),
-                ),
-              ],
-            ),
-            child: TextFormField(
-              controller: _homeSearchController,
-              textInputAction: TextInputAction.search,
-              onFieldSubmitted: (_) => _performHomeSearch(),
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: textDark,
-              ),
-              decoration: InputDecoration(
-                hintText: _langController.tr(
-                  'ডাক্তার, বিশেষত্ব, হাসপাতাল বা ওষুধ খুঁজুন...',
-                  'Search doctor, specialty, hospital or medicine...',
-                ),
-                hintStyle: const TextStyle(
-                  fontSize: 12,
-                  color: Color(0xFF94A3B8),
-                  fontWeight: FontWeight.w400,
-                ),
-                prefixIcon: const Icon(Icons.search_rounded, color: brandGreen, size: 22),
-                suffixIcon: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (_homeSearchController.text.isNotEmpty)
-                      IconButton(
-                        icon: const Icon(Icons.clear_rounded, color: Colors.grey, size: 18),
-                        onPressed: () {
-                          setState(() {
-                            _homeSearchController.clear();
-                          });
-                        },
-                      ),
-                    InkWell(
-                      onTap: _performHomeSearch,
-                      borderRadius: BorderRadius.circular(10),
-                      child: Container(
-                        margin: const EdgeInsets.only(right: 8),
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: brandGreen,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 16),
-                      ),
-                    ),
-                  ],
-                ),
-                filled: true,
-                fillColor: Colors.white,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: Color(0xFFCBD5E1), width: 1),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: brandGreen, width: 1.8),
-                ),
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
-
-
 
   // 5. Horizontal Top Doctors List Carousel
   Widget _buildHorizontalDoctorsList() {
@@ -537,7 +661,7 @@ class _HomeViewState extends State<HomeView> {
     ];
 
     return SizedBox(
-      height: 168,
+      height: 182,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
@@ -550,17 +674,17 @@ class _HomeViewState extends State<HomeView> {
               setState(() => _currentBottomNavIndex = 3);
             },
             child: Container(
-              width: 265,
-              padding: const EdgeInsets.all(12),
+              width: 275,
+              padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
+                color: Colors.white.withOpacity(0.8),
+                borderRadius: BorderRadius.circular(22),
+                border: Border.all(color: Colors.white.withOpacity(0.55), width: 1.5),
                 boxShadow: [
                   BoxShadow(
-                    color: brandGreen.withValues(alpha: 0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 3),
+                    color: brandGreen.withOpacity(0.04),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
                   ),
                 ],
               ),
@@ -571,18 +695,25 @@ class _HomeViewState extends State<HomeView> {
                     children: [
                       Stack(
                         children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(14),
-                            child: Image.network(
-                              doc['image']!,
-                              width: 52,
-                              height: 52,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) => Container(
+                          Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: brandGreen.withOpacity(0.25), width: 1.2),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(16),
+                              child: Image.network(
+                                doc['image']!,
                                 width: 52,
                                 height: 52,
-                                color: const Color(0xFFE2E8F0),
-                                child: const Icon(Icons.person, color: textMuted),
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) => Container(
+                                  width: 52,
+                                  height: 52,
+                                  color: const Color(0xFFE2E8F0),
+                                  child: const Icon(Icons.person, color: textMuted),
+                                ),
                               ),
                             ),
                           ),
@@ -590,18 +721,25 @@ class _HomeViewState extends State<HomeView> {
                             right: 2,
                             bottom: 2,
                             child: Container(
-                              width: 10,
-                              height: 10,
+                              width: 12,
+                              height: 12,
                               decoration: BoxDecoration(
                                 color: const Color(0xFF10B981),
                                 shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white, width: 1.5),
+                                border: Border.all(color: Colors.white, width: 2),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFF10B981).withOpacity(0.35),
+                                    blurRadius: 5,
+                                    spreadRadius: 1,
+                                  ),
+                                ],
                               ),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(width: 10),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -650,8 +788,9 @@ class _HomeViewState extends State<HomeView> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF1F5F9),
-                      borderRadius: BorderRadius.circular(8),
+                      color: const Color(0xFFF1F5F9).withOpacity(0.6),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.grey.shade100, width: 0.8),
                     ),
                     child: Row(
                       children: [
@@ -673,15 +812,31 @@ class _HomeViewState extends State<HomeView> {
                     ),
                   ),
 
-                  SizedBox(
+                  Container(
                     width: double.infinity,
                     height: 34,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [brandGreen, Color(0xFF0F9D58)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: brandGreen.withOpacity(0.2),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
                     child: ElevatedButton(
                       onPressed: () {
                         setState(() => _currentBottomNavIndex = 3);
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: brandGreen,
+                        backgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
@@ -894,16 +1049,23 @@ class _HomeViewState extends State<HomeView> {
     return GestureDetector(
       onTap: item.onTap,
       child: Container(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: item.borderColor, width: 1.2),
+          gradient: LinearGradient(
+            colors: [
+              Colors.white.withOpacity(0.95),
+              Colors.white.withOpacity(0.65),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: item.borderColor.withOpacity(0.65), width: 1.3),
           boxShadow: [
             BoxShadow(
-              color: item.iconColor.withValues(alpha: 0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
+              color: item.iconColor.withOpacity(0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -916,18 +1078,28 @@ class _HomeViewState extends State<HomeView> {
               children: [
                 // Top Icon / Image Box (Compact Size)
                 item.imagePath != null
-                    ? SizedBox(
-                        width: 48,
-                        height: 48,
+                    ? Container(
+                        width: 52,
+                        height: 52,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: item.iconColor.withOpacity(0.18),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
                         child: Image.asset(
                           item.imagePath!,
                           fit: BoxFit.contain,
                           errorBuilder: (context, error, stackTrace) => Container(
-                            width: 48,
-                            height: 48,
+                            width: 52,
+                            height: 52,
                             decoration: BoxDecoration(
                               color: item.iconColor,
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(16),
                             ),
                             child: Icon(
                               item.icon,
@@ -938,16 +1110,16 @@ class _HomeViewState extends State<HomeView> {
                         ),
                       )
                     : Container(
-                        width: 48,
-                        height: 48,
+                        width: 52,
+                        height: 52,
                         decoration: BoxDecoration(
                           color: item.iconColor,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: item.iconColor.withValues(alpha: 0.25),
-                              blurRadius: 5,
-                              offset: const Offset(0, 2),
+                              color: item.iconColor.withOpacity(0.25),
+                              blurRadius: 8,
+                              offset: const Offset(0, 3),
                             ),
                           ],
                         ),
@@ -957,7 +1129,7 @@ class _HomeViewState extends State<HomeView> {
                           size: 24,
                         ),
                       ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 8),
 
                 // Card Title (Centered)
                 Text(
@@ -965,24 +1137,24 @@ class _HomeViewState extends State<HomeView> {
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 13,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w900,
                     color: Color(0xFF1E293B),
                     height: 1.15,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 3),
 
                 // Subtitle / Description Text (Centered)
                 Text(
                   item.subtitle,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    fontSize: 10.5,
+                    fontSize: 10,
                     fontWeight: FontWeight.w500,
                     color: Color(0xFF64748B),
-                    height: 1.2,
+                    height: 1.25,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -991,31 +1163,38 @@ class _HomeViewState extends State<HomeView> {
             ),
 
             // Bottom Action Link "সেবা গ্রহণ করুন ->" (Centered)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  item.actionText,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF0F9D58),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: item.iconColor.withOpacity(0.08),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    item.actionText,
+                    style: TextStyle(
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w800,
+                      color: item.iconColor,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 3),
-                const Icon(
-                  Icons.arrow_forward_rounded,
-                  color: Color(0xFF0F9D58),
-                  size: 13,
-                ),
-              ],
+                  const SizedBox(width: 3),
+                  Icon(
+                    Icons.arrow_forward_rounded,
+                    color: item.iconColor,
+                    size: 10,
+                  ),
+                ],
+              ),
             ),
           ],
         ),
       ),
     );
   }
-
 
   // Hero Banner Slider Card (Exactly 3 unique medical-related banner slides)
   Widget _buildHeroBanner() {
@@ -1026,7 +1205,7 @@ class _HomeViewState extends State<HomeView> {
         'badge': 'OPEN 24/7',
         'assetImage': null,
         'color1': const Color(0xFF008536),
-        'color2': const Color(0xFF0F9D58),
+        'color2': const Color(0xFF02A946),
         'icon': Icons.medical_services_rounded,
       },
       {
@@ -1035,7 +1214,7 @@ class _HomeViewState extends State<HomeView> {
         'badge': '20% OFF',
         'assetImage': null,
         'color1': const Color(0xFF0288D1),
-        'color2': const Color(0xFF00A8E8),
+        'color2': const Color(0xFF38BDF8),
         'icon': Icons.medication_rounded,
       },
       {
@@ -1043,7 +1222,7 @@ class _HomeViewState extends State<HomeView> {
         'subtitle': _langController.tr('এক কলেই দ্রুত জরুরি স্থানান্তরের জন্য কল করুন', 'Call now for quick emergency medical transport'),
         'badge': 'HOTLINE',
         'assetImage': null,
-        'color1': const Color(0xFFDC2626),
+        'color1': const Color(0xFFED1B24),
         'color2': const Color(0xFFEF4444),
         'icon': Icons.airport_shuttle_rounded,
       },
@@ -1067,7 +1246,7 @@ class _HomeViewState extends State<HomeView> {
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 2.0),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(22),
                     child: Image.asset(
                       assetImg,
                       fit: BoxFit.contain,
@@ -1080,85 +1259,108 @@ class _HomeViewState extends State<HomeView> {
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 2.0),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(22),
                   child: Container(
-                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [banner['color1'] as Color, banner['color2'] as Color],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(22),
                       boxShadow: [
                         BoxShadow(
-                          color: (banner['color1'] as Color).withValues(alpha: 0.25),
+                          color: (banner['color1'] as Color).withOpacity(0.2),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
                       ],
                     ),
-                    child: Row(
+                    child: Stack(
                       children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.25),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Text(
-                                  banner['badge'],
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                banner['title'],
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  height: 1.2,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                banner['subtitle'],
-                                style: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.9),
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
+                        // Custom tech background grid
+                        Positioned.fill(
+                          child: CustomPaint(
+                            painter: TechGridPainter(
+                              color: Colors.white.withOpacity(0.08),
+                            ),
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        Container(
-                          padding: const EdgeInsets.all(14),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white30, width: 1.5),
-                          ),
-                          child: Icon(
-                            banner['icon'] as IconData,
-                            color: Colors.white,
-                            size: 34,
+
+                        // Banner Content
+                        Padding(
+                          padding: const EdgeInsets.all(18),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.2),
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Text(
+                                        banner['badge'],
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 9,
+                                          fontWeight: FontWeight.w900,
+                                          letterSpacing: 0.5,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      banner['title'],
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        height: 1.25,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      banner['subtitle'],
+                                      style: TextStyle(
+                                        color: Colors.white.withOpacity(0.85),
+                                        fontSize: 10.5,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Container(
+                                padding: const EdgeInsets.all(14),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.18),
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: Colors.white.withOpacity(0.25), width: 1.5),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.05),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: Icon(
+                                  banner['icon'] as IconData,
+                                  color: Colors.white,
+                                  size: 30,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -1179,8 +1381,8 @@ class _HomeViewState extends State<HomeView> {
             return AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               margin: const EdgeInsets.symmetric(horizontal: 3),
-              width: isSelected ? 18 : 8,
-              height: 8,
+              width: isSelected ? 22 : 6,
+              height: 6,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(4),
                 color: isSelected ? brandGreen : const Color(0xFFCBD5E1),
@@ -1243,14 +1445,14 @@ class _HomeViewState extends State<HomeView> {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: cardBg,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
+          color: Colors.white.withOpacity(0.85),
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: Colors.white.withOpacity(0.6), width: 1.5),
           boxShadow: [
             BoxShadow(
-              color: brandGreen.withValues(alpha: 0.04),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
+              color: brandGreen.withOpacity(0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -1262,7 +1464,7 @@ class _HomeViewState extends State<HomeView> {
               children: [
                 ClipRRect(
                   borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(15),
+                    top: Radius.circular(21),
                   ),
                   child: Image.network(
                     imageUrl,
@@ -1280,16 +1482,25 @@ class _HomeViewState extends State<HomeView> {
                   top: 6,
                   left: 6,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                     decoration: BoxDecoration(
-                      color: brandGreen,
+                      gradient: const LinearGradient(
+                        colors: [brandGreen, Color(0xFF0F9D58)],
+                      ),
                       borderRadius: BorderRadius.circular(6),
+                      boxShadow: [
+                        BoxShadow(
+                          color: brandGreen.withOpacity(0.2),
+                          blurRadius: 4,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
                     ),
                     child: Text(
                       _langController.tr('সুপারিশকৃত', 'Sponsor'),
                       style: const TextStyle(
-                        fontSize: 8.5,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 8,
+                        fontWeight: FontWeight.w900,
                         color: Colors.white,
                       ),
                     ),
@@ -1298,26 +1509,29 @@ class _HomeViewState extends State<HomeView> {
                 Positioned(
                   top: 6,
                   right: 6,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.65),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.star_rounded, color: Color(0xFFF59E0B), size: 11),
-                        const SizedBox(width: 2),
-                        Text(
-                          rating,
-                          style: const TextStyle(
-                            fontSize: 9.5,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(6),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+                        color: Colors.black.withOpacity(0.55),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.star_rounded, color: Color(0xFFFBBF24), size: 10),
+                            const SizedBox(width: 2),
+                            Text(
+                              rating,
+                              style: const TextStyle(
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
@@ -1334,7 +1548,7 @@ class _HomeViewState extends State<HomeView> {
                       name,
                       style: const TextStyle(
                         fontSize: 12.5,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w800,
                         color: textDark,
                         height: 1.15,
                       ),
@@ -1345,7 +1559,7 @@ class _HomeViewState extends State<HomeView> {
                     Text(
                       address,
                       style: const TextStyle(
-                        fontSize: 10,
+                        fontSize: 9.5,
                         color: Color(0xFF64748B),
                         fontWeight: FontWeight.w500,
                       ),
@@ -1357,17 +1571,17 @@ class _HomeViewState extends State<HomeView> {
                       children: [
                         const Icon(
                           Icons.access_time_rounded,
-                          size: 11,
+                          size: 10.5,
                           color: brandGreen,
                         ),
-                        const SizedBox(width: 3),
+                        const SizedBox(width: 3.5),
                         Expanded(
                           child: Text(
                             time,
                             style: const TextStyle(
-                              fontSize: 9.5,
+                              fontSize: 9,
                               color: brandGreen,
-                              fontWeight: FontWeight.w700,
+                              fontWeight: FontWeight.w800,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -1943,3 +2157,32 @@ class _QueryBannerCardState extends State<_QueryBannerCard> {
     );
   }
 }
+
+class TechGridPainter extends CustomPainter {
+  final Color color;
+  TechGridPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 0.6
+      ..style = PaintingStyle.stroke;
+
+    const double step = 20.0;
+    for (double i = 0; i < size.width; i += step) {
+      canvas.drawLine(Offset(i, 0), Offset(i, size.height), paint);
+    }
+    for (double j = 0; j < size.height; j += step) {
+      canvas.drawLine(Offset(0, j), Offset(size.width, j), paint);
+    }
+    
+    // Draw some tech diagnostic circles
+    canvas.drawCircle(Offset(size.width * 0.8, size.height * 0.5), 45, paint);
+    canvas.drawCircle(Offset(size.width * 0.8, size.height * 0.5), 55, paint..strokeWidth = 0.4);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
