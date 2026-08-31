@@ -4,7 +4,8 @@ import 'constants/app_constants.dart';
 import 'controllers/home_controller.dart';
 import 'controllers/auth_controller.dart';
 import 'controllers/language_controller.dart';
-import 'views/splash/splash_view.dart';
+// import 'views/splash/splash_view.dart';
+import 'views/auth/login_view.dart';
 
 class MediSebaApp extends StatefulWidget {
   const MediSebaApp({super.key});
@@ -46,7 +47,12 @@ class _MediSebaAppState extends State<MediSebaApp> {
             scaffoldBackgroundColor: AppColors.background,
             fontFamily: 'Roboto',
           ),
-          home: SplashView(
+          // home: SplashView(
+          //   homeController: _homeController,
+          //   authController: _authController,
+          //   languageController: _languageController,
+          // ),
+          home: LoginView(
             homeController: _homeController,
             authController: _authController,
             languageController: _languageController,
