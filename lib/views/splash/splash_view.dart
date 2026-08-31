@@ -53,9 +53,10 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
         Widget destinationView;
 
         if (widget.authController.isLoggedIn) {
-          final phone = widget.authController.currentUserData?.phone.toLowerCase() ?? '';
-          final email = widget.authController.currentUser?.email?.toLowerCase() ?? '';
-          final loginIdentifier = phone.isNotEmpty ? phone : email;
+          final String loginIdentifier = (widget.authController.loginIdentifier ??
+              widget.authController.currentUserData?.phone ??
+              widget.authController.currentUser?.email ??
+              '').toLowerCase();
 
           // Dynamically detect if staff or admin login matching LoginRole pattern
           final bool isAdminOrStaff = loginIdentifier.contains('admin') ||

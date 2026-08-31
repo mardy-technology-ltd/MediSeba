@@ -28,6 +28,7 @@ class AuthController extends ChangeNotifier {
   bool get isLoggedIn => _currentUser != null;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
+  String? get loginIdentifier => _authRepository.loginIdentifier;
 
   /// Calculates profile completion percentage (0 to 100)
   double get profileCompletionPercentage {

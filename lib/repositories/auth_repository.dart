@@ -8,9 +8,11 @@ class AuthRepository {
   static const String baseUrl = 'https://api.mediseba.org/api/v1';
   
   String? _token;
+  String? _loginIdentifier;
   UserModel? _currentUserData;
 
   String? get token => _token;
+  String? get loginIdentifier => _loginIdentifier;
   UserModel? get currentUserData => _currentUserData;
 
   AuthRepository() {
@@ -20,6 +22,7 @@ class AuthRepository {
   void _loadSession() {
     try {
       _token = CacheService.get('auth_token') as String?;
+      _loginIdentifier = CacheService.get('auth_login_identifier') as String?;
       final cachedUser = CacheService.get('auth_user');
       if (cachedUser != null) {
         _currentUserData = UserModel.fromMap(
@@ -69,7 +72,9 @@ class AuthRepository {
         
         if (token != null) {
           _token = token.toString();
+          _loginIdentifier = emailOrPhone;
           await CacheService.put('auth_token', _token);
+          await CacheService.put('auth_login_identifier', _loginIdentifier);
 
           // Construct or parse UserModel
           if (userJson != null) {
@@ -173,7 +178,9 @@ class AuthRepository {
         
         if (token != null) {
           _token = token.toString();
+          _loginIdentifier = phone;
           await CacheService.put('auth_token', _token);
+          await CacheService.put('auth_login_identifier', _loginIdentifier);
 
           _currentUserData = UserModel(
             uid: userJson?['id']?.toString() ?? userJson?['uid']?.toString() ?? 'user_id',
@@ -249,8 +256,10 @@ class AuthRepository {
 
   Future<void> logout() async {
     _token = null;
+    _loginIdentifier = null;
     _currentUserData = null;
     await CacheService.delete('auth_token');
     await CacheService.delete('auth_user');
+    await CacheService.delete('auth_login_identifier');
   }
 }
