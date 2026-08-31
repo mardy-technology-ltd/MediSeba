@@ -140,7 +140,13 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
               'email': (u['email'] ?? '').toString(),
               'role': _mapRoleApiToUi(rawRole),
               'boss': (u['supervisor_name'] ?? '-- কোনো রিপোর্টিং বস নেই (Top Executive) --').toString(),
-              'supervisor_id': u['supervisor_id'],
+              'supervisor_id': u['supervisor_id'] != null
+                  ? int.tryParse(u['supervisor_id'].toString())
+                  : (u['supervisor'] != null
+                      ? (u['supervisor'] is Map
+                          ? int.tryParse(u['supervisor']['id']?.toString() ?? '')
+                          : int.tryParse(u['supervisor'].toString()))
+                      : null),
               'date': formattedDate,
               'isSelected': false,
             };
@@ -296,16 +302,68 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
     return _getRoleColor(role).withValues(alpha: 0.08);
   }
 
-  /// Get list of reporting bosses dynamically from supervisors
-  List<Map<String, dynamic>> get _dynamicReportingBossesList {
+  /// Resolve supervisor UI role from users list or text parsing
+  String _getSupervisorUiRole(Map<String, dynamic> s) {
+    final String sIdStr = (s['id'] ?? '').toString();
+    for (final u in _usersList) {
+      if (u['id'] == sIdStr) {
+        return u['role'] ?? '';
+      }
+    }
+    final String nameLower = (s['name'] ?? '').toString().toLowerCase();
+    final String emailLower = (s['email'] ?? '').toString().toLowerCase();
+    if (nameLower.contains('director') || emailLower.contains('sd@')) {
+      return 'Sales Director';
+    }
+    if (nameLower.contains('head of sales') || nameLower.contains('hos') || emailLower.contains('hos@')) {
+      return 'Head of Sales';
+    }
+    if (nameLower.contains('asst. marketing') || nameLower.contains('amm') || emailLower.contains('amm@')) {
+      return 'Asst. Marketing Manager';
+    }
+    if (nameLower.contains('marketing') || nameLower.contains('mm') || emailLower.contains('mm@')) {
+      return 'Marketing Manager';
+    }
+    if (nameLower.contains('area') || nameLower.contains('am') || emailLower.contains('am@')) {
+      return 'Area Manager';
+    }
+    if (nameLower.contains('supervisor') || emailLower.contains('supervisor@')) {
+      return 'Supervisor';
+    }
+    if (nameLower.contains('hbp') || emailLower.contains('hbp@')) {
+      return 'HBP Field Agent';
+    }
+    return '';
+  }
+
+  /// Get list of reporting bosses dynamically filtered from supervisors list
+  List<Map<String, dynamic>> _getFilteredBossesList(String selectedRoleUi) {
     final List<Map<String, dynamic>> list = [
       {'id': 0, 'name': '-- কোনো রিপোর্টিং বস নেই (Top Executive) --'},
     ];
+    String? targetRoleUi;
+    if (selectedRoleUi == 'HBP Field Agent') {
+      targetRoleUi = 'Supervisor';
+    } else if (selectedRoleUi == 'Supervisor') {
+      targetRoleUi = 'Area Manager';
+    } else if (selectedRoleUi == 'Area Manager') {
+      targetRoleUi = 'Asst. Marketing Manager';
+    } else if (selectedRoleUi == 'Asst. Marketing Manager') {
+      targetRoleUi = 'Marketing Manager';
+    } else if (selectedRoleUi == 'Marketing Manager') {
+      targetRoleUi = 'Head of Sales';
+    } else if (selectedRoleUi == 'Head of Sales') {
+      targetRoleUi = 'Sales Director';
+    }
+
     for (var s in _supervisorsList) {
-      final int id = int.tryParse(s['id']?.toString() ?? '') ?? 0;
-      final String name = (s['name'] ?? '').toString();
-      final String email = (s['email'] ?? '').toString();
-      list.add({'id': id, 'name': '$name ($email)'});
+      final String roleUi = _getSupervisorUiRole(s);
+      if (targetRoleUi != null && roleUi == targetRoleUi) {
+        final int id = int.tryParse(s['id']?.toString() ?? '') ?? 0;
+        final String name = (s['name'] ?? '').toString();
+        final String email = (s['email'] ?? '').toString();
+        list.add({'id': id, 'name': '$name ($email)'});
+      }
     }
     return list;
   }
@@ -1224,7 +1282,7 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setModalState) {
-            final bosses = _dynamicReportingBossesList;
+            final bosses = _getFilteredBossesList(selectedRole);
 
             return Padding(
               padding: EdgeInsets.only(
@@ -1335,6 +1393,7 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
                           if (val != null) {
                             setModalState(() {
                               selectedRole = val;
+                              selectedBossId = 0;
                             });
                           }
                         },
@@ -1452,7 +1511,18 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setModalState) {
-            final bosses = _dynamicReportingBossesList;
+            final bosses = _getFilteredBossesList(selectedRole);
+            final bool hasCurrentBoss = bosses.any((b) => b['id'] == selectedBossId);
+            if (!hasCurrentBoss) {
+              String currentBossName = 'আইডি: $selectedBossId';
+              for (final b in _supervisorsList) {
+                if (b['id'] == selectedBossId) {
+                  currentBossName = '${b['name']} (${b['email']})';
+                  break;
+                }
+              }
+              bosses.add({'id': selectedBossId, 'name': '$currentBossName (বর্তমান বস)'});
+            }
 
             return Padding(
               padding: EdgeInsets.only(
@@ -1548,6 +1618,7 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
                           if (val != null) {
                             setModalState(() {
                               selectedRole = val;
+                              selectedBossId = 0;
                             });
                           }
                         },

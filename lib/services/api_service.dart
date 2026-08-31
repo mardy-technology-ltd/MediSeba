@@ -599,7 +599,7 @@ class ApiService {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final Map<String, dynamic> body = jsonDecode(response.body);
-        return body['success'] == true;
+        return body['success'] == true || body['status'] == 'success';
       }
     } catch (e) {
       debugPrint('❌ ApiService.hbpRegisterPatient exception: $e');
