@@ -15,8 +15,9 @@ class AuthUser {
 }
 
 class AuthController extends ChangeNotifier {
+  static AuthController? instance;
   final AuthRepository _authRepository = AuthRepository();
-  
+
   AuthUser? _currentUser;
   UserModel? _currentUserData;
   bool _isLoading = false;
@@ -70,6 +71,7 @@ class AuthController extends ChangeNotifier {
   }
 
   AuthController() {
+    instance = this;
     _checkCurrentUser();
   }
 

@@ -332,6 +332,9 @@ class MoreMenuView extends StatelessWidget {
                               titleColor: brandRed,
                               onTap: () async {
                                 await authController.logout();
+                                if (context.mounted) {
+                                  Navigator.of(context).popUntil((route) => route.isFirst);
+                                }
                               },
                             ),
                           ],

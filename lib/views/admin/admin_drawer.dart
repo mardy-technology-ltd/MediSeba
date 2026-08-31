@@ -10,6 +10,7 @@ import 'admin_appointments_management_view.dart';
 import 'admin_medicine_inventory_view.dart';
 import 'admin_prescriptions_view.dart';
 import 'admin_settings_view.dart';
+import '../../controllers/auth_controller.dart';
 
 class AdminDrawer extends StatelessWidget {
   final int selectedIndex;
@@ -194,9 +195,14 @@ class AdminDrawer extends StatelessWidget {
                   side: const BorderSide(color: Color(0xFFFCA5A5)),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 ),
-                onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.pop(context);
+                onPressed: () async {
+                  Navigator.pop(context); // Close drawer
+                  if (AuthController.instance != null) {
+                    await AuthController.instance!.logout();
+                  }
+                  if (context.mounted) {
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                  }
                 },
                 icon: const Icon(Icons.logout_rounded, size: 16),
                 label: const Text(
