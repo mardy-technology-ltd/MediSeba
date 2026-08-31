@@ -94,33 +94,52 @@ class _LoginViewState extends State<LoginView> {
       _isLoggingIn = true;
     });
 
-    await widget.authController.login(_inputController.text.trim(), _passwordController.text);
+    final success = await widget.authController.login(_inputController.text.trim(), _passwordController.text);
 
     if (mounted) {
       setState(() {
         _isLoggingIn = false;
       });
 
-      Widget targetView;
-      if (_selectedRole == LoginRole.patient) {
-        targetView = HomeView(
-          homeController: widget.homeController,
-          authController: widget.authController,
-          languageController: widget.languageController,
+      if (success) {
+        Widget targetView;
+        if (_selectedRole == LoginRole.patient) {
+          targetView = HomeView(
+            homeController: widget.homeController,
+            authController: widget.authController,
+            languageController: widget.languageController,
+          );
+        } else {
+          // Direct entry into Admin/Management Portal for all staff & admin roles
+          targetView = AdminDashboardView(
+            homeController: widget.homeController,
+            authController: widget.authController,
+            languageController: widget.languageController,
+          );
+        }
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => targetView),
         );
       } else {
-        // Direct entry into Admin/Management Portal for all staff & admin roles
-        targetView = AdminDashboardView(
-          homeController: widget.homeController,
-          authController: widget.authController,
-          languageController: widget.languageController,
+        // Show error snackbar
+        final errorMsg = widget.authController.errorMessage ?? 'লগইন করতে ব্যর্থ হয়েছে। আবার চেষ্টা করুন।';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline_rounded, color: Colors.white, size: 20),
+                const SizedBox(width: 8),
+                Expanded(child: Text(errorMsg)),
+              ],
+            ),
+            backgroundColor: const Color(0xFFDC2626),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
         );
       }
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => targetView),
-      );
     }
   }
 
