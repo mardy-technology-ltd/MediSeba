@@ -1,10 +1,4 @@
 import 'package:flutter/material.dart';
-import 'admin_dashboard_view.dart';
-import 'admin_inbox_view.dart';
-import 'admin_job_circulars_view.dart';
-import 'admin_patient_records_view.dart';
-import 'admin_appointments_management_view.dart';
-import 'admin_medicine_inventory_view.dart';
 import 'admin_drawer.dart';
 
 class AdminDoctorsManagementView extends StatefulWidget {
@@ -26,88 +20,116 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
   // Initial Mock Data Matching Web Screenshot Precisely
   final List<Map<String, dynamic>> _doctors = [
     {
-      'id': 'doc_101',
-      'name': 'Dr. Ahmed Rahman',
-      'specialty': 'Cardiology • Consultant',
-      'bmdc': 'BMDC-590025',
+      'id': 'doc_rakib',
+      'name': 'Dr. Rakib Test',
+      'specialty': 'General Medicine • Consultant',
+      'bmdc': 'A-8546',
       'fee': 800,
-      'email': 'ahmed@mediseba.test',
-      'phone': '01710000001',
-      'isActive': false,
+      'email': '01795321465@mediseba.org',
+      'phone': '01795321465',
+      'isActive': true,
       'isVerified': true,
       'initial': 'R',
-      'avatarBg': const Color(0xFFDCFCE7),
-      'avatarColor': const Color(0xFF15803D),
+      'avatarBg': const Color(0xFFE0F2FE),
+      'avatarColor': const Color(0xFF0369A1),
     },
     {
-      'id': 'doc_102',
-      'name': 'Dr. Farzana Islam',
-      'specialty': 'Medicine • Consultant',
-      'bmdc': 'BMDC-559743',
-      'fee': 800,
-      'email': 'farzana@mediseba.test',
-      'phone': '01710000002',
+      'id': 'doc_uat',
+      'name': 'uat doctor test',
+      'specialty': 'General Medicine • Consultant',
+      'bmdc': 'B-MD224',
+      'fee': 300,
+      'email': '01447998899@mediseba.org',
+      'phone': '01447998899',
       'isActive': true,
-      'isVerified': false,
-      'initial': 'I',
-      'avatarBg': const Color(0xFFDCFCE7),
-      'avatarColor': const Color(0xFF15803D),
+      'isVerified': true,
+      'initial': 'U',
+      'avatarBg': const Color(0xFFF1F5F9),
+      'avatarColor': const Color(0xFF475569),
     },
     {
-      'id': 'doc_103',
+      'id': 'doc_farzana',
+      'name': 'Dr. Farzana baby',
+      'specialty': 'Medicine • Senior Specialist Consultant',
+      'bmdc': 'BMDC-290770',
+      'fee': 800,
+      'email': 'dr-farzana-islam@mediseba.test',
+      'phone': '01800000001',
+      'isActive': true,
+      'isVerified': true,
+      'initial': 'F',
+      'avatarBg': const Color(0xFFFCE7F3),
+      'avatarColor': const Color(0xFFBE185D),
+    },
+    {
+      'id': 'doc_ahmed',
+      'name': 'Dr. Ahmed Rahman',
+      'specialty': 'Cardiology • Senior Specialist Consultant',
+      'bmdc': 'BMDC-371154',
+      'fee': 800,
+      'email': 'dr-ahmed-rahman@mediseba.test',
+      'phone': '01800000002',
+      'isActive': true,
+      'isVerified': true,
+      'initial': 'A',
+      'avatarBg': const Color(0xFFFEF3C7),
+      'avatarColor': const Color(0xFFB45309),
+    },
+    {
+      'id': 'doc_imran',
       'name': 'Dr. Imran Kabir',
-      'specialty': 'Neurology • Consultant',
-      'bmdc': 'BMDC-950496',
+      'specialty': 'Neurology • Senior Specialist Consultant',
+      'bmdc': 'BMDC-538913',
       'fee': 800,
-      'email': 'imran@mediseba.test',
-      'phone': '01710000003',
+      'email': 'dr-imran-kabir@mediseba.test',
+      'phone': '01800000003',
       'isActive': true,
       'isVerified': true,
-      'initial': 'K',
-      'avatarBg': const Color(0xFFDCFCE7),
-      'avatarColor': const Color(0xFF15803D),
+      'initial': 'I',
+      'avatarBg': const Color(0xFFE0F2FE),
+      'avatarColor': const Color(0xFF0369A1),
     },
     {
-      'id': 'doc_104',
+      'id': 'doc_nusrat',
       'name': 'Dr. Nusrat Jahan',
-      'specialty': 'Gynecology & Obstetrics • Consultant',
-      'bmdc': 'BMDC-386513',
-      'fee': 800,
-      'email': 'nusrat@mediseba.test',
-      'phone': '01710000004',
+      'specialty': 'Gynecology & Obstetrics • Senior Specialist Consultant',
+      'bmdc': 'BMDC-741988',
+      'fee': 600,
+      'email': 'dr-nusrat-jahan@mediseba.test',
+      'phone': '01800000004',
       'isActive': true,
       'isVerified': true,
-      'initial': 'J',
-      'avatarBg': const Color(0xFFDCFCE7),
-      'avatarColor': const Color(0xFF15803D),
+      'initial': 'N',
+      'avatarBg': const Color(0xFFF3E8FF),
+      'avatarColor': const Color(0xFF7E22CE),
     },
     {
-      'id': 'doc_105',
+      'id': 'doc_tanvir',
       'name': 'Dr. Tanvir Hasan',
-      'specialty': 'Orthopedics • Consultant',
-      'bmdc': 'BMDC-594863',
-      'fee': 800,
-      'email': 'tanvir@mediseba.test',
-      'phone': '01710000005',
+      'specialty': 'Orthopedics • Senior Specialist Consultant',
+      'bmdc': 'BMDC-469765',
+      'fee': 700,
+      'email': 'dr-tanvir-hasan@mediseba.test',
+      'phone': '01800000005',
       'isActive': true,
       'isVerified': true,
-      'initial': 'H',
-      'avatarBg': const Color(0xFFDCFCE7),
-      'avatarColor': const Color(0xFF15803D),
+      'initial': 'T',
+      'avatarBg': const Color(0xFFECFDF5),
+      'avatarColor': const Color(0xFF047857),
     },
     {
-      'id': 'doc_106',
+      'id': 'doc_samiul',
       'name': 'Dr. Samiul Sajib',
-      'specialty': 'Chest Specialist • Consultant',
-      'bmdc': 'BMDC-138505',
-      'fee': 800,
-      'email': 'sajib@mediseba.test',
-      'phone': '01710000006',
+      'specialty': 'Pediatrics • Senior Specialist Consultant',
+      'bmdc': 'BMDC-440385',
+      'fee': 600,
+      'email': 'dr-samiul-sajib@mediseba.test',
+      'phone': '01800000006',
       'isActive': true,
       'isVerified': true,
       'initial': 'S',
-      'avatarBg': const Color(0xFFDCFCE7),
-      'avatarColor': const Color(0xFF15803D),
+      'avatarBg': const Color(0xFFFEE2E2),
+      'avatarColor': const Color(0xFFB91C1C),
     },
   ];
 
@@ -373,216 +395,188 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
     bool currentActive = item['isActive'] as bool;
     bool currentVerified = item['isVerified'] as bool;
 
-    showDialog(
+    showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (context) {
-        final screenWidth = MediaQuery.of(context).size.width;
-        final isMobile = screenWidth < 550;
-
         return StatefulBuilder(
           builder: (context, setModalState) {
-            return Dialog(
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-              insetPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 20),
-              child: Container(
-                constraints: const BoxConstraints(maxWidth: 580),
-                padding: const EdgeInsets.all(18),
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Header Row matching Web Pop-up (Fully un-overflowable)
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFECFDF5),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: const Color(0xFFA7F3D0)),
-                            ),
-                            child: const Icon(Icons.edit_note_rounded, color: brandGreen, size: 20),
-                          ),
-                          const SizedBox(width: 8),
-                          const Expanded(
-                            child: Text(
-                              'ডাক্তার প্রোফাইল ও স্ট্যাটাস এডিট',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w900,
-                                color: textDark,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.cancel_outlined, color: Color(0xFF94A3B8), size: 22),
-                            onPressed: () => Navigator.pop(context),
-                          ),
-                        ],
+            return Container(
+              padding: EdgeInsets.fromLTRB(20, 16, 20, MediaQuery.of(context).viewInsets.bottom + 24),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFCBD5E1),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
                       ),
-                      const SizedBox(height: 14),
-
-                      // Form Grid (Responsive: 1 column on Mobile, 2 column on Desktop)
-                      if (isMobile) ...[
-                        _buildWebStyledInput('ডাক্তারের নাম', nameController),
-                        const SizedBox(height: 10),
-                        _buildWebStyledInput('মোবাইল নম্বর', phoneController, keyboardType: TextInputType.phone),
-                        const SizedBox(height: 10),
-                        _buildWebStyledInput('বিএমডিসি নম্বর', bmdcController),
-                        const SizedBox(height: 10),
-                        _buildWebStyledInput('স্পেশালিটি', specialtyController),
-                        const SizedBox(height: 10),
-                        _buildWebStyledInput('পদবী (Designation)', designationController),
-                        const SizedBox(height: 10),
-                        _buildWebStyledInput('কনসালটেশন ফি (BDT)', feeController, keyboardType: TextInputType.number),
-                        const SizedBox(height: 10),
-                        _buildDropdownField(
-                          label: 'অ্যাকাউন্ট স্ট্যাটাস',
-                          value: currentActive,
-                          items: const [
-                            DropdownMenuItem(value: true, child: Text('এক্টিভ (Active)')),
-                            DropdownMenuItem(value: false, child: Text('ইন-এক্টিভ (Inactive)')),
-                          ],
-                          onChanged: (val) {
-                            if (val != null) setModalState(() => currentActive = val);
-                          },
-                        ),
-                        const SizedBox(height: 10),
-                        _buildDropdownField(
-                          label: 'BMDC ভেরিফিকেশন',
-                          value: currentVerified,
-                          items: const [
-                            DropdownMenuItem(value: true, child: Text('ভেরিফাইড (Verified)')),
-                            DropdownMenuItem(value: false, child: Text('পেন্ডিং (Pending Verification)')),
-                          ],
-                          onChanged: (val) {
-                            if (val != null) setModalState(() => currentVerified = val);
-                          },
-                        ),
-                      ] else ...[
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
                         Row(
-                          children: [
-                            Expanded(child: _buildWebStyledInput('ডাক্তারের নাম', nameController)),
-                            const SizedBox(width: 12),
-                            Expanded(child: _buildWebStyledInput('মোবাইল নম্বর', phoneController, keyboardType: TextInputType.phone)),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            Expanded(child: _buildWebStyledInput('বিএমডিসি নম্বর', bmdcController)),
-                            const SizedBox(width: 12),
-                            Expanded(child: _buildWebStyledInput('স্পেশালিটি', specialtyController)),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            Expanded(child: _buildWebStyledInput('পদবী (Designation)', designationController)),
-                            const SizedBox(width: 12),
-                            Expanded(child: _buildWebStyledInput('কনসালটেশন ফি (BDT)', feeController, keyboardType: TextInputType.number)),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildDropdownField(
-                                label: 'অ্যাকাউন্ট স্ট্যাটাস',
-                                value: currentActive,
-                                items: const [
-                                  DropdownMenuItem(value: true, child: Text('এক্টিভ (Active)')),
-                                  DropdownMenuItem(value: false, child: Text('ইন-এক্টিভ (Inactive)')),
-                                ],
-                                onChanged: (val) {
-                                  if (val != null) setModalState(() => currentActive = val);
-                                },
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: _buildDropdownField(
-                                label: 'BMDC ভেরিফিকেশন',
-                                value: currentVerified,
-                                items: const [
-                                  DropdownMenuItem(value: true, child: Text('ভেরিফাইড (Verified)')),
-                                  DropdownMenuItem(value: false, child: Text('পেন্ডিং (Pending Verification)')),
-                                ],
-                                onChanged: (val) {
-                                  if (val != null) setModalState(() => currentVerified = val);
-                                },
-                              ),
+                          children: const [
+                            Icon(Icons.edit_note_rounded, color: brandGreen, size: 22),
+                            SizedBox(width: 8),
+                            Text(
+                              'ডাক্তার প্রোফাইল এডিট করুন',
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: textDark),
                             ),
                           ],
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close_rounded, color: Color(0xFF64748B)),
+                          onPressed: () => Navigator.pop(context),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 14),
 
-                      const SizedBox(height: 24),
+                    _buildInputField('ডাক্তারের পূর্ণ নাম *', nameController, 'যেমন: Dr. Ahmed Rahman'),
+                    const SizedBox(height: 12),
 
-                      // Action Buttons Row matching Web Screenshot
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          // Cancel Button (বাতিল)
-                          OutlinedButton(
-                            style: OutlinedButton.styleFrom(
-                              backgroundColor: const Color(0xFFF1F5F9),
-                              foregroundColor: const Color(0xFF475569),
-                              side: BorderSide.none,
-                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            ),
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('বাতিল', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-                          ),
-                          const SizedBox(width: 12),
+                    Row(
+                      children: [
+                        Expanded(child: _buildInputField('স্পেশালিটি *', specialtyController, 'যেমন: Cardiology')),
+                        const SizedBox(width: 10),
+                        Expanded(child: _buildInputField('পদবী (Designation) *', designationController, 'যেমন: Senior Consultant')),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
 
-                          // Save Button (তথ্য আপডেট করুন) matching Web Screenshot button
-                          ElevatedButton.icon(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: brandGreen,
-                              foregroundColor: Colors.white,
-                              elevation: 0,
-                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            ),
-                            onPressed: () {
-                              final spec = specialtyController.text.trim();
-                              final desig = designationController.text.trim();
-                              final fullSpecialty = desig.isNotEmpty ? '$spec • $desig' : spec;
+                    Row(
+                      children: [
+                        Expanded(child: _buildInputField('BMDC নম্বর *', bmdcController, 'BMDC-371154')),
+                        const SizedBox(width: 10),
+                        Expanded(child: _buildInputField('কনসালটেশন ফি (৳) *', feeController, '800', keyboardType: TextInputType.number)),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
 
-                              setState(() {
-                                _doctors[index]['name'] = nameController.text.trim();
-                                _doctors[index]['phone'] = phoneController.text.trim();
-                                _doctors[index]['bmdc'] = bmdcController.text.trim();
-                                _doctors[index]['specialty'] = fullSpecialty;
-                                _doctors[index]['fee'] = int.tryParse(feeController.text.trim()) ?? 800;
-                                _doctors[index]['isActive'] = currentActive;
-                                _doctors[index]['isVerified'] = currentVerified;
-                              });
-
-                              Navigator.pop(context);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('ডাক্তার প্রোফাইল ও স্ট্যাটাস সফলভাবে আপডেট করা হয়েছে!'),
-                                  backgroundColor: brandGreen,
+                    Row(
+                      children: [
+                        Expanded(child: _buildInputField('মোবাইল নম্বর *', phoneController, '01800000002', keyboardType: TextInputType.phone)),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'স্ট্যাটাস',
+                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF475569)),
+                              ),
+                              const SizedBox(height: 4),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF8FAFC),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: const Color(0xFFCBD5E1), width: 1),
                                 ),
-                              );
-                            },
-                            icon: const Icon(Icons.save_outlined, size: 18),
-                            label: const Text(
-                              'তথ্য আপডেট করুন',
-                              style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.bold),
-                            ),
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton<bool>(
+                                    value: currentActive,
+                                    isExpanded: true,
+                                    isDense: true,
+                                    style: const TextStyle(fontSize: 12.5, color: textDark, fontWeight: FontWeight.w600),
+                                    items: const [
+                                      DropdownMenuItem(value: true, child: Text('Active')),
+                                      DropdownMenuItem(value: false, child: Text('Inactive')),
+                                    ],
+                                    onChanged: (val) {
+                                      if (val != null) {
+                                        setModalState(() {
+                                          currentActive = val;
+                                        });
+                                      }
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+
+                    // Verification Checkbox
+                    CheckboxListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text('BMDC ভেরিফাইড', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                      value: currentVerified,
+                      activeColor: brandGreen,
+                      onChanged: (val) {
+                        setModalState(() {
+                          currentVerified = val ?? true;
+                        });
+                      },
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    SizedBox(
+                      width: double.infinity,
+                      height: 46,
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: brandGreen,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        onPressed: () {
+                          if (nameController.text.trim().isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('দয়া করে ডাক্তারের নাম লিখুন')),
+                            );
+                            return;
+                          }
+
+                          final spec = specialtyController.text.trim();
+                          final desig = designationController.text.trim();
+                          final fullSpecialty = desig.isNotEmpty ? '$spec • $desig' : spec;
+
+                          setState(() {
+                            _doctors[index]['name'] = nameController.text.trim();
+                            _doctors[index]['phone'] = phoneController.text.trim();
+                            _doctors[index]['bmdc'] = bmdcController.text.trim();
+                            _doctors[index]['specialty'] = fullSpecialty;
+                            _doctors[index]['fee'] = int.tryParse(feeController.text.trim()) ?? 800;
+                            _doctors[index]['isActive'] = currentActive;
+                            _doctors[index]['isVerified'] = currentVerified;
+                          });
+
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('ডাক্তার প্রোফাইল সফলভাবে আপডেট করা হয়েছে!'),
+                              backgroundColor: brandGreen,
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.check_circle_rounded, size: 18),
+                        label: const Text(
+                          'তথ্য আপডেট করুন',
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                        ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             );
@@ -592,76 +586,7 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
     );
   }
 
-  Widget _buildDropdownField({
-    required String label,
-    required bool value,
-    required List<DropdownMenuItem<bool>> items,
-    required ValueChanged<bool?> onChanged,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF334155)),
-        ),
-        const SizedBox(height: 4),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF8FAFC),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: value ? brandGreen : const Color(0xFFE2E8F0),
-              width: value ? 1.5 : 1,
-            ),
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<bool>(
-              value: value,
-              isExpanded: true,
-              isDense: true,
-              icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF475569)),
-              style: const TextStyle(fontSize: 12.5, color: textDark, fontWeight: FontWeight.w600),
-              items: items,
-              onChanged: onChanged,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 
-  Widget _buildWebStyledInput(String label, TextEditingController controller, {TextInputType keyboardType = TextInputType.text}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF334155)),
-        ),
-        const SizedBox(height: 4),
-        TextField(
-          controller: controller,
-          keyboardType: keyboardType,
-          style: const TextStyle(fontSize: 13, color: textDark, fontWeight: FontWeight.w600),
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: const Color(0xFFF8FAFC),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: brandGreen, width: 1.5),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 
   Widget _buildInputField(String label, TextEditingController controller, String hint, {TextInputType keyboardType = TextInputType.text}) {
     return Column(
@@ -839,79 +764,202 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
 
   /// 1. Build Header Panel matching Web Screenshot
   Widget _buildHeaderPanel() {
+    final activeCount = _doctors.where((d) => d['isActive'] == true).length;
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        gradient: const LinearGradient(
+          colors: [darkGreen, brandGreen],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: brandGreen.withValues(alpha: 0.25),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          Row(
-            children: const [
-              Icon(Icons.medical_services_rounded, color: brandGreen, size: 22),
-              SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  'ডাক্তার ম্যানেজমেন্ট (Doctor Management)',
-                  style: TextStyle(
-                    fontSize: 15.5,
-                    fontWeight: FontWeight.w900,
-                    color: textDark,
+          // Decorative background bubble
+          Positioned(
+            right: -30,
+            top: -30,
+            child: Container(
+              width: 130,
+              height: 130,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: 0.08),
+              ),
+            ),
+          ),
+          Positioned(
+            left: -20,
+            bottom: -20,
+            child: Container(
+              width: 90,
+              height: 90,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: 0.05),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Glowing Badge
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.18),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.25), width: 1),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Icon(Icons.shield_rounded, color: Colors.amber, size: 13),
+                      SizedBox(width: 4),
+                      Text(
+                        'MEDICAL PANEL & DIRECTORY',
+                        style: TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.white,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          const Text(
-            'ডাক্তার তথ্য এডিট, এক্টিভ/ইন-এক্টিভ মোড, বিএমডিসি লাইসেন্স ভেরিফাই ও ফি নিয়ন্ত্রণ করুন।',
-            style: TextStyle(fontSize: 11.5, color: Color(0xFF64748B), height: 1.4),
-          ),
-          const SizedBox(height: 14),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              OutlinedButton.icon(
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: const Color(0xFF334155),
-                  side: const BorderSide(color: Color(0xFFCBD5E1), width: 1.2),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                const SizedBox(height: 12),
+                const Text(
+                  'নিবন্ধিত ডাক্তার প্যানেল',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                    height: 1.1,
+                  ),
                 ),
-                onPressed: () {
-                  setState(() {});
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('ক্যাশ রিফ্রেশ সম্পন্ন হয়েছে')),
-                  );
-                },
-                icon: const Icon(Icons.sync_rounded, size: 16, color: brandGreen),
-                label: const Text('ক্যাশ রিফ্রেশ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-              ),
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: brandGreen,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                const Text(
+                  '(Verified Doctors List)',
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white70,
+                  ),
                 ),
-                onPressed: _showCreateDoctorModal,
-                icon: const Icon(Icons.add_rounded, size: 18),
-                label: const Text('+ নতুন ডাক্তার যুক্ত করুন', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold)),
-              ),
-            ],
+                const SizedBox(height: 6),
+                Text(
+                  'BMDC ভেরিফাইড ডাক্তারদের প্রোফাইল, ফি ও টেলিমেডিসিন পারমিশন ফুল CRUD হাব।',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.white.withValues(alpha: 0.88),
+                    height: 1.35,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                
+                // Metrics & Action Row
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 10,
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    // Metrics Wrap
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 6,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            'মোট ডাক্তার: ${_doctors.length} জন',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            'সক্রিয়: $activeCount জন',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    
+                    // Buttons Wrap
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        // Refresh Button
+                        Container(
+                          height: 32,
+                          width: 32,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.15),
+                            shape: BoxShape.circle,
+                          ),
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            icon: const Icon(Icons.refresh_rounded, color: Colors.white, size: 18),
+                            onPressed: () {
+                              setState(() {});
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('ক্যাশ রিফ্রেশ সম্পন্ন হয়েছে')),
+                              );
+                            },
+                          ),
+                        ),
+                        // Add Button
+                        ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: darkGreen,
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
+                          onPressed: _showCreateDoctorModal,
+                          icon: const Icon(Icons.add_rounded, size: 16),
+                          label: const Text(
+                            'যোগ করুন',
+                            style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w900),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -923,13 +971,13 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFCBD5E1).withValues(alpha: 0.6), width: 1.2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: brandGreen.withValues(alpha: 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -940,11 +988,11 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
             _searchQuery = val;
           });
         },
-        style: const TextStyle(fontSize: 13, color: textDark, fontWeight: FontWeight.w500),
+        style: const TextStyle(fontSize: 13, color: textDark, fontWeight: FontWeight.w600),
         decoration: InputDecoration(
           hintText: 'ডাক্তারের নাম, স্পেশালিটি বা বিএমডিসি নম্বর দিয়ে খুঁজুন...',
-          hintStyle: const TextStyle(fontSize: 12.5, color: Color(0xFF94A3B8)),
-          prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF64748B), size: 20),
+          hintStyle: const TextStyle(fontSize: 12.5, color: Color(0xFF94A3B8), fontWeight: FontWeight.w500),
+          prefixIcon: const Icon(Icons.search_rounded, color: brandGreen, size: 20),
           suffixIcon: _searchQuery.isNotEmpty
               ? IconButton(
                   icon: const Icon(Icons.clear_rounded, size: 18, color: Color(0xFF94A3B8)),
@@ -968,21 +1016,34 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
     final bool isActive = item['isActive'] as bool;
     final bool isVerified = item['isVerified'] as bool;
 
+    final Color avatarBg = item['avatarBg'] as Color? ?? const Color(0xFFE0F2FE);
+    final Color avatarColor = item['avatarColor'] as Color? ?? const Color(0xFF0369A1);
+
+    String specialtyText = item['specialty'] as String;
+    String designationText = '';
+    if (specialtyText.contains('•')) {
+      final parts = specialtyText.split('•');
+      specialtyText = parts[0].trim();
+      designationText = parts[1].trim();
+    }
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isActive ? const Color(0xFFE2E8F0) : const Color(0xFFFCA5A5),
+          color: isActive 
+              ? const Color(0xFFCBD5E1).withValues(alpha: 0.5) 
+              : const Color(0xFFFCA5A5).withValues(alpha: 0.6),
           width: 1.2,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
+            color: brandGreen.withValues(alpha: 0.03),
             blurRadius: 10,
-            offset: const Offset(0, 3),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -995,26 +1056,31 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
             children: [
               // Avatar Circle
               Container(
-                width: 44,
-                height: 44,
+                width: 46,
+                height: 46,
                 decoration: BoxDecoration(
-                  color: item['avatarBg'] as Color? ?? const Color(0xFFDCFCE7),
+                  gradient: LinearGradient(
+                    colors: [avatarBg, avatarBg.withValues(alpha: 0.65)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                   shape: BoxShape.circle,
+                  border: Border.all(color: avatarColor.withValues(alpha: 0.15), width: 1.5),
                 ),
                 child: Center(
                   child: Text(
                     item['initial'] as String? ?? 'D',
                     style: TextStyle(
                       fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: item['avatarColor'] as Color? ?? const Color(0xFF15803D),
+                      fontWeight: FontWeight.w900,
+                      color: avatarColor,
                     ),
                   ),
                 ),
               ),
               const SizedBox(width: 10),
 
-              // Doctor Name & Specialty
+              // Doctor Name & Specialty chips
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1035,20 +1101,47 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
                         ),
                         if (isVerified) ...[
                           const SizedBox(width: 4),
-                          const Icon(Icons.verified_rounded, color: brandGreen, size: 16),
+                          Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFECFDF5),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.verified_rounded, color: brandGreen, size: 16),
+                          ),
                         ],
                       ],
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      item['specialty'] as String,
-                      style: const TextStyle(
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF0F766E),
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    const SizedBox(height: 4),
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 4,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF1F5F9),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            specialtyText,
+                            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF475569)),
+                          ),
+                        ),
+                        if (designationText.isNotEmpty) ...[
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFECFDF5),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              designationText,
+                              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: brandGreen),
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ],
                 ),
@@ -1058,20 +1151,22 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
 
               // Active / Inactive Badge
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
                 decoration: BoxDecoration(
-                  color: isActive ? const Color(0xFFDCFCE7) : const Color(0xFFFEE2E2),
+                  color: isActive ? const Color(0xFFECFDF5) : const Color(0xFFFEF2F2),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: isActive ? const Color(0xFF86EFAC) : const Color(0xFFFCA5A5),
+                    color: isActive ? const Color(0xFFA7F3D0) : const Color(0xFFFECACA),
+                    width: 0.8,
                   ),
                 ),
                 child: Text(
-                  isActive ? 'এক্টিভ (Active)' : 'ইন-এক্টিভ (Inactive)',
+                  isActive ? 'ACTIVE' : 'INACTIVE',
                   style: TextStyle(
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.bold,
-                    color: isActive ? const Color(0xFF15803D) : const Color(0xFFB91C1C),
+                    fontSize: 9,
+                    fontWeight: FontWeight.w900,
+                    color: isActive ? const Color(0xFF047857) : const Color(0xFFDC2626),
+                    letterSpacing: 0.3,
                   ),
                 ),
               ),
@@ -1082,75 +1177,79 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
 
           // Meta Info Table: BMDC, Fee, Email, Phone matching screenshot layout
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: const Color(0xFFF8FAFC),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: const Color(0xFFF1F5F9)),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFE2E8F0).withValues(alpha: 0.5)),
             ),
             child: Column(
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text.rich(
-                      TextSpan(
-                        text: 'BMDC: ',
-                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF334155)),
-                        children: [
-                          TextSpan(
-                            text: item['bmdc'] as String,
-                            style: const TextStyle(color: Color(0xFF475569), fontWeight: FontWeight.normal),
+                    Row(
+                      children: [
+                        const Icon(Icons.badge_outlined, size: 14, color: Color(0xFF64748B)),
+                        const SizedBox(width: 6),
+                        const Text('BMDC: ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF64748B))),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFEFF6FF),
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(color: const Color(0xFFBFDBFE), width: 0.5),
                           ),
-                        ],
-                      ),
+                          child: Text(
+                            item['bmdc'] as String,
+                            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Color(0xFF1D4ED8)),
+                          ),
+                        ),
+                      ],
                     ),
-                    Text.rich(
-                      TextSpan(
-                        text: 'ফি: ',
-                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF334155)),
-                        children: [
-                          TextSpan(
-                            text: '৳ ${item['fee']}',
-                            style: const TextStyle(color: brandGreen, fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
+                    Row(
+                      children: [
+                        const Icon(Icons.payments_outlined, size: 14, color: Color(0xFF64748B)),
+                        const SizedBox(width: 6),
+                        const Text('ভিজিট ফি: ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF64748B))),
+                        Text(
+                          '৳ ${item['fee']}',
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: brandGreen),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
-                      child: Text.rich(
-                        TextSpan(
-                          text: 'ইমেইল: ',
-                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF334155)),
-                          children: [
-                            TextSpan(
-                              text: item['email'] as String,
-                              style: const TextStyle(color: Color(0xFF64748B), fontWeight: FontWeight.normal),
-                            ),
-                          ],
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text.rich(
-                      TextSpan(
-                        text: 'ফোন: ',
-                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF334155)),
+                      child: Row(
                         children: [
-                          TextSpan(
-                            text: item['phone'] as String,
-                            style: const TextStyle(color: Color(0xFF475569), fontWeight: FontWeight.normal),
+                          const Icon(Icons.mail_outline_rounded, size: 14, color: Color(0xFF64748B)),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              item['email'] as String,
+                              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: Color(0xFF475569)),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ],
                       ),
+                    ),
+                    const SizedBox(width: 10),
+                    Row(
+                      children: [
+                        const Icon(Icons.phone_outlined, size: 14, color: Color(0xFF64748B)),
+                        const SizedBox(width: 6),
+                        Text(
+                          item['phone'] as String,
+                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF334155)),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -1174,10 +1273,10 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
                     side: BorderSide(
                       color: isVerified ? const Color(0xFFA7F3D0) : const Color(0xFFFDE68A),
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 9),
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
                   onPressed: () => _toggleDoctorVerification(index),
                   icon: Icon(
@@ -1203,10 +1302,10 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
                     foregroundColor: const Color(0xFF0284C7),
                     backgroundColor: const Color(0xFFF0F9FF),
                     side: const BorderSide(color: Color(0xFFBAE6FD)),
-                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 9),
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
                   onPressed: () => _showEditDoctorModal(item, index),
                   icon: const Icon(Icons.edit_outlined, size: 13),
@@ -1231,10 +1330,10 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
                     side: BorderSide(
                       color: isActive ? const Color(0xFFFECACA) : const Color(0xFFA7F3D0),
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 9),
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
                   onPressed: () => _toggleDoctorStatus(index),
                   icon: Icon(
@@ -1258,213 +1357,5 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
     );
   }
 
-  /// Build Navigation Drawer matching Image 1
-  Widget _buildAdminDrawer(BuildContext context) {
-    final menuItems = [
-      {'title': 'ড্যাশবোর্ড (Overview)', 'icon': Icons.dashboard_rounded, 'selected': false},
-      {'title': 'ইনবক্স ও অ্যাপ্লিকেশন', 'icon': Icons.mail_outline_rounded, 'selected': false},
-      {'title': 'চাকরি ও নিয়োগ সার্কুলার', 'icon': Icons.work_outline_rounded, 'selected': false},
-      {'title': 'ডাক্তার ম্যানেজমেন্ট', 'icon': Icons.medical_services_outlined, 'selected': true},
-      {'title': 'রোগীর রেকর্ডস', 'icon': Icons.people_outline_rounded, 'selected': false},
-      {'title': 'সিরিয়াল ও অ্যাপয়েন্টমেন্ট', 'icon': Icons.calendar_month_outlined, 'selected': false},
-      {'title': 'মেডিসিন ইনভেন্টরি', 'icon': Icons.medication_outlined, 'selected': false},
-      {'title': 'ডিজিটাল প্রেসক্রিপশন', 'icon': Icons.description_outlined, 'selected': false},
-      {'title': 'সিস্টেম সেটিং ও কন্ট্রোল', 'icon': Icons.settings_outlined, 'selected': false},
-    ];
 
-    return Drawer(
-      backgroundColor: Colors.white,
-      child: Column(
-        children: [
-          // Drawer Header matching Image 1
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(16, 44, 16, 16),
-            decoration: const BoxDecoration(
-              color: Color(0xFFF8FAFC),
-              border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Image.asset(
-                  'assets/images/logo.png',
-                  height: 36,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) => const Icon(
-                    Icons.local_hospital_rounded,
-                    size: 40,
-                    color: brandGreen,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFDCFCE7),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: const Text(
-                    'ADMIN CONTROL PANEL',
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      color: brandGreen,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Drawer Navigation List
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              itemCount: menuItems.length,
-              itemBuilder: (context, index) {
-                final item = menuItems[index];
-                final isSelected = item['selected'] as bool;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                  child: Material(
-                    color: isSelected ? darkGreen : Colors.transparent,
-                    borderRadius: BorderRadius.circular(10),
-                    clipBehavior: Clip.antiAlias,
-                    child: ListTile(
-                      dense: true,
-                      leading: Icon(
-                        item['icon'] as IconData,
-                        color: isSelected ? Colors.white : const Color(0xFF475569),
-                        size: 20,
-                      ),
-                      title: Text(
-                        item['title'] as String,
-                        style: TextStyle(
-                          fontSize: 12.5,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                          color: isSelected ? Colors.white : const Color(0xFF334155),
-                        ),
-                      ),
-                      trailing: isSelected
-                          ? const Icon(Icons.chevron_right_rounded, color: Colors.white, size: 18)
-                          : null,
-                      onTap: () {
-                        Navigator.pop(context);
-                        if (index == 0) {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const AdminDashboardView(),
-                            ),
-                          );
-                        } else if (index == 1) {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const AdminInboxView(),
-                            ),
-                          );
-                        } else if (index == 2) {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const AdminJobCircularsView(),
-                            ),
-                          );
-                        } else if (index == 4) {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const AdminPatientRecordsView(),
-                            ),
-                          );
-                        } else if (index == 5) {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const AdminAppointmentsManagementView(),
-                            ),
-                          );
-                        } else if (index == 6) {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const AdminMedicineInventoryView(),
-                            ),
-                          );
-                        } else if (!isSelected) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('${item['title']} সেকশন নির্বাচন করা হয়েছে')),
-                          );
-                        }
-                      },
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-
-          // Admin User Profile Footer matching Image 1
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: const BoxDecoration(
-              color: Color(0xFFF8FAFC),
-              border: Border(top: BorderSide(color: Color(0xFFE2E8F0))),
-            ),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 18,
-                      backgroundColor: const Color(0xFFD97706),
-                      child: const Text(
-                        'SA',
-                        style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text(
-                            'System Admin',
-                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: textDark),
-                          ),
-                          Text(
-                            'admin@mediseba.org',
-                            style: TextStyle(fontSize: 11, color: Color(0xFF64748B)),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFFDC2626),
-                      side: const BorderSide(color: Color(0xFFFCA5A5)),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    ),
-                    onPressed: () {
-                      Navigator.pop(context); // Close drawer
-                      Navigator.pop(context); // Exit admin panel back to app
-                    },
-                    icon: const Icon(Icons.logout_rounded, size: 16),
-                    label: const Text('অ্যাপে ফিরে যান', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
