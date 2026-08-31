@@ -11,6 +11,9 @@ import 'admin_medicine_inventory_view.dart';
 import 'admin_prescriptions_view.dart';
 import 'admin_settings_view.dart';
 import '../../controllers/auth_controller.dart';
+import '../../controllers/home_controller.dart';
+import '../../controllers/language_controller.dart';
+import '../auth/login_view.dart';
 
 class AdminDrawer extends StatelessWidget {
   final int selectedIndex;
@@ -201,7 +204,16 @@ class AdminDrawer extends StatelessWidget {
                     await AuthController.instance!.logout();
                   }
                   if (context.mounted) {
-                    Navigator.of(context).popUntil((route) => route.isFirst);
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(
+                        builder: (context) => LoginView(
+                          homeController: HomeController.instance ?? HomeController(),
+                          authController: AuthController.instance ?? AuthController(),
+                          languageController: LanguageController.instance ?? LanguageController(),
+                        ),
+                      ),
+                      (route) => false,
+                    );
                   }
                 },
                 icon: const Icon(Icons.logout_rounded, size: 16),

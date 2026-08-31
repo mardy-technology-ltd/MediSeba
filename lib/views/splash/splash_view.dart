@@ -4,6 +4,10 @@ import '../../controllers/auth_controller.dart';
 import '../../controllers/language_controller.dart';
 import '../onboarding/onboarding_view.dart';
 
+import '../home/home_view.dart';
+import '../admin/admin_dashboard_view.dart';
+import '../../services/cache_service.dart';
+
 class SplashView extends StatefulWidget {
   final HomeController homeController;
   final AuthController authController;
@@ -46,11 +50,52 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
 
     Future.delayed(const Duration(milliseconds: 2500), () {
       if (mounted) {
-        final Widget destinationView = OnboardingView(
-          homeController: widget.homeController,
-          authController: widget.authController,
-          languageController: widget.languageController,
-        );
+        Widget destinationView;
+
+        if (widget.authController.isLoggedIn) {
+          final phone = widget.authController.currentUserData?.phone.toLowerCase() ?? '';
+          final email = widget.authController.currentUser?.email?.toLowerCase() ?? '';
+          final loginIdentifier = phone.isNotEmpty ? phone : email;
+
+          // Dynamically detect if staff or admin login matching LoginRole pattern
+          final bool isAdminOrStaff = loginIdentifier.contains('admin') ||
+              loginIdentifier.contains('doctor') ||
+              loginIdentifier.contains('rahim') || // HBP
+              loginIdentifier.contains('tanvir') || // Supervisor
+              loginIdentifier.contains('areamanager') || // Area Manager
+              loginIdentifier.contains('marketing') || // Marketing Manager
+              loginIdentifier.contains('headsales') || // Head of Sales
+              loginIdentifier.contains('director'); // Sales Director
+
+          if (isAdminOrStaff) {
+            destinationView = AdminDashboardView(
+              homeController: widget.homeController,
+              authController: widget.authController,
+              languageController: widget.languageController,
+            );
+          } else {
+            destinationView = HomeView(
+              homeController: widget.homeController,
+              authController: widget.authController,
+              languageController: widget.languageController,
+            );
+          }
+        } else {
+          final hasSeenOnboarding = CacheService.get('has_seen_onboarding') == true;
+          if (hasSeenOnboarding) {
+            destinationView = HomeView(
+              homeController: widget.homeController,
+              authController: widget.authController,
+              languageController: widget.languageController,
+            );
+          } else {
+            destinationView = OnboardingView(
+              homeController: widget.homeController,
+              authController: widget.authController,
+              languageController: widget.languageController,
+            );
+          }
+        }
 
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(

@@ -4,6 +4,7 @@ import '../models/doctor_model.dart';
 import '../services/api_service.dart';
 
 class HomeController extends ChangeNotifier {
+  static HomeController? instance;
   List<MedicalServiceModel> _services = [];
   List<DoctorModel> _topDoctors = [];
   bool _isLoading = false;
@@ -13,6 +14,7 @@ class HomeController extends ChangeNotifier {
   bool get isLoading => _isLoading;
 
   HomeController() {
+    instance = this;
     loadHomeData();
   }
 

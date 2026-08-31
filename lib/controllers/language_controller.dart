@@ -4,10 +4,12 @@ import '../services/cache_service.dart';
 enum AppLanguage { bangla, english }
 
 class LanguageController extends ChangeNotifier {
+  static LanguageController? instance;
   static const String _languageKey = 'user_app_language';
   AppLanguage _currentLanguage = AppLanguage.bangla;
 
   LanguageController() {
+    instance = this;
     _loadSavedLanguage();
   }
 

@@ -10,6 +10,7 @@ import '../../controllers/language_controller.dart';
 import '../../widgets/share_app_dialog.dart';
 import '../../widgets/helpline_bottom_sheet.dart';
 import '../profile/profile_view.dart';
+import '../auth/login_view.dart';
 
 class MoreMenuView extends StatelessWidget {
   final AuthController authController;
@@ -333,7 +334,16 @@ class MoreMenuView extends StatelessWidget {
                               onTap: () async {
                                 await authController.logout();
                                 if (context.mounted) {
-                                  Navigator.of(context).popUntil((route) => route.isFirst);
+                                  Navigator.of(context).pushAndRemoveUntil(
+                                    MaterialPageRoute(
+                                      builder: (context) => LoginView(
+                                        homeController: homeController,
+                                        authController: authController,
+                                        languageController: languageController,
+                                      ),
+                                    ),
+                                    (route) => false,
+                                  );
                                 }
                               },
                             ),
