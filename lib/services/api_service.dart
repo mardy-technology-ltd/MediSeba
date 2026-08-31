@@ -8,9 +8,9 @@ import '../models/medicine_model.dart';
 import 'cache_service.dart';
 
 class ApiService {
-  static const String doctorsEndpoint = 'https://mediseba-web.vercel.app/api/v1/doctors';
-  static const String availabilitiesEndpoint = 'https://mediseba-web.vercel.app/api/v1/availabilities';
-  static const String medicinesEndpoint = 'https://mediseba-web.vercel.app/api/v1/search-medicines?q=';
+  static const String doctorsEndpoint = 'https://api.mediseba.org/api/v1/doctors';
+  static const String availabilitiesEndpoint = 'https://api.mediseba.org/api/v1/availabilities';
+  static const String medicinesEndpoint = 'https://api.mediseba.org/api/v1/search-medicines?q=';
   static const String _doctorsCacheKey = 'doctors_list';
   static const String _availabilitiesCacheKey = 'availabilities_list';
   static const String _medicinesCacheKey = 'medicines_list';
@@ -317,7 +317,7 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
-        if (body['success'] == true) {
+        if (body['success'] == true || body['status'] == 'success') {
           return body['data'] as Map<String, dynamic>?;
         }
       }
@@ -351,7 +351,7 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
-        if (body['success'] == true) {
+        if (body['success'] == true || body['status'] == 'success') {
           final List list = body['data'] ?? [];
           return list.map((e) => Map<String, dynamic>.from(e as Map)).toList();
         }
@@ -383,7 +383,7 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
-        if (body['success'] == true) {
+        if (body['success'] == true || body['status'] == 'success') {
           final List list = body['data'] ?? [];
           return list.map((e) => Map<String, dynamic>.from(e as Map)).toList();
         }
@@ -435,7 +435,7 @@ class ApiService {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final Map<String, dynamic> body = jsonDecode(response.body);
-        return body['success'] == true;
+        return body['success'] == true || body['status'] == 'success';
       }
     } catch (e) {
       debugPrint('❌ ApiService.createSalesAgent exception: $e');
@@ -475,7 +475,7 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
-        return body['success'] == true;
+        return body['success'] == true || body['status'] == 'success';
       }
     } catch (e) {
       debugPrint('❌ ApiService.assignSupervisor exception: $e');
@@ -515,7 +515,7 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
-        return body['success'] == true;
+        return body['success'] == true || body['status'] == 'success';
       }
     } catch (e) {
       debugPrint('❌ ApiService.updateAgentRole exception: $e');
@@ -554,7 +554,7 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
-        return body['success'] == true;
+        return body['success'] == true || body['status'] == 'success';
       }
     } catch (e) {
       debugPrint('❌ ApiService.deleteSalesAgent exception: $e');

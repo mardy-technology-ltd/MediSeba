@@ -5,7 +5,7 @@ import '../models/user_model.dart';
 import '../services/cache_service.dart';
 
 class AuthRepository {
-  static const String baseUrl = 'https://mediseba-web.vercel.app/api/v1';
+  static const String baseUrl = 'https://api.mediseba.org/api/v1';
   
   String? _token;
   UserModel? _currentUserData;
