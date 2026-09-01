@@ -552,9 +552,9 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final double width = constraints.maxWidth;
-        final int crossAxisCount = width > 640 ? 3 : (width < 340 ? 1 : 2);
-        // Generous vertical space to ensure no wrapping or overflow
-        final double childAspectRatio = width > 640 ? 1.4 : (width < 340 ? 2.5 : 1.15);
+        final int crossAxisCount = width > 600 ? 3 : 2;
+        // Generous vertical space to ensure no wrapping or overflow on any phone width
+        final double childAspectRatio = width > 600 ? 1.4 : (width < 340 ? 1.05 : 1.15);
 
         return GridView.builder(
           shrinkWrap: true,

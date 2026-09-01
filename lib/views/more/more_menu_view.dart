@@ -205,7 +205,7 @@ class MoreMenuView extends StatelessWidget {
                     crossAxisCount: 2,
                     mainAxisSpacing: 12,
                     crossAxisSpacing: 12,
-                    childAspectRatio: 2.3,
+                    childAspectRatio: 2.05,
                     children: [
                       _buildQuickTile(
                         context,
@@ -403,12 +403,17 @@ class MoreMenuView extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.bold,
-                      color: textDark,
+                  child: FittedBox(
+                    alignment: Alignment.centerLeft,
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.bold,
+                        color: textDark,
+                      ),
+                      maxLines: 2,
                     ),
                   ),
                 ),

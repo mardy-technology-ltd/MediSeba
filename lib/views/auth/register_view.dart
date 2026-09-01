@@ -201,83 +201,140 @@ class _RegisterViewState extends State<RegisterView> {
 
                       const SizedBox(height: 18),
 
-                      // 2. Phone & Email in split row
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: _buildFormField(
-                              controller: _phoneController,
-                              label: 'ফোন নম্বর *',
-                              hintText: '01700000000',
-                              prefixIcon: Icons.phone_iphone_rounded,
-                              keyboardType: TextInputType.phone,
+                      if (isSmallScreen) ...[
+                        _buildFormField(
+                          controller: _phoneController,
+                          label: 'ফোন নম্বর *',
+                          hintText: '01700000000',
+                          prefixIcon: Icons.phone_iphone_rounded,
+                          keyboardType: TextInputType.phone,
+                        ),
+                        const SizedBox(height: 16),
+                        _buildFormField(
+                          controller: _emailController,
+                          label: 'ইমেইল ঠিকানা',
+                          hintText: 'patient@example.com',
+                          prefixIcon: Icons.mail_outline_rounded,
+                          keyboardType: TextInputType.emailAddress,
+                        ),
+                        const SizedBox(height: 16),
+                        _buildFormField(
+                          controller: _passwordController,
+                          label: 'পাসওয়ার্ড *',
+                          hintText: '••••••••',
+                          prefixIcon: Icons.lock_outline_rounded,
+                          obscureText: !_isPasswordVisible,
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _isPasswordVisible ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                              color: const Color(0xFF94A3B8),
+                              size: 20,
                             ),
+                            onPressed: () {
+                              setState(() {
+                                _isPasswordVisible = !_isPasswordVisible;
+                              });
+                            },
                           ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: _buildFormField(
-                              controller: _emailController,
-                              label: 'ইমেইল ঠিকানা',
-                              hintText: 'patient@example.com',
-                              prefixIcon: Icons.mail_outline_rounded,
-                              keyboardType: TextInputType.emailAddress,
+                        ),
+                        const SizedBox(height: 16),
+                        _buildFormField(
+                          controller: _confirmPasswordController,
+                          label: 'পাসওয়ার্ড নিশ্চিত করুন *',
+                          hintText: '••••••••',
+                          prefixIcon: Icons.lock_outline_rounded,
+                          obscureText: !_isConfirmPasswordVisible,
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _isConfirmPasswordVisible ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                              color: const Color(0xFF94A3B8),
+                              size: 20,
                             ),
+                            onPressed: () {
+                              setState(() {
+                                _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+                              });
+                            },
                           ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 18),
-
-                      // 3. Password & Confirm Password in split row
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: _buildFormField(
-                              controller: _passwordController,
-                              label: 'পাসওয়ার্ড *',
-                              hintText: '••••••••',
-                              prefixIcon: Icons.lock_outline_rounded,
-                              obscureText: !_isPasswordVisible,
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _isPasswordVisible ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                                  color: const Color(0xFF94A3B8),
-                                  size: 20,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    _isPasswordVisible = !_isPasswordVisible;
-                                  });
-                                },
+                        ),
+                      ] else ...[
+                        // 2. Phone & Email in split row
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: _buildFormField(
+                                controller: _phoneController,
+                                label: 'ফোন নম্বর *',
+                                hintText: '01700000000',
+                                prefixIcon: Icons.phone_iphone_rounded,
+                                keyboardType: TextInputType.phone,
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: _buildFormField(
-                              controller: _confirmPasswordController,
-                              label: 'পাসওয়ার্ড নিশ্চিত করুন *',
-                              hintText: '••••••••',
-                              prefixIcon: Icons.lock_outline_rounded,
-                              obscureText: !_isConfirmPasswordVisible,
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _isConfirmPasswordVisible ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                                  color: const Color(0xFF94A3B8),
-                                  size: 20,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
-                                  });
-                                },
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: _buildFormField(
+                                controller: _emailController,
+                                label: 'ইমেইল ঠিকানা',
+                                hintText: 'patient@example.com',
+                                prefixIcon: Icons.mail_outline_rounded,
+                                keyboardType: TextInputType.emailAddress,
                               ),
                             ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
+                        const SizedBox(height: 18),
+
+                        // 3. Password & Confirm Password in split row
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: _buildFormField(
+                                controller: _passwordController,
+                                label: 'পাসওয়ার্ড *',
+                                hintText: '••••••••',
+                                prefixIcon: Icons.lock_outline_rounded,
+                                obscureText: !_isPasswordVisible,
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _isPasswordVisible ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                                    color: const Color(0xFF94A3B8),
+                                    size: 20,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _isPasswordVisible = !_isPasswordVisible;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: _buildFormField(
+                                controller: _confirmPasswordController,
+                                label: 'পাসওয়ার্ড নিশ্চিত করুন *',
+                                hintText: '••••••••',
+                                prefixIcon: Icons.lock_outline_rounded,
+                                obscureText: !_isConfirmPasswordVisible,
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _isConfirmPasswordVisible ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                                    color: const Color(0xFF94A3B8),
+                                    size: 20,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
 
                       const SizedBox(height: 30),
 
@@ -411,12 +468,15 @@ class _RegisterViewState extends State<RegisterView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-            color: textDark,
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: textDark,
+            ),
           ),
         ),
         const SizedBox(height: 8),

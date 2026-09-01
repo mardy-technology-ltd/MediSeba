@@ -508,17 +508,26 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
           const SizedBox(height: 6),
 
           // Chart Date Labels
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('01 Aug', style: TextStyle(fontSize: 10, color: Color(0xFF94A3B8))),
-              Text('02 Aug', style: TextStyle(fontSize: 10, color: Color(0xFF94A3B8))),
-              Text('03 Aug', style: TextStyle(fontSize: 10, color: Color(0xFF94A3B8))),
-              Text('04 Aug', style: TextStyle(fontSize: 10, color: Color(0xFF94A3B8))),
-              Text('05 Aug', style: TextStyle(fontSize: 10, color: Color(0xFF94A3B8))),
-              Text('06 Aug', style: TextStyle(fontSize: 10, color: Color(0xFF94A3B8))),
-              Text('07 Aug', style: TextStyle(fontSize: 10, color: Color(0xFF94A3B8))),
-            ],
+          const FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('01 Aug', style: TextStyle(fontSize: 10, color: Color(0xFF94A3B8))),
+                SizedBox(width: 8),
+                Text('02 Aug', style: TextStyle(fontSize: 10, color: Color(0xFF94A3B8))),
+                SizedBox(width: 8),
+                Text('03 Aug', style: TextStyle(fontSize: 10, color: Color(0xFF94A3B8))),
+                SizedBox(width: 8),
+                Text('04 Aug', style: TextStyle(fontSize: 10, color: Color(0xFF94A3B8))),
+                SizedBox(width: 8),
+                Text('05 Aug', style: TextStyle(fontSize: 10, color: Color(0xFF94A3B8))),
+                SizedBox(width: 8),
+                Text('06 Aug', style: TextStyle(fontSize: 10, color: Color(0xFF94A3B8))),
+                SizedBox(width: 8),
+                Text('07 Aug', style: TextStyle(fontSize: 10, color: Color(0xFF94A3B8))),
+              ],
+            ),
           ),
         ],
       ),
@@ -1179,10 +1188,15 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                rxId,
-                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF0284C7)),
+              Flexible(
+                child: Text(
+                  rxId,
+                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF0284C7)),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
+              const SizedBox(width: 8),
               Text(date, style: const TextStyle(fontSize: 11, color: Color(0xFF94A3B8))),
             ],
           ),

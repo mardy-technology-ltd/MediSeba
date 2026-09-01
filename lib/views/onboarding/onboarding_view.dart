@@ -142,84 +142,89 @@ class _OnboardingViewState extends State<OnboardingView> {
                 itemCount: onboardingData.length,
                 itemBuilder: (context, index) {
                   final data = onboardingData[index];
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // Decorative Icon Card Container
-                        Container(
-                          width: 170,
-                          height: 170,
-                          decoration: BoxDecoration(
-                            color: data['bgColor'] as Color,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: (data['accentColor'] as Color).withValues(alpha: 0.15),
-                                blurRadius: 30,
-                                offset: const Offset(0, 10),
+                  return Center(
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // Decorative Icon Card Container
+                            Container(
+                              width: 170,
+                              height: 170,
+                              decoration: BoxDecoration(
+                                color: data['bgColor'] as Color,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: (data['accentColor'] as Color).withValues(alpha: 0.15),
+                                    blurRadius: 30,
+                                    offset: const Offset(0, 10),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                          child: Center(
-                            child: Icon(
-                              data['icon'] as IconData,
-                              size: 80,
-                              color: data['accentColor'] as Color,
+                              child: Center(
+                                child: Icon(
+                                  data['icon'] as IconData,
+                                  size: 80,
+                                  color: data['accentColor'] as Color,
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
 
-                        const SizedBox(height: 36),
+                            const SizedBox(height: 36),
 
-                        // Badge Tag
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
-                          decoration: BoxDecoration(
-                            color: (data['accentColor'] as Color).withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: (data['accentColor'] as Color).withValues(alpha: 0.3),
+                            // Badge Tag
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: (data['accentColor'] as Color).withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: (data['accentColor'] as Color).withValues(alpha: 0.3),
+                                ),
+                              ),
+                              child: Text(
+                                data['badge'] as String,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w800,
+                                  color: data['accentColor'] as Color,
+                                ),
+                              ),
                             ),
-                          ),
-                          child: Text(
-                            data['badge'] as String,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w800,
-                              color: data['accentColor'] as Color,
+
+                            const SizedBox(height: 16),
+
+                            // Title Text
+                            Text(
+                              data['title'] as String,
+                              style: const TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w900,
+                                color: Color(0xFF0F172A),
+                                height: 1.25,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                          ),
+
+                            const SizedBox(height: 12),
+
+                            // Subtitle Description
+                            Text(
+                              data['subtitle'] as String,
+                              style: const TextStyle(
+                                fontSize: 13.5,
+                                color: Color(0xFF64748B),
+                                height: 1.5,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
                         ),
-
-                        const SizedBox(height: 16),
-
-                        // Title Text
-                        Text(
-                          data['title'] as String,
-                          style: const TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w900,
-                            color: Color(0xFF0F172A),
-                            height: 1.25,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-
-                        const SizedBox(height: 12),
-
-                        // Subtitle Description
-                        Text(
-                          data['subtitle'] as String,
-                          style: const TextStyle(
-                            fontSize: 13.5,
-                            color: Color(0xFF64748B),
-                            height: 1.5,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+                      ),
                     ),
                   );
                 },

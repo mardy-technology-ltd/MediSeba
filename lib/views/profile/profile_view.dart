@@ -326,24 +326,31 @@ class ProfileView extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Icon(
-                    is100Val ? Icons.check_circle_rounded : Icons.pie_chart_rounded,
-                    color: is100Val ? brandGreen : const Color(0xFF6366F1),
-                    size: 22,
-                  ),
-                  const SizedBox(width: 8),
-                  const Text(
-                    'Profile Completion',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: textDark,
+              Expanded(
+                child: Row(
+                  children: [
+                    Icon(
+                      is100Val ? Icons.check_circle_rounded : Icons.pie_chart_rounded,
+                      color: is100Val ? brandGreen : const Color(0xFF6366F1),
+                      size: 22,
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 8),
+                    const Flexible(
+                      child: Text(
+                        'Profile Completion',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: textDark,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(

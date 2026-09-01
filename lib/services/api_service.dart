@@ -606,4 +606,143 @@ class ApiService {
     }
     return false;
   }
+
+  /// 8. Get Admin Doctors List
+  static Future<List<Map<String, dynamic>>> getAdminDoctors({
+    required String token,
+    String? search,
+    int page = 1,
+    int perPage = 15,
+  }) async {
+    try {
+      String url = 'https://api.mediseba.org/api/v1/admin/doctors?page=$page&per_page=$perPage';
+      if (search != null && search.trim().isNotEmpty) {
+        url += '&search=${Uri.encodeComponent(search.trim())}';
+      }
+
+      debugPrint('🚀 [API REQ] GET: $url');
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+          'User-Agent': 'MediSebaApp/1.0',
+        },
+      ).timeout(const Duration(seconds: 8));
+
+      debugPrint('👈 [API RES] STATUS: ${response.statusCode}');
+      debugPrint('👈 [API RES] BODY: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> body = jsonDecode(response.body);
+        if (body['success'] == true && body['data'] is List) {
+          return List<Map<String, dynamic>>.from(
+            (body['data'] as List).map((e) => Map<String, dynamic>.from(e as Map)),
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ ApiService.getAdminDoctors exception: $e');
+    }
+    return [];
+  }
+
+  /// 9. Create Admin Doctor
+  static Future<bool> createAdminDoctor({
+    required String token,
+    required Map<String, dynamic> payload,
+  }) async {
+    try {
+      const url = 'https://api.mediseba.org/api/v1/admin/doctors';
+      debugPrint('🚀 [API REQ] POST: $url');
+      debugPrint('Body: ${jsonEncode(payload)}');
+
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+          'User-Agent': 'MediSebaApp/1.0',
+        },
+        body: jsonEncode(payload),
+      ).timeout(const Duration(seconds: 8));
+
+      debugPrint('👈 [API RES] STATUS: ${response.statusCode}');
+      debugPrint('👈 [API RES] BODY: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> body = jsonDecode(response.body);
+        return body['success'] == true;
+      }
+    } catch (e) {
+      debugPrint('❌ ApiService.createAdminDoctor exception: $e');
+    }
+    return false;
+  }
+
+  /// 10. Update Admin Doctor
+  static Future<bool> updateAdminDoctor({
+    required String token,
+    required Map<String, dynamic> payload,
+  }) async {
+    try {
+      const url = 'https://api.mediseba.org/api/v1/admin/doctors';
+      debugPrint('🚀 [API REQ] PUT: $url');
+      debugPrint('Body: ${jsonEncode(payload)}');
+
+      final response = await http.put(
+        Uri.parse(url),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+          'User-Agent': 'MediSebaApp/1.0',
+        },
+        body: jsonEncode(payload),
+      ).timeout(const Duration(seconds: 8));
+
+      debugPrint('👈 [API RES] STATUS: ${response.statusCode}');
+      debugPrint('👈 [API RES] BODY: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> body = jsonDecode(response.body);
+        return body['success'] == true;
+      }
+    } catch (e) {
+      debugPrint('❌ ApiService.updateAdminDoctor exception: $e');
+    }
+    return false;
+  }
+
+  /// 11. Delete Admin Doctor
+  static Future<bool> deleteAdminDoctor({
+    required String token,
+    required String idOrUuid,
+  }) async {
+    try {
+      final url = 'https://api.mediseba.org/api/v1/admin/doctors?id=$idOrUuid';
+      debugPrint('🚀 [API REQ] DELETE: $url');
+
+      final response = await http.delete(
+        Uri.parse(url),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+          'User-Agent': 'MediSebaApp/1.0',
+        },
+      ).timeout(const Duration(seconds: 8));
+
+      debugPrint('👈 [API RES] STATUS: ${response.statusCode}');
+      debugPrint('👈 [API RES] BODY: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> body = jsonDecode(response.body);
+        return body['success'] == true;
+      }
+    } catch (e) {
+      debugPrint('❌ ApiService.deleteAdminDoctor exception: $e');
+    }
+    return false;
+  }
 }

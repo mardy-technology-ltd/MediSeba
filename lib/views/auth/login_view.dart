@@ -320,18 +320,24 @@ class _LoginViewState extends State<LoginView> {
                               color: textDark,
                             ),
                           ),
-                          GestureDetector(
-                            onTap: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('পাসওয়ার্ড পুনরুদ্ধারের জন্য অ্যাডমিনের সাথে যোগাযোগ করুন।')),
-                              );
-                            },
-                            child: const Text(
-                              'পাসওয়ার্ড ভুলে গেছেন? (Forgot Password)',
-                              style: TextStyle(
-                                fontSize: 12.5,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF009688),
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: GestureDetector(
+                              onTap: () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('পাসওয়ার্ড পুনরুদ্ধারের জন্য অ্যাডমিনের সাথে যোগাযোগ করুন।')),
+                                );
+                              },
+                              child: const FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  'পাসওয়ার্ড ভুলে গেছেন?',
+                                  style: TextStyle(
+                                    fontSize: 12.5,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF009688),
+                                  ),
+                                ),
                               ),
                             ),
                           ),
@@ -466,24 +472,27 @@ class _LoginViewState extends State<LoginView> {
                       const SizedBox(height: 32),
 
                       // Secure SSL Badge Footer
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(
-                            Icons.gpp_good_outlined,
-                            color: Color(0xFF94A3B8),
-                            size: 16,
-                          ),
-                          SizedBox(width: 6),
-                          Text(
-                            '256-Bit SSL Encrypted Enterprise Portal',
-                            style: TextStyle(
-                              fontSize: 11.5,
-                              fontWeight: FontWeight.w600,
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(
+                              Icons.gpp_good_outlined,
                               color: Color(0xFF94A3B8),
+                              size: 16,
                             ),
-                          ),
-                        ],
+                            SizedBox(width: 6),
+                            Text(
+                              '256-Bit SSL Encrypted Enterprise Portal',
+                              style: TextStyle(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF94A3B8),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 10),
                     ],

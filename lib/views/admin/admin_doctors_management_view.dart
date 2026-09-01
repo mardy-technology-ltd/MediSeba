@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'admin_drawer.dart';
+import 'dart:async';
+import '../../services/api_service.dart';
+import '../../services/cache_service.dart';
+import '../../controllers/auth_controller.dart';
 
 class AdminDoctorsManagementView extends StatefulWidget {
   const AdminDoctorsManagementView({super.key});
@@ -17,223 +21,151 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
-  // Initial Mock Data Matching Web Screenshot Precisely
-  final List<Map<String, dynamic>> _doctors = [
-    {
-      'id': 'doc_valo',
-      'name': 'valo doctor',
-      'specialty': 'General Medicine • Consultant',
-      'bmdc': 'B-111111',
-      'fee': 800,
-      'email': '01444444444@mediseba.org',
-      'phone': '01444444444',
-      'isActive': true,
-      'isVerified': true,
-      'initial': 'V',
-      'avatarBg': const Color(0xFFECFDF5),
-      'avatarColor': const Color(0xFF047857),
-    },
-    {
-      'id': 'doc_kharap',
-      'name': 'kharap doctor',
-      'specialty': 'General Medicine • Consultant',
-      'bmdc': 'D-222243',
-      'fee': 500,
-      'email': 'gojem@mailinator.com',
-      'phone': '01733223322',
-      'isActive': true,
-      'isVerified': true,
-      'initial': 'K',
-      'avatarBg': const Color(0xFFFEF2F2),
-      'avatarColor': const Color(0xFFDC2626),
-    },
-    {
-      'id': 'doc_konok',
-      'name': 'Konok',
-      'specialty': 'General Medicine • Consultant',
-      'bmdc': '102042',
-      'fee': 800,
-      'email': '01365432587@mediseba.org',
-      'phone': '01365432587',
-      'isActive': true,
-      'isVerified': true,
-      'initial': 'K',
-      'avatarBg': const Color(0xFFEFF6FF),
-      'avatarColor': const Color(0xFF1D4ED8),
-    },
-    {
-      'id': 'doc_rakib',
-      'name': 'Dr. Rakib Test',
-      'specialty': 'General Medicine • Consultant',
-      'bmdc': 'A-8546',
-      'fee': 800,
-      'email': '01795321465@mediseba.org',
-      'phone': '01795321465',
-      'isActive': true,
-      'isVerified': true,
-      'initial': 'R',
-      'avatarBg': const Color(0xFFE0F2FE),
-      'avatarColor': const Color(0xFF0369A1),
-    },
-    {
-      'id': 'doc_uat',
-      'name': 'uat doctor test',
-      'specialty': 'General Medicine • Consultant',
-      'bmdc': 'B-MD224',
-      'fee': 300,
-      'email': '01447998899@mediseba.org',
-      'phone': '01447998899',
-      'isActive': true,
-      'isVerified': true,
-      'initial': 'U',
-      'avatarBg': const Color(0xFFF1F5F9),
-      'avatarColor': const Color(0xFF475569),
-    },
-    {
-      'id': 'doc_farzana',
-      'name': 'Dr. Farzana baby',
-      'specialty': 'Medicine • Senior Specialist Consultant',
-      'bmdc': 'BMDC-290770',
-      'fee': 800,
-      'email': 'dr-farzana-islam@mediseba.test',
-      'phone': '01800000001',
-      'isActive': true,
-      'isVerified': true,
-      'initial': 'F',
-      'avatarBg': const Color(0xFFFCE7F3),
-      'avatarColor': const Color(0xFFBE185D),
-    },
-    {
-      'id': 'doc_ahmed',
-      'name': 'Dr. Ahmed Rahman',
-      'specialty': 'Cardiology • Senior Specialist Consultant',
-      'bmdc': 'BMDC-371154',
-      'fee': 800,
-      'email': 'dr-ahmed-rahman@mediseba.test',
-      'phone': '01800000002',
-      'isActive': true,
-      'isVerified': true,
-      'initial': 'A',
-      'avatarBg': const Color(0xFFFEF3C7),
-      'avatarColor': const Color(0xFFB45309),
-    },
-    {
-      'id': 'doc_imran',
-      'name': 'Dr. Imran Kabir',
-      'specialty': 'Neurology • Senior Specialist Consultant',
-      'bmdc': 'BMDC-538913',
-      'fee': 800,
-      'email': 'dr-imran-kabir@mediseba.test',
-      'phone': '01800000003',
-      'isActive': true,
-      'isVerified': true,
-      'initial': 'I',
-      'avatarBg': const Color(0xFFE0F2FE),
-      'avatarColor': const Color(0xFF0369A1),
-    },
-    {
-      'id': 'doc_nusrat',
-      'name': 'Dr. Nusrat Jahan',
-      'specialty': 'Gynecology & Obstetrics • Senior Specialist Consultant',
-      'bmdc': 'BMDC-741988',
-      'fee': 600,
-      'email': 'dr-nusrat-jahan@mediseba.test',
-      'phone': '01800000004',
-      'isActive': true,
-      'isVerified': true,
-      'initial': 'N',
-      'avatarBg': const Color(0xFFF3E8FF),
-      'avatarColor': const Color(0xFF7E22CE),
-    },
-    {
-      'id': 'doc_tanvir',
-      'name': 'Dr. Tanvir Hasan',
-      'specialty': 'Orthopedics • Senior Specialist Consultant',
-      'bmdc': 'BMDC-469765',
-      'fee': 700,
-      'email': 'dr-tanvir-hasan@mediseba.test',
-      'phone': '01800000005',
-      'isActive': true,
-      'isVerified': true,
-      'initial': 'T',
-      'avatarBg': const Color(0xFFECFDF5),
-      'avatarColor': const Color(0xFF047857),
-    },
-    {
-      'id': 'doc_samiul',
-      'name': 'Dr. Samiul Sajib',
-      'specialty': 'Pediatrics • Senior Specialist Consultant',
-      'bmdc': 'BMDC-440385',
-      'fee': 600,
-      'email': 'dr-samiul-sajib@mediseba.test',
-      'phone': '01800000006',
-      'isActive': true,
-      'isVerified': true,
-      'initial': 'S',
-      'avatarBg': const Color(0xFFFEE2E2),
-      'avatarColor': const Color(0xFFB91C1C),
-    },
-  ];
+  List<Map<String, dynamic>> _doctors = [];
+  bool _isLoading = false;
+  String? _errorMessage;
+  int _currentPage = 1;
+  Timer? _searchDebounce;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchDoctors(forceRefresh: true);
+  }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _searchDebounce?.cancel();
     super.dispose();
   }
 
-  List<Map<String, dynamic>> get _filteredDoctors {
-    if (_searchQuery.trim().isEmpty) {
-      return _doctors;
+  List<Map<String, dynamic>> get _filteredDoctors => _doctors;
+
+  Future<void> _fetchDoctors({bool forceRefresh = false}) async {
+    if (_isLoading && !forceRefresh) return;
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+      if (forceRefresh) {
+        _doctors = [];
+        _currentPage = 1;
+      }
+    });
+
+    try {
+      final token = AuthController.instance?.token ?? CacheService.get('auth_token') as String?;
+      if (token == null) {
+        setState(() {
+          _errorMessage = 'লগইন সেশন পাওয়া যায়নি। দয়া করে আবার লগইন করুন।';
+          _isLoading = false;
+        });
+        return;
+      }
+
+      final list = await ApiService.getAdminDoctors(
+        token: token,
+        search: _searchQuery,
+        page: _currentPage,
+        perPage: 15,
+      );
+
+      setState(() {
+        if (forceRefresh) {
+          _doctors = list;
+        } else {
+          _doctors.addAll(list);
+        }
+        _isLoading = false;
+        if (list.length >= 15) {
+          _currentPage++;
+        }
+      });
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'তথ্য লোড করতে সমস্যা হয়েছে: $e';
+        _isLoading = false;
+      });
     }
-    final q = _searchQuery.toLowerCase().trim();
-    return _doctors.where((doc) {
-      return doc['name'].toString().toLowerCase().contains(q) ||
-          doc['specialty'].toString().toLowerCase().contains(q) ||
-          doc['bmdc'].toString().toLowerCase().contains(q) ||
-          doc['phone'].toString().toLowerCase().contains(q);
-    }).toList();
   }
 
-  void _toggleDoctorStatus(int index) {
-    setState(() {
-      _doctors[index]['isActive'] = !(_doctors[index]['isActive'] as bool);
-    });
-    final bool active = _doctors[index]['isActive'];
-    final String name = _doctors[index]['name'];
+  Future<void> _toggleDoctorStatus(int index) async {
+    final item = _doctors[index];
+    final currentActive = (item['isActive'] == true || item['status'] == 'active');
+    final newActive = !currentActive;
+    final String name = item['name'] ?? 'Doctor';
 
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          active
-              ? '$name এর প্রোফাইল সক্রিয় (Active) করা হয়েছে!'
-              : '$name এর প্রোফাইল ইন-এক্টিভ (Inactive) করা হয়েছে।',
+    final token = AuthController.instance?.token ?? CacheService.get('auth_token') as String?;
+    if (token == null) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    final payload = {
+      'id': int.tryParse(item['id'].toString()) ?? item['id'],
+      'name': item['name'],
+      'phone': item['phone'],
+      'email': item['email'] ?? '',
+      'bmdc_number': item['bmdc_number'] ?? item['bmdc'] ?? '',
+      'qualification': item['qualification'] ?? item['specialty'] ?? '',
+      'designation': item['designation'] ?? 'Consultant',
+      'speciality': item['speciality'] ?? item['specialty'] ?? 'General Medicine',
+      'consultation_fee': int.tryParse(item['consultation_fee']?.toString() ?? item['fee']?.toString() ?? '800') ?? 800,
+      'status': newActive ? 'active' : 'inactive',
+    };
+
+    final success = await ApiService.updateAdminDoctor(token: token, payload: payload);
+    if (!mounted) return;
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            newActive
+                ? '$name এর প্রোফাইল সক্রিয় (Active) করা হয়েছে!'
+                : '$name এর প্রোফাইল ইন-এক্টিভ (Inactive) করা হয়েছে।',
+          ),
+          backgroundColor: newActive ? brandGreen : const Color(0xFFDC2626),
+          duration: const Duration(seconds: 2),
         ),
-        backgroundColor: active ? brandGreen : const Color(0xFFDC2626),
-        duration: const Duration(seconds: 2),
-      ),
-    );
+      );
+      _fetchDoctors(forceRefresh: true);
+    } else {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('স্ট্যাটাস আপডেট করতে সমস্যা হয়েছে।')),
+      );
+    }
   }
 
-  void _toggleDoctorVerification(int index) {
-    setState(() {
-      _doctors[index]['isVerified'] = !(_doctors[index]['isVerified'] as bool);
-    });
-    final bool verified = _doctors[index]['isVerified'];
-    final String name = _doctors[index]['name'];
+  Future<void> _deleteDoctor(String idOrUuid) async {
+    final token = AuthController.instance?.token ?? CacheService.get('auth_token') as String?;
+    if (token == null) return;
 
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          verified
-              ? '$name এর BMDC লাইসেন্স সফলভাবে ভেরিফাইড করা হয়েছে!'
-              : '$name এর BMDC ভেরিফিকেশন পেন্ডিং অবস্থায় রাখা হয়েছে।',
+    setState(() {
+      _isLoading = true;
+    });
+
+    final success = await ApiService.deleteAdminDoctor(token: token, idOrUuid: idOrUuid);
+    if (!mounted) return;
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('ডাক্তার প্রোফাইল সফলভাবে মুছে ফেলা হয়েছে।'),
+          backgroundColor: Color(0xFFDC2626),
         ),
-        backgroundColor: verified ? brandGreen : const Color(0xFFD97706),
-        duration: const Duration(seconds: 2),
-      ),
-    );
+      );
+      _fetchDoctors(forceRefresh: true);
+    } else {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('ডিলিট করতে সমস্যা হয়েছে।')),
+      );
+    }
   }
 
   void _showCreateDoctorModal() {
@@ -364,41 +296,59 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
                           elevation: 0,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
-                        onPressed: () {
+                        onPressed: () async {
                           if (nameController.text.trim().isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('দয়া করে ডাক্তারের নাম লিখুন')),
                             );
                             return;
                           }
+                          if (phoneController.text.trim().isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('দয়া করে মোবাইল নম্বর লিখুন')),
+                            );
+                            return;
+                          }
 
-                          final initialName = nameController.text.trim().replaceAll('Dr.', '').trim();
-                          final initialChar = initialName.isNotEmpty ? initialName[0].toUpperCase() : 'D';
+                          final token = AuthController.instance?.token ?? CacheService.get('auth_token') as String?;
+                          if (token == null) return;
 
-                          setState(() {
-                            _doctors.insert(0, {
-                              'id': 'doc_${DateTime.now().millisecondsSinceEpoch}',
-                              'name': nameController.text.trim(),
-                              'specialty': specialtyController.text.trim().isEmpty ? 'General Physician' : specialtyController.text.trim(),
-                              'bmdc': bmdcController.text.trim().isEmpty ? 'BMDC-PENDING' : bmdcController.text.trim(),
-                              'fee': int.tryParse(feeController.text.trim()) ?? 800,
-                              'email': emailController.text.trim().isEmpty ? 'doctor@mediseba.test' : emailController.text.trim(),
-                              'phone': phoneController.text.trim().isEmpty ? '01700000000' : phoneController.text.trim(),
-                              'isActive': isActive,
-                              'isVerified': isVerified,
-                              'initial': initialChar,
-                              'avatarBg': const Color(0xFFDCFCE7),
-                              'avatarColor': const Color(0xFF15803D),
-                            });
-                          });
+                          final String phone = phoneController.text.trim();
+                          final String password = 'doc${phone.length > 6 ? phone.substring(phone.length - 6) : '123456'}';
 
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('নতুন ডাক্তার প্রোফাইল সফলভাবে তৈরি হয়েছে!'),
-                              backgroundColor: brandGreen,
-                            ),
-                          );
+                          final payload = {
+                            'name': nameController.text.trim(),
+                            'phone': phone,
+                            'email': emailController.text.trim().isEmpty ? '$phone@mediseba.org' : emailController.text.trim(),
+                            'password': password,
+                            'bmdc_number': bmdcController.text.trim().isEmpty ? 'BMDC-PENDING' : bmdcController.text.trim(),
+                            'qualification': specialtyController.text.trim().isEmpty ? 'MBBS' : specialtyController.text.trim(),
+                            'designation': 'Consultant',
+                            'speciality': specialtyController.text.trim().isEmpty ? 'General Medicine' : specialtyController.text.trim(),
+                            'consultation_fee': int.tryParse(feeController.text.trim()) ?? 800,
+                          };
+
+                          final success = await ApiService.createAdminDoctor(token: token, payload: payload);
+
+                          if (context.mounted) {
+                            Navigator.pop(context);
+                            if (success) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('নতুন ডাক্তার প্রোফাইল সফলভাবে তৈরি হয়েছে!'),
+                                  backgroundColor: brandGreen,
+                                ),
+                              );
+                              _fetchDoctors(forceRefresh: true);
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('ডাক্তার যুক্ত করতে সমস্যা হয়েছে।'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          }
                         },
                         icon: const Icon(Icons.check_circle_rounded, size: 18),
                         label: const Text(
@@ -581,7 +531,7 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
                           elevation: 0,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
-                        onPressed: () {
+                        onPressed: () async {
                           if (nameController.text.trim().isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('দয়া করে ডাক্তারের নাম লিখুন')),
@@ -589,27 +539,46 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
                             return;
                           }
 
+                          final token = AuthController.instance?.token ?? CacheService.get('auth_token') as String?;
+                          if (token == null) return;
+
                           final spec = specialtyController.text.trim();
                           final desig = designationController.text.trim();
-                          final fullSpecialty = desig.isNotEmpty ? '$spec • $desig' : spec;
 
-                          setState(() {
-                            _doctors[index]['name'] = nameController.text.trim();
-                            _doctors[index]['phone'] = phoneController.text.trim();
-                            _doctors[index]['bmdc'] = bmdcController.text.trim();
-                            _doctors[index]['specialty'] = fullSpecialty;
-                            _doctors[index]['fee'] = int.tryParse(feeController.text.trim()) ?? 800;
-                            _doctors[index]['isActive'] = currentActive;
-                            _doctors[index]['isVerified'] = currentVerified;
-                          });
+                          final payload = {
+                            'id': int.tryParse(item['id'].toString()) ?? item['id'],
+                            'name': nameController.text.trim(),
+                            'phone': phoneController.text.trim(),
+                            'email': item['email'] ?? '',
+                            'bmdc_number': bmdcController.text.trim(),
+                            'qualification': desig.isNotEmpty ? '$spec • $desig' : spec,
+                            'designation': desig.isEmpty ? 'Consultant' : desig,
+                            'speciality': spec.isEmpty ? 'General Medicine' : spec,
+                            'consultation_fee': int.tryParse(feeController.text.trim()) ?? 800,
+                            'status': currentActive ? 'active' : 'inactive',
+                          };
 
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('ডাক্তার প্রোফাইল সফলভাবে আপডেট করা হয়েছে!'),
-                              backgroundColor: brandGreen,
-                            ),
-                          );
+                          final success = await ApiService.updateAdminDoctor(token: token, payload: payload);
+
+                          if (context.mounted) {
+                            Navigator.pop(context);
+                            if (success) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('ডাক্তার প্রোফাইল সফলভাবে আপডেট করা হয়েছে!'),
+                                  backgroundColor: brandGreen,
+                                ),
+                              );
+                              _fetchDoctors(forceRefresh: true);
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('আপডেট করতে সমস্যা হয়েছে।'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          }
                         },
                         icon: const Icon(Icons.check_circle_rounded, size: 18),
                         label: const Text(
@@ -666,7 +635,7 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
   @override
   Widget build(BuildContext context) {
     final filtered = _filteredDoctors;
-    final activeCount = _doctors.where((d) => d['isActive'] == true).length;
+    final activeCount = _doctors.where((d) => d['isActive'] == true || d['status'] == 'active').length;
 
     return Scaffold(
       key: _scaffoldKey,
@@ -705,10 +674,10 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
           IconButton(
             icon: const Icon(Icons.refresh_rounded, color: Color(0xFF64748B), size: 22),
             onPressed: () {
-              setState(() {});
+              _fetchDoctors(forceRefresh: true);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('ডাক্তার ডাটা ক্যাশ রিফ্রেশ করা হয়েছে'),
+                  content: Text('ডাক্তারদের তালিকা রিফ্রেশ করা হচ্ছে...'),
                   duration: Duration(seconds: 1),
                 ),
               );
@@ -736,7 +705,35 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
               const SizedBox(height: 16),
 
               // 3. DOCTOR CARDS GRID / LIST
-              if (filtered.isEmpty)
+              if (_isLoading && filtered.isEmpty)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 40),
+                    child: CircularProgressIndicator(color: brandGreen),
+                  ),
+                )
+              else if (_errorMessage != null)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFEF2F2),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFFFCA5A5)),
+                  ),
+                  child: Column(
+                    children: [
+                      const Icon(Icons.error_outline_rounded, color: Colors.red, size: 36),
+                      const SizedBox(height: 10),
+                      Text(
+                        _errorMessage!,
+                        style: const TextStyle(fontSize: 13, color: Colors.red, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                )
+              else if (filtered.isEmpty)
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 16),
@@ -806,7 +803,7 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
 
   /// 1. Build Header Panel matching Web Screenshot
   Widget _buildHeaderPanel() {
-    final activeCount = _doctors.where((d) => d['isActive'] == true).length;
+    final activeCount = _doctors.where((d) => d['isActive'] == true || d['status'] == 'active').length;
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -973,9 +970,9 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
                             padding: EdgeInsets.zero,
                             icon: const Icon(Icons.refresh_rounded, color: Colors.white, size: 18),
                             onPressed: () {
-                              setState(() {});
+                              _fetchDoctors(forceRefresh: true);
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('ক্যাশ রিফ্রেশ সম্পন্ন হয়েছে')),
+                                const SnackBar(content: Text('এপিআই থেকে ডাক্তারদের তালিকা রিফ্রেশ করা হচ্ছে...')),
                               );
                             },
                           ),
@@ -1029,6 +1026,10 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
           setState(() {
             _searchQuery = val;
           });
+          _searchDebounce?.cancel();
+          _searchDebounce = Timer(const Duration(milliseconds: 500), () {
+            _fetchDoctors(forceRefresh: true);
+          });
         },
         style: const TextStyle(fontSize: 13, color: textDark, fontWeight: FontWeight.w600),
         decoration: InputDecoration(
@@ -1043,6 +1044,7 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
                     setState(() {
                       _searchQuery = '';
                     });
+                    _fetchDoctors(forceRefresh: true);
                   },
                 )
               : null,
@@ -1055,19 +1057,22 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
 
   /// 3. Build Doctor Card matching Screenshot
   Widget _buildDoctorCard(Map<String, dynamic> item, int index) {
-    final bool isActive = item['isActive'] as bool;
-    final bool isVerified = item['isVerified'] as bool;
+    final bool isActive = item['status'] == 'active' || item['isActive'] == true;
+    final bool isVerified = item['isVerified'] == true || item['status'] == 'active';
 
     final Color avatarBg = item['avatarBg'] as Color? ?? const Color(0xFFE0F2FE);
     final Color avatarColor = item['avatarColor'] as Color? ?? const Color(0xFF0369A1);
 
-    String specialtyText = item['specialty'] as String;
-    String designationText = '';
-    if (specialtyText.contains('•')) {
-      final parts = specialtyText.split('•');
-      specialtyText = parts[0].trim();
-      designationText = parts[1].trim();
-    }
+    final String name = item['name']?.toString() ?? 'Doctor';
+    final String specialtyText = item['speciality']?.toString() ?? item['specialty']?.toString() ?? 'General Medicine';
+    final String designationText = item['designation']?.toString() ?? '';
+    final String bmdcCode = item['bmdc_number']?.toString() ?? item['bmdc']?.toString() ?? 'BMDC-PENDING';
+    final String consultationFee = item['consultation_fee']?.toString() ?? item['fee']?.toString() ?? '800';
+    final String emailAddr = item['email']?.toString() ?? '';
+    final String phoneNum = item['phone']?.toString() ?? '';
+
+    final String initialsName = name.replaceAll('Dr.', '').trim();
+    final String initialChar = initialsName.isNotEmpty ? initialsName[0].toUpperCase() : 'D';
 
     return Container(
       width: double.infinity,
@@ -1111,7 +1116,7 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
                 ),
                 child: Center(
                   child: Text(
-                    item['initial'] as String? ?? 'D',
+                    initialChar,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w900,
@@ -1131,7 +1136,7 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
                       children: [
                         Flexible(
                           child: Text(
-                            item['name'] as String,
+                            name,
                             style: const TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w900,
@@ -1243,7 +1248,7 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
                             border: Border.all(color: const Color(0xFFBFDBFE), width: 0.5),
                           ),
                           child: Text(
-                            item['bmdc'] as String,
+                            bmdcCode,
                             style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Color(0xFF1D4ED8)),
                           ),
                         ),
@@ -1255,7 +1260,7 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
                         const SizedBox(width: 6),
                         const Text('ভিজিট ফি: ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF64748B))),
                         Text(
-                          '৳ ${item['fee']}',
+                          '৳ $consultationFee',
                           style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: brandGreen),
                         ),
                       ],
@@ -1273,7 +1278,7 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
                           const SizedBox(width: 6),
                           Expanded(
                             child: Text(
-                              item['email'] as String,
+                              emailAddr,
                               style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: Color(0xFF475569)),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -1288,7 +1293,7 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
                         const Icon(Icons.phone_outlined, size: 14, color: Color(0xFF64748B)),
                         const SizedBox(width: 6),
                         Text(
-                          item['phone'] as String,
+                          phoneNum,
                           style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF334155)),
                         ),
                       ],
@@ -1306,30 +1311,49 @@ class _AdminDoctorsManagementViewState extends State<AdminDoctorsManagementView>
           // 3 Action Buttons Row: Verify (ভেরিফাইড / এপ্রুভ করুন), Edit (এডিট), Status Toggle (ইন-এক্টিভ করুন / এক্টিভ করুন)
           Row(
             children: [
-              // 1. Verify Toggle Button
+              // 1. Delete Button
               Expanded(
                 child: OutlinedButton.icon(
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: isVerified ? brandGreen : const Color(0xFFD97706),
-                    backgroundColor: isVerified ? const Color(0xFFECFDF5) : const Color(0xFFFEF3C7),
-                    side: BorderSide(
-                      color: isVerified ? const Color(0xFFA7F3D0) : const Color(0xFFFDE68A),
-                    ),
+                    foregroundColor: const Color(0xFFDC2626),
+                    backgroundColor: const Color(0xFFFEF2F2),
+                    side: const BorderSide(color: Color(0xFFFECACA)),
                     padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 9),
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
-                  onPressed: () => _toggleDoctorVerification(index),
-                  icon: Icon(
-                    isVerified ? Icons.verified_user_rounded : Icons.gpp_maybe_rounded,
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('নিশ্চিত করুন', style: TextStyle(fontWeight: FontWeight.bold)),
+                        content: Text('${item['name'] ?? 'ডাক্তার'} এর প্রোফাইলটি মুছে ফেলতে চান?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text('বাতিল', style: TextStyle(color: Color(0xFF64748B))),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              _deleteDoctor(item['id'].toString());
+                            },
+                            child: const Text('মুছে ফেলুন', style: TextStyle(color: Color(0xFFDC2626), fontWeight: FontWeight.bold)),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  icon: const Icon(
+                    Icons.delete_outline_rounded,
                     size: 13,
                   ),
-                  label: FittedBox(
+                  label: const FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
-                      isVerified ? 'ভেরিফাইড' : 'এপ্রুভ করুন',
-                      style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold),
+                      'মুছে ফেলুন',
+                      style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold),
                       maxLines: 1,
                     ),
                   ),
