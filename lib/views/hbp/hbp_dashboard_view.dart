@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/home_controller.dart';
 import '../../controllers/language_controller.dart';
+import '../../services/api_service.dart';
+import '../../services/cache_service.dart';
 import 'widgets/hbp_drawer.dart';
 import 'widgets/hbp_register_customer_dialog.dart';
 
@@ -48,16 +50,16 @@ class _HbpDashboardViewState extends State<HbpDashboardView> {
     super.initState();
     _customers = [
       {
-        'id': 'CUST-8021',
-        'name': 'আব্দুল করিম',
-        'phone': '01728394851',
+        'id': 'REG-17251842',
+        'name': 'মোঃ রফিকুল ইসলাম',
+        'phone': '01712345678',
         'age': '৪৫',
         'gender': 'পুরুষ',
-        'address': 'বোয়ালিয়া, রাজশাহী',
-        'package': 'সাধারণ স্বাস্থ্য প্যাকেজ',
-        'price': 350,
+        'address': 'মাঠ পর্যায়',
+        'package': 'প্রথমা প্যাকেজ',
+        'price': 99,
         'paymentMethod': 'ক্যাশ কালেকশন',
-        'status': 'সক্রিয় (Active)',
+        'status': 'সক্রিয় (Verified)',
         'date': 'আজ, ১০:১৫ AM',
       },
       {
@@ -67,8 +69,8 @@ class _HbpDashboardViewState extends State<HbpDashboardView> {
         'age': '৩২',
         'gender': 'মহিলা',
         'address': 'মতিহার, রাজশাহী',
-        'package': 'মা ও শিশু কেয়ার প্যাকেজ',
-        'price': 550,
+        'package': 'আস্থা প্যাকেজ',
+        'price': 199,
         'paymentMethod': 'বিকাশ QR',
         'status': 'সক্রিয় (Active)',
         'date': 'গতকাল, ০৪:৩০ PM',
@@ -80,13 +82,45 @@ class _HbpDashboardViewState extends State<HbpDashboardView> {
         'age': '৫২',
         'gender': 'পুরুষ',
         'address': 'তালাইমারী, রাজশাহী',
-        'package': 'গোল্ড ফ্যামিলি হেলথ প্যাকেজ',
+        'package': 'আপনজন প্যাকেজ',
         'price': 999,
         'paymentMethod': 'ডিজিটাল গেটওয়ে',
         'status': 'সক্রিয় (Active)',
         'date': '২৮ আগস্ট, ১১:০০ AM',
       },
     ];
+    _fetchApiMetrics();
+  }
+
+  void _fetchApiMetrics() async {
+    final String? token = widget.authController.token ?? CacheService.get('auth_token')?.toString();
+    if (token != null && token.isNotEmpty) {
+      final data = await ApiService.fetchHbpMetrics(token);
+      if (data != null && mounted) {
+        setState(() {
+          _totalSold = data['total_packages_sold'] ?? _totalSold;
+          _collectedAmount = data['total_sales_amount'] ?? _collectedAmount;
+          if (data['sales_history'] is List) {
+            final apiHistory = (data['sales_history'] as List).map((item) {
+              return {
+                'id': item['id'] ?? 'REG-000',
+                'name': item['customer_name'] ?? 'গ্রাহক',
+                'phone': item['customer_phone'] ?? '',
+                'package': item['package_name'] ?? 'প্যাকেজ',
+                'price': item['purchased_price'] ?? item['price'] ?? 99,
+                'paymentMethod': item['payment_method'] == 'cash' ? 'ক্যাশ কালেকশন' : (item['payment_method'] == 'qr' ? 'বিকাশ QR' : 'ডিজিটাল গেটওয়ে'),
+                'status': 'সক্রিয় (Verified)',
+                'date': item['date'] ?? '',
+                'address': 'মাঠ পর্যায়',
+              };
+            }).toList();
+            if (apiHistory.isNotEmpty) {
+              _customers = List<Map<String, dynamic>>.from(apiHistory);
+            }
+          }
+        });
+      }
+    }
   }
 
   @override

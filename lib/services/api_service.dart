@@ -8,6 +8,7 @@ import '../models/medicine_model.dart';
 import 'cache_service.dart';
 
 class ApiService {
+  static const String baseUrl = 'https://api.mediseba.org/api/v1';
   static const String doctorsEndpoint = 'https://api.mediseba.org/api/v1/doctors';
   static const String availabilitiesEndpoint = 'https://api.mediseba.org/api/v1/availabilities';
   static const String medicinesEndpoint = 'https://api.mediseba.org/api/v1/search-medicines?q=';
@@ -744,5 +745,171 @@ class ApiService {
       debugPrint('❌ ApiService.deleteAdminDoctor exception: $e');
     }
     return false;
+  }
+
+  // ===========================================================================
+  // 🌐 HBP PORTAL API ENDPOINTS (Developer Documentation Integration)
+  // ===========================================================================
+
+  /// 1️⃣ Fetch HBP Dashboard Metrics & Sales History
+  static Future<Map<String, dynamic>?> fetchHbpMetrics(String token) async {
+    try {
+      // 1. Try primary endpoint: /hbp/metrics
+      var url = '$baseUrl/hbp/metrics';
+      debugPrint('🚀 [API REQ] GET HBP Metrics: $url');
+
+      var response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+          'User-Agent': 'MediSebaApp/1.0',
+        },
+      ).timeout(const Duration(seconds: 8));
+
+      debugPrint('👈 [API RES] HBP Metrics STATUS: ${response.statusCode}');
+      debugPrint('👈 [API RES] HBP Metrics BODY: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> body = jsonDecode(response.body);
+        if (body['status'] == 'success' || body['success'] == true) {
+          return body['data'] as Map<String, dynamic>?;
+        }
+      }
+
+      // 2. Try fallback endpoint: /hbp/dashboard (as noted in developer documentation)
+      url = '$baseUrl/hbp/dashboard';
+      debugPrint('🚀 [API REQ] GET HBP Dashboard (Fallback): $url');
+
+      response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+          'User-Agent': 'MediSebaApp/1.0',
+        },
+      ).timeout(const Duration(seconds: 8));
+
+      debugPrint('👈 [API RES] HBP Dashboard STATUS: ${response.statusCode}');
+      debugPrint('👈 [API RES] HBP Dashboard BODY: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> body = jsonDecode(response.body);
+        if (body['status'] == 'success' || body['success'] == true) {
+          return body['data'] as Map<String, dynamic>?;
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ ApiService.fetchHbpMetrics exception: $e');
+    }
+    return null;
+  }
+
+  /// 2️⃣ Register New Patient Account by HBP Field Agent
+  static Future<Map<String, dynamic>> registerPatientByHbp({
+    required String token,
+    required String name,
+    required String phone,
+    required String password,
+    String? email,
+    required String packageId,
+    required String paymentMethod,
+  }) async {
+    try {
+      final url = '$baseUrl/hbp/register-patient';
+      final payload = {
+        'name': name,
+        'phone': phone,
+        'password': password,
+        if (email != null && email.isNotEmpty) 'email': email,
+        'package_id': packageId,
+        'payment_method': paymentMethod,
+      };
+
+      debugPrint('🚀 [API REQ] POST HBP Register Patient: $url');
+      debugPrint('👉 PAYLOAD: ${jsonEncode(payload)}');
+
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+          'User-Agent': 'MediSebaApp/1.0',
+        },
+        body: jsonEncode(payload),
+      ).timeout(const Duration(seconds: 10));
+
+      debugPrint('👈 [API RES] HBP Register STATUS: ${response.statusCode}');
+      debugPrint('👈 [API RES] HBP Register BODY: ${response.body}');
+
+      final Map<String, dynamic> body = jsonDecode(response.body);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return {
+          'success': true,
+          'message': body['message'] ?? 'Patient account registered successfully.',
+          'data': body['data'],
+        };
+      } else {
+        return {
+          'success': false,
+          'message': body['message'] ?? 'রেজিস্ট্রেশন ব্যর্থ হয়েছে (কোড ${response.statusCode})',
+        };
+      }
+    } catch (e) {
+      debugPrint('❌ ApiService.registerPatientByHbp exception: $e');
+      return {
+        'success': false,
+        'message': 'নেটওয়ার্ক ত্রুটি: $e',
+      };
+    }
+  }
+
+  /// 3️⃣ Fetch Health Packages List
+  static Future<List<Map<String, dynamic>>> fetchHealthPackages() async {
+    try {
+      final url = '$baseUrl/packages';
+      debugPrint('🚀 [API REQ] GET Packages: $url');
+
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'MediSebaApp/1.0',
+        },
+      ).timeout(const Duration(seconds: 8));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> body = jsonDecode(response.body);
+        if (body['data'] is List) {
+          return List<Map<String, dynamic>>.from(body['data'] as List);
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ ApiService.fetchHealthPackages exception: $e');
+    }
+    return [];
+  }
+
+  /// 4️⃣ Fetch HBP Agent Profile
+  static Future<Map<String, dynamic>?> fetchHbpProfile(String token) async {
+    try {
+      final url = '$baseUrl/user/profile';
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      ).timeout(const Duration(seconds: 8));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> body = jsonDecode(response.body);
+        return body['data'] as Map<String, dynamic>?;
+      }
+    } catch (e) {
+      debugPrint('❌ ApiService.fetchHbpProfile exception: $e');
+    }
+    return null;
   }
 }

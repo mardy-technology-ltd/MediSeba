@@ -16,78 +16,91 @@ class _HbpRegisterCustomerDialogState extends State<HbpRegisterCustomerDialog> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
+  final _passwordController = TextEditingController();
   final _ageController = TextEditingController();
   final _addressController = TextEditingController();
 
   String _selectedGender = 'পুরুষ';
-  String _selectedPackage = 'সাধারণ স্বাস্থ্য প্যাকেজ (৳ ৩৫০)';
-  int _packagePrice = 350;
-  String _selectedPaymentMethod = 'ক্যাশ কালেকশন (Cash)';
+  String _selectedPackageId = '1';
+  String _selectedPackageName = 'প্রথমা প্যাকেজ (Prothoma - ৳99)';
+  int _packagePrice = 99;
+  String _selectedPaymentMethodId = 'cash';
+  String _selectedPaymentMethodLabel = 'ক্যাশ কালেকশন (Cash)';
   bool _isSubmitting = false;
 
   final List<Map<String, dynamic>> _packages = [
-    {'name': 'সাধারণ স্বাস্থ্য প্যাকেজ (৳ ৩৫০)', 'price': 350},
-    {'name': 'মা ও শিশু কেয়ার প্যাকেজ (৳ ৫৫০)', 'price': 550},
-    {'name': 'গোল্ড ফ্যামিলি হেলথ প্যাকেজ (৳ ৯৯৯)', 'price': 999},
-    {'name': 'প্রিমিয়াম ডায়াবেটিক কেয়ার (৳ ১২৫০)', 'price': 1250},
+    {'id': '1', 'name': 'প্রথমা প্যাকেজ (Prothoma - ৳99)', 'price': 99, 'points': 999},
+    {'id': '2', 'name': 'আস্থা প্যাকেজ (Astha - ৳199)', 'price': 199, 'points': 1499},
+    {'id': '3', 'name': 'সহযাত্রা প্যাকেজ (Sohojatra - ৳299)', 'price': 299, 'points': 2000},
+    {'id': '4', 'name': 'মাতৃমমতা প্যাকেজ (Matrumomota - ৳499)', 'price': 499, 'points': 2500},
+    {'id': '5', 'name': 'আপনজন প্যাকেজ (Aponjon - ৳999)', 'price': 999, 'points': 5500},
+    {'id': 'none', 'name': 'ফ্রি অ্যাকাউন্ট (প্যাকেজ ছাড়া - ৳0)', 'price': 0, 'points': 0},
   ];
 
-  final List<String> _paymentMethods = [
-    'ক্যাশ কালেকশন (Cash)',
-    'বিকাশ / নগদ (QR Scan)',
-    'ডিজিটাল পেমেন্ট গেটওয়ে (EPS/Online)',
+  final List<Map<String, String>> _paymentMethods = [
+    {'id': 'cash', 'label': 'ক্যাশ কালেকশন (Cash)'},
+    {'id': 'qr', 'label': 'বিকাশ / নগদ (Merchant QR)'},
+    {'id': 'eps', 'label': 'ডিজিটাল পেমেন্ট (EPS Gateways)'},
   ];
 
   @override
   void dispose() {
     _nameController.dispose();
     _phoneController.dispose();
+    _passwordController.dispose();
     _ageController.dispose();
     _addressController.dispose();
     super.dispose();
   }
 
-  void _handleSubmit() {
+  void _handleSubmit() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() {
       _isSubmitting = true;
     });
 
+    final name = _nameController.text.trim();
+    final phone = _phoneController.text.trim();
+    final password = _passwordController.text.trim();
+    final address = _addressController.text.trim().isEmpty ? 'মাঠ পর্যায়' : _addressController.text.trim();
+
     final newCustomer = {
-      'id': 'CUST-${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}',
-      'name': _nameController.text.trim(),
-      'phone': _phoneController.text.trim(),
+      'id': 'REG-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}',
+      'name': name,
+      'phone': phone,
       'age': _ageController.text.trim().isEmpty ? 'N/A' : _ageController.text.trim(),
       'gender': _selectedGender,
-      'address': _addressController.text.trim().isEmpty ? 'মাঠ পর্যায়' : _addressController.text.trim(),
-      'package': _selectedPackage.split(' (')[0],
+      'address': address,
+      'package': _selectedPackageName.split(' (')[0],
       'price': _packagePrice,
-      'paymentMethod': _selectedPaymentMethod.split(' (')[0],
+      'paymentMethod': _selectedPaymentMethodLabel.split(' (')[0],
       'status': 'সক্রিয় (Active)',
       'date': 'আজ, ${_formatCurrentTime()}',
     };
 
-    Future.delayed(const Duration(milliseconds: 600), () {
-      if (mounted) {
-        widget.onCustomerAdded(newCustomer);
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
-                const SizedBox(width: 8),
-                Expanded(child: Text('${newCustomer['name']} সফলভাবে নিবন্ধিত হয়েছেন!')),
-              ],
-            ),
-            backgroundColor: const Color(0xFF0F9D58),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    widget.onCustomerAdded(newCustomer);
+
+    if (mounted) {
+      setState(() {
+        _isSubmitting = false;
+      });
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+              const SizedBox(width: 8),
+              Expanded(child: Text('$name সফলভাবে নিবন্ধিত হয়েছেন!')),
+            ],
           ),
-        );
-      }
-    });
+          backgroundColor: const Color(0xFF0F9D58),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+      );
+    }
   }
 
   String _formatCurrentTime() {
@@ -274,6 +287,24 @@ class _HbpRegisterCustomerDialogState extends State<HbpRegisterCustomerDialog> {
                       ),
                       const SizedBox(height: 14),
 
+                      // Password Field (Required by Backend API Note #3)
+                      _buildInputLabel('পাসওয়ার্ড (রোগীর অ্যাকাউন্টের জন্য) *'),
+                      TextFormField(
+                        controller: _passwordController,
+                        obscureText: true,
+                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF0F172A)),
+                        decoration: _buildInputDecoration(
+                          hint: 'সর্বনিম্ন ৬ অক্ষরের পাসওয়ার্ড',
+                          icon: Icons.lock_outline_rounded,
+                        ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) return 'রোগীর জন্য একটি পাসওয়ার্ড তৈরি করুন';
+                          if (value.trim().length < 6) return 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে';
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 14),
+
                       // Package Selection
                       _buildInputLabel('হেলথ প্যাকেজ নির্বাচন *'),
                       Container(
@@ -285,20 +316,21 @@ class _HbpRegisterCustomerDialogState extends State<HbpRegisterCustomerDialog> {
                         ),
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton<String>(
-                            value: _selectedPackage,
+                            value: _selectedPackageId,
                             isExpanded: true,
                             style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
                             items: _packages.map((pkg) {
                               return DropdownMenuItem<String>(
-                                value: pkg['name'] as String,
+                                value: pkg['id'] as String,
                                 child: Text(pkg['name'] as String),
                               );
                             }).toList(),
                             onChanged: (val) {
                               if (val != null) {
-                                final matched = _packages.firstWhere((element) => element['name'] == val);
+                                final matched = _packages.firstWhere((element) => element['id'] == val);
                                 setState(() {
-                                  _selectedPackage = val;
+                                  _selectedPackageId = val;
+                                  _selectedPackageName = matched['name'] as String;
                                   _packagePrice = matched['price'] as int;
                                 });
                               }
@@ -319,17 +351,23 @@ class _HbpRegisterCustomerDialogState extends State<HbpRegisterCustomerDialog> {
                         ),
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton<String>(
-                            value: _selectedPaymentMethod,
+                            value: _selectedPaymentMethodId,
                             isExpanded: true,
                             style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
                             items: _paymentMethods.map((method) {
                               return DropdownMenuItem<String>(
-                                value: method,
-                                child: Text(method),
+                                value: method['id']!,
+                                child: Text(method['label']!),
                               );
                             }).toList(),
                             onChanged: (val) {
-                              if (val != null) setState(() => _selectedPaymentMethod = val);
+                              if (val != null) {
+                                final matched = _paymentMethods.firstWhere((element) => element['id'] == val);
+                                setState(() {
+                                  _selectedPaymentMethodId = val;
+                                  _selectedPaymentMethodLabel = matched['label']!;
+                                });
+                              }
                             },
                           ),
                         ),
