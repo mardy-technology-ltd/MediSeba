@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'register_view.dart';
 import '../home/home_view.dart';
 import '../admin/admin_dashboard_view.dart';
+import '../hbp/hbp_dashboard_view.dart';
 import '../../controllers/home_controller.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/language_controller.dart';
@@ -48,9 +49,15 @@ class _LoginViewState extends State<LoginView> {
 
   LoginRole _detectRole(String input) {
     final cleanInput = input.trim().toLowerCase();
+    if (cleanInput.contains('hbp') ||
+        cleanInput.contains('sojib') ||
+        cleanInput.contains('rahim') ||
+        cleanInput.contains('01710000010') ||
+        cleanInput.contains('01798456879')) {
+      return LoginRole.hbp;
+    }
     if (cleanInput.contains('doctor')) return LoginRole.doctor;
     if (cleanInput.contains('admin')) return LoginRole.admin;
-    if (cleanInput.contains('rahim')) return LoginRole.hbp;
     if (cleanInput.contains('tanvir')) return LoginRole.supervisor;
     if (cleanInput.contains('areamanager')) return LoginRole.areaMgr;
     if (cleanInput.contains('marketing')) return LoginRole.marketingMgr;
@@ -102,16 +109,37 @@ class _LoginViewState extends State<LoginView> {
       });
 
       if (success) {
+        final uData = widget.authController.currentUserData;
+        final uName = (uData?.name ?? '').toLowerCase();
+        final uPhone = (uData?.phone ?? '').toLowerCase();
+        final id = _inputController.text.trim().toLowerCase();
+
+        final bool isHbpUser = _selectedRole == LoginRole.hbp ||
+            id.contains('hbp') ||
+            id.contains('sojib') ||
+            id.contains('01798456879') ||
+            uName.contains('sojib') ||
+            uPhone.contains('01798456879');
+
+        final bool isAdminUser = _selectedRole == LoginRole.admin ||
+            id.contains('admin') ||
+            uName.contains('admin');
+
         Widget targetView;
-        if (_selectedRole == LoginRole.patient) {
-          targetView = HomeView(
+        if (isHbpUser) {
+          targetView = HbpDashboardView(
+            homeController: widget.homeController,
+            authController: widget.authController,
+            languageController: widget.languageController,
+          );
+        } else if (isAdminUser || (_selectedRole != LoginRole.patient && _selectedRole != LoginRole.hbp)) {
+          targetView = AdminDashboardView(
             homeController: widget.homeController,
             authController: widget.authController,
             languageController: widget.languageController,
           );
         } else {
-          // Direct entry into Admin/Management Portal for all staff & admin roles
-          targetView = AdminDashboardView(
+          targetView = HomeView(
             homeController: widget.homeController,
             authController: widget.authController,
             languageController: widget.languageController,

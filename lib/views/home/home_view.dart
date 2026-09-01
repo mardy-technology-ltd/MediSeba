@@ -19,6 +19,7 @@ import '../../controllers/language_controller.dart';
 import '../more/more_menu_view.dart';
 import '../profile/profile_view.dart';
 import '../patient_portal/patient_portal_view.dart';
+import '../hbp/hbp_dashboard_view.dart';
 import '../medishop/medishop_view.dart';
 import '../ambulance/ambulance_seba_view.dart';
 import '../career/career_view.dart';
@@ -1819,6 +1820,23 @@ class _HomeViewState extends State<HomeView> {
                     physics: const BouncingScrollPhysics(),
                     padding: const EdgeInsets.symmetric(horizontal: 12.0),
                     children: [
+                      _buildBkashMenuItem(
+                        icon: Icons.shield_outlined,
+                        title: isBangla ? 'এইচবিপি ফিল্ড পোর্টাল' : 'HBP Field Portal',
+                        onTap: () {
+                          Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => HbpDashboardView(
+                                homeController: widget.homeController,
+                                authController: widget.authController,
+                                languageController: _langController,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                       _buildBkashMenuItem(
                         icon: Icons.assignment_ind_outlined,
                         title: isBangla ? 'পেশেন্ট পোর্টাল' : 'Patient Portal',

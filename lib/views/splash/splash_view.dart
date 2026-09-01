@@ -6,6 +6,7 @@ import '../onboarding/onboarding_view.dart';
 
 import '../home/home_view.dart';
 import '../admin/admin_dashboard_view.dart';
+import '../hbp/hbp_dashboard_view.dart';
 import '../../services/cache_service.dart';
 
 class SplashView extends StatefulWidget {
@@ -58,17 +59,33 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
               widget.authController.currentUser?.email ??
               '').toLowerCase();
 
+          final String userName = (widget.authController.currentUserData?.name ?? '').toLowerCase();
+          final String userPhone = (widget.authController.currentUserData?.phone ?? '').toLowerCase();
+
+          final bool isHbp = loginIdentifier.contains('hbp') ||
+              loginIdentifier.contains('sojib') ||
+              loginIdentifier.contains('rahim') ||
+              loginIdentifier.contains('01710000010') ||
+              loginIdentifier.contains('01798456879') ||
+              userName.contains('sojib') ||
+              userPhone.contains('01798456879');
+
           // Dynamically detect if staff or admin login matching LoginRole pattern
           final bool isAdminOrStaff = loginIdentifier.contains('admin') ||
               loginIdentifier.contains('doctor') ||
-              loginIdentifier.contains('rahim') || // HBP
               loginIdentifier.contains('tanvir') || // Supervisor
               loginIdentifier.contains('areamanager') || // Area Manager
               loginIdentifier.contains('marketing') || // Marketing Manager
               loginIdentifier.contains('headsales') || // Head of Sales
               loginIdentifier.contains('director'); // Sales Director
 
-          if (isAdminOrStaff) {
+          if (isHbp) {
+            destinationView = HbpDashboardView(
+              homeController: widget.homeController,
+              authController: widget.authController,
+              languageController: widget.languageController,
+            );
+          } else if (isAdminOrStaff) {
             destinationView = AdminDashboardView(
               homeController: widget.homeController,
               authController: widget.authController,
