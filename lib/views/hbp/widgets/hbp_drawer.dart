@@ -163,11 +163,19 @@ class HbpDrawer extends StatelessWidget {
                   _buildDrawerItem(
                     icon: Icons.people_alt_rounded,
                     title: 'কাস্টমার ও প্যাকেজ তালিকা',
-                    subtitle: 'মাঠ পর্যায়ের তালিকা',
-                    isSelected: selectedIndex == 1,
+                    subtitle: 'মেডিসেবা প্যাকেজ ক্যাটালগ',
+                    isSelected: false,
                     onTap: () {
                       Navigator.pop(context);
-                      onItemSelected(1);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => OfferListView(
+                            showAppBar: true,
+                            languageController: languageController,
+                          ),
+                        ),
+                      );
                     },
                   ),
                   const SizedBox(height: 4),
@@ -347,8 +355,7 @@ class HbpDrawer extends StatelessWidget {
                         fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
                         color: isSelected ? Colors.white : const Color(0xFFE2E8F0),
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
                     ),
                     const SizedBox(height: 1),
                     Text(
@@ -357,8 +364,7 @@ class HbpDrawer extends StatelessWidget {
                         fontSize: 11,
                         color: Color(0xFF64748B),
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
                     ),
                   ],
                 ),

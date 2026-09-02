@@ -27,6 +27,8 @@ class HbpDashboardView extends StatefulWidget {
 class _HbpDashboardViewState extends State<HbpDashboardView> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+  final GlobalKey _customerListKey = GlobalKey();
 
   String _searchQuery = '';
   String _selectedFilter = 'সকল';
@@ -113,6 +115,7 @@ class _HbpDashboardViewState extends State<HbpDashboardView> {
   @override
   void dispose() {
     _searchController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -320,7 +323,15 @@ class _HbpDashboardViewState extends State<HbpDashboardView> {
         selectedIndex: _currentDrawerIndex,
         onItemSelected: (index) {
           setState(() => _currentDrawerIndex = index);
-          if (index == 2) _showWalletDialog();
+          if (index == 0) {
+            _scrollController.animateTo(
+              0,
+              duration: const Duration(milliseconds: 400),
+              curve: Curves.easeInOut,
+            );
+          } else if (index == 2) {
+            _showWalletDialog();
+          }
         },
         onRegisterCustomerTap: _openRegisterCustomerModal,
       ),
@@ -369,6 +380,20 @@ class _HbpDashboardViewState extends State<HbpDashboardView> {
           ),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh_rounded, color: Color(0xFF475569), size: 22),
+            onPressed: () {
+              _fetchApiMetrics();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('ড্যাশবোর্ড রিফ্রেশ হচ্ছে...'),
+                  duration: const Duration(seconds: 1),
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+              );
+            },
+          ),
           IconButton(
             constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
             padding: const EdgeInsets.all(6),
@@ -421,6 +446,7 @@ class _HbpDashboardViewState extends State<HbpDashboardView> {
         elevation: 4,
       ),
       body: SingleChildScrollView(
+        controller: _scrollController,
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Column(
@@ -442,7 +468,10 @@ class _HbpDashboardViewState extends State<HbpDashboardView> {
             const SizedBox(height: 20),
 
             // 4. Registered Customer & Package List Section
-            _buildCustomerListSection(filteredCustomers),
+            Container(
+              key: _customerListKey,
+              child: _buildCustomerListSection(filteredCustomers),
+            ),
 
             const SizedBox(height: 70), // Spacing for floating action button
           ],
@@ -538,12 +567,11 @@ class _HbpDashboardViewState extends State<HbpDashboardView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Expanded(
+                    Expanded(
                       child: Text(
                         'আপনার ইউনিক রেফারেল কোড:',
                         style: TextStyle(fontSize: 11.5, color: Color(0xFF94A3B8), fontWeight: FontWeight.w600),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
                       ),
                     ),
                     GestureDetector(
@@ -732,8 +760,7 @@ class _HbpDashboardViewState extends State<HbpDashboardView> {
                 child: Text(
                   'মাসিক প্যাকেজ বিক্রয়: $_totalSoldটি / $_monthlyTargetটি (৩৩% বেঞ্চমার্ক)',
                   style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700, color: Color(0xFF334155)),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
                 ),
               ),
               const SizedBox(width: 8),
@@ -765,8 +792,7 @@ class _HbpDashboardViewState extends State<HbpDashboardView> {
                 child: Text(
                   '💡 ৩৩% (২১৪টি) সেলস পার হলে প্রমোশন ও বোনাস পাবেন।',
                   style: TextStyle(fontSize: 10, color: Color(0xFF64748B)),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
                 ),
               ),
               const SizedBox(width: 6),
@@ -876,23 +902,25 @@ class _HbpDashboardViewState extends State<HbpDashboardView> {
                       Text(
                         title,
                         style: const TextStyle(
-                          fontSize: 11,
+                          fontSize: 10.5,
                           fontWeight: FontWeight.w700,
                           color: Color(0xFF64748B),
+                          height: 1.2,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
                       ),
                       const SizedBox(height: 2),
-                      Text(
-                        value,
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w900,
-                          color: color,
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          value,
+                          style: TextStyle(
+                            fontSize: 16.5,
+                            fontWeight: FontWeight.w900,
+                            color: color,
+                          ),
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
@@ -903,8 +931,7 @@ class _HbpDashboardViewState extends State<HbpDashboardView> {
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF94A3B8),
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
                   ),
                 ],
               ),
@@ -1109,14 +1136,12 @@ class _HbpDashboardViewState extends State<HbpDashboardView> {
                           Text(
                             cust['name'] as String,
                             style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
                           ),
                           Text(
                             '${cust['phone']} | ${cust['address']}',
                             style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
                           ),
                         ],
                       ),

@@ -119,31 +119,95 @@ class OfferListView extends StatelessWidget {
 
                   const SizedBox(height: 14),
 
-                  // 3. Responsive package cards list/grid
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      if (constraints.maxWidth > 900) {
-                        return Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(child: _buildFullBodyPackageCard(context, langController)),
-                            const SizedBox(width: 14),
-                            Expanded(child: _buildCardiacPackageCard(context, langController)),
-                            const SizedBox(width: 14),
-                            Expanded(child: _buildDiabetesPackageCard(context, langController)),
-                          ],
-                        );
-                      }
-                      return Column(
-                        children: [
-                          _buildFullBodyPackageCard(context, langController),
-                          const SizedBox(height: 16),
-                          _buildCardiacPackageCard(context, langController),
-                          const SizedBox(height: 16),
-                          _buildDiabetesPackageCard(context, langController),
+                  // 3. Official MediSeba 5 Health Packages List
+                  Column(
+                    children: [
+                      _buildHealthPackageCard(
+                        context: context,
+                        name: 'প্রথমা প্যাকেজ',
+                        subtitle: 'স্বাস্থ্যের প্রথম পদক্ষেপ',
+                        price: '99',
+                        points: '999',
+                        validity: '৩ মাস',
+                        primaryColor: const Color(0xFF0F9D58),
+                        lightBg: const Color(0xFFE8F5E9),
+                        benefits: [
+                          '৩ মাসে ২ বার MBBS ডাক্তারের পরামর্শ',
+                          'অনলাইন অথবা Health Point এ সেবা',
+                          '৳ ৯৯৯ হেলথ ক্রেডিট',
+                          'টেস্টে সর্বোচ্চ ৩০% পর্যন্ত Cash Back সুবিধা',
                         ],
-                      );
-                    },
+                      ),
+                      const SizedBox(height: 16),
+                      _buildHealthPackageCard(
+                        context: context,
+                        name: 'আস্থা প্যাকেজ',
+                        subtitle: 'নিয়মিত স্বাস্থ্য, আপনার ভরসা',
+                        price: '199',
+                        points: '1,499',
+                        validity: '৬ মাস',
+                        isBestSeller: true,
+                        primaryColor: const Color(0xFF00796B),
+                        lightBg: const Color(0xFFE0F2F1),
+                        benefits: [
+                          '৬ মাসে ২ বার MBBS ডাক্তারের পরামর্শ',
+                          'অনলাইন অথবা Health Point এ সেবা',
+                          '৳ ১,৪৯৯ হেলথ ক্রেডিট',
+                          'টেস্টে সর্বোচ্চ ৩০% পর্যন্ত Cash Back সুবিধা',
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      _buildHealthPackageCard(
+                        context: context,
+                        name: 'সহযাত্রী প্যাকেজ',
+                        subtitle: 'দুজনের যত্ন, একসাথে সুস্থ পথচলা',
+                        price: '299',
+                        points: '2,000',
+                        validity: '৬ মাস',
+                        primaryColor: const Color(0xFFE11D48),
+                        lightBg: const Color(0xFFFFE4E6),
+                        benefits: [
+                          '৬ মাসে সর্বোচ্চ ৩ বার MBBS ডাক্তারের পরামর্শ',
+                          'অনলাইন অথবা Health Point এ সেবা',
+                          '৳ ২,০০০ হেলথ ক্রেডিট',
+                          'টেস্ট ক্রেডিট ব্যবহারের সুবিধা',
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      _buildHealthPackageCard(
+                        context: context,
+                        name: 'মাতৃমমতা প্যাকেজ',
+                        subtitle: 'মায়ের যত্ন, আগামী সুরক্ষায়',
+                        price: '499',
+                        points: '2,500',
+                        validity: 'সিঙ্গেল/প্রসবকালীন পর্যায়',
+                        primaryColor: const Color(0xFFC026D3),
+                        lightBg: const Color(0xFFFAE8FF),
+                        benefits: [
+                          'প্রতি ৩ মাসে ১ বার MBBS ডাক্তারের পরামর্শ',
+                          'গর্ভকালীন জরুরি ডাক্তারি পরামর্শ',
+                          '৳ ২,৫০০ হেলথ ক্রেডিট',
+                          'হাসপাতালে ২৫% ছাড় সুবিধা',
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      _buildHealthPackageCard(
+                        context: context,
+                        name: 'আপনজন প্যাকেজ',
+                        subtitle: 'পুরো পরিবারের সুরক্ষা, একটি কার্ডেই',
+                        price: '999',
+                        points: '5,500',
+                        validity: '১ বছর',
+                        primaryColor: const Color(0xFF7C3AED),
+                        lightBg: const Color(0xFFF5F3FF),
+                        benefits: [
+                          'পরিবারের ৪ জনের জন্য সুবিধা',
+                          'প্রতি ৩ মাস পর পর প্রতি ব্যক্তি ২ বার করে ডাক্তারের পরামর্শ (সর্বমোট ৮ বার)',
+                          '৳ ৫,৫০০ হেলথ ক্রেডিট',
+                          'টেস্ট ক্রেডিট ব্যবহারের সুবিধা',
+                        ],
+                      ),
+                    ],
                   ),
 
                   const SizedBox(height: 24),
@@ -769,6 +833,168 @@ class OfferListView extends StatelessWidget {
                 fontWeight: FontWeight.w600,
                 color: Color(0xFF334155),
                 height: 1.3,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Health Package Card matching Web UI
+  Widget _buildHealthPackageCard({
+    required BuildContext context,
+    required String name,
+    required String subtitle,
+    required String price,
+    required String points,
+    required String validity,
+    required Color primaryColor,
+    required Color lightBg,
+    required List<String> benefits,
+    bool isBestSeller = false,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: isBestSeller ? primaryColor : const Color(0xFFE2E8F0), width: isBestSeller ? 2 : 1),
+        boxShadow: [
+          BoxShadow(
+            color: primaryColor.withValues(alpha: 0.08),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: lightBg,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(Icons.stars_rounded, color: primaryColor, size: 20),
+              ),
+              Row(
+                children: [
+                  if (isBestSeller) ...[
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF97316),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Text(
+                        '🔥 বেস্ট সেলার',
+                        style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w800, color: Colors.white),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                  ],
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: lightBg,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: primaryColor.withValues(alpha: 0.3)),
+                    ),
+                    child: Text(
+                      'মেয়াদ: $validity',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: primaryColor),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Text(
+            name,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF0F172A)),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            subtitle,
+            style: const TextStyle(fontSize: 12, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(height: 14),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFF1F5F9)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('প্যাকেজ মূল্য', style: TextStyle(fontSize: 10.5, color: Color(0xFF94A3B8))),
+                    Text('৳ $price', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: primaryColor)),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    const Text('হেলথ ক্রেডিট', style: TextStyle(fontSize: 10.5, color: Color(0xFF94A3B8))),
+                    Text('+$points Pts', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: Color(0xFF0F9D58))),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          ...benefits.map((benefit) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Icons.check_circle_rounded, size: 16, color: Color(0xFF0F9D58)),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      benefit,
+                      style: const TextStyle(fontSize: 12.5, color: Color(0xFF334155), height: 1.3),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+          const SizedBox(height: 14),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () => showHelplineBottomSheet(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(vertical: 13),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'প্যাকেজটি কিনুন (৳ $price)',
+                    style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w800, color: Colors.white),
+                  ),
+                  const SizedBox(width: 6),
+                  const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 16),
+                ],
               ),
             ),
           ),

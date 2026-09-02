@@ -35,6 +35,12 @@ class _HbpRegisterCustomerDialogState extends State<HbpRegisterCustomerDialog> {
       'shortName': '🆓 ফ্রি পেশেন্ট অ্যাকাউন্ট',
       'price': 0,
       'points': 0,
+      'validity': 'লাইফটাইম',
+      'subtitle': 'সাধারণ অ্যাকাউন্ট তৈরি',
+      'features': [
+        'ফ্রি পেশেন্ট প্রোফাইল অ্যাকাউন্ট',
+        'ডাক্তার সিরিয়াল নেওয়ার সুযোগ',
+      ],
     },
     {
       'id': '1',
@@ -42,6 +48,14 @@ class _HbpRegisterCustomerDialogState extends State<HbpRegisterCustomerDialog> {
       'shortName': 'প্রথমা প্যাকেজ (Prothoma) — ৳99',
       'price': 99,
       'points': 999,
+      'validity': '৩ মাস',
+      'subtitle': 'স্বাস্থ্য সুরক্ষায় প্রথম পদক্ষেপ',
+      'features': [
+        '৩ মাসে ২ জন MBBS ডাক্তারের পরামর্শ',
+        'অনলাইন অথবা অফলাইন Health Point এ সেবা',
+        '৳ ৯৯৯ হেলথ ক্রেডিট 포인트',
+        'টেস্ট ফি তে ৩০% পর্যন্ত Cash Back সুবিধা',
+      ],
     },
     {
       'id': '2',
@@ -49,6 +63,14 @@ class _HbpRegisterCustomerDialogState extends State<HbpRegisterCustomerDialog> {
       'shortName': 'আস্থা প্যাকেজ (Astha) — ৳199',
       'price': 199,
       'points': 1499,
+      'validity': '৬ মাস',
+      'subtitle': 'নিয়মিত স্বাস্থ্য পরামর্শ',
+      'features': [
+        '৬ মাসে ২ জন MBBS ডাক্তারের পরামর্শ',
+        'অনলাইন অথবা অফলাইন Health Point এ সেবা',
+        '৳ ১,৪৯৯ হেলথ ক্রেডিট 포인트',
+        'টেস্ট ফি তে ৩০% পর্যন্ত Cash Back সুবিধা',
+      ],
     },
     {
       'id': '3',
@@ -56,6 +78,14 @@ class _HbpRegisterCustomerDialogState extends State<HbpRegisterCustomerDialog> {
       'shortName': 'সহযাত্রা প্যাকেজ (Sohojatra) — ৳299',
       'price': 299,
       'points': 2000,
+      'validity': '৬ মাস',
+      'subtitle': 'দুশ্চিন্তা ছাড়ুন, একসাথে সুস্থ থাকুন',
+      'features': [
+        '৬ মাসে ৩ জন MBBS ডাক্তারের পরামর্শ',
+        'অনলাইন অথবা অফলাইন Health Point এ সেবা',
+        '৳ ২,০০০ হেলথ ক্রেডিট 포인트',
+        'টেস্ট সেবায় ক্যাশব্যাক সুবিধা',
+      ],
     },
     {
       'id': '4',
@@ -63,6 +93,14 @@ class _HbpRegisterCustomerDialogState extends State<HbpRegisterCustomerDialog> {
       'shortName': 'মাতৃমমতা প্যাকেজ (Matrumomota) — ৳499',
       'price': 499,
       'points': 2500,
+      'validity': 'সিঙ্গেল/গর্ভকালীন পর্যায়',
+      'subtitle': 'মায়ের যত্ন, সন্তানের সুরক্ষায়',
+      'features': [
+        'প্রতি ৩ মাসে ১ জন MBBS ডাক্তারের পরামর্শ',
+        'গর্ভকালীন সময়ে ডাক্তারের পরামর্শ',
+        '৳ ২,৫০০ হেলথ ক্রেডিট 포인트',
+        'হসপিটালে ২৫% ছাড় সুবিধা',
+      ],
     },
     {
       'id': '5',
@@ -70,6 +108,14 @@ class _HbpRegisterCustomerDialogState extends State<HbpRegisterCustomerDialog> {
       'shortName': 'আপনজন প্যাকেজ (Aponjon) — ৳999',
       'price': 999,
       'points': 5500,
+      'validity': '১ বছর',
+      'subtitle': 'পুরো পরিবারের সুরক্ষা, একটি কার্ডে',
+      'features': [
+        'পরিবারের ৪ জনের জন্য সুবিধা',
+        'প্রতি ১০ গ্রাম পর পর প্রতি মাসে ২ বার করে ডাক্তারের পরামর্শ শেয়ার (৮টি)',
+        '৳ ৫,৫০০ হেলথ ক্রেডিট 포인트',
+        'ওয়েট ক্রেডিট স্থানান্তরের সুবিধা',
+      ],
     },
   ];
 
@@ -211,13 +257,12 @@ class _HbpRegisterCustomerDialogState extends State<HbpRegisterCustomerDialog> {
                     child: Text(
                       'নতুন কাস্টমার অ্যাকাউন্ট ও প্যাকেজ একটিভ',
                       style: TextStyle(
-                        fontSize: 16.5,
+                        fontSize: 16,
                         fontWeight: FontWeight.w900,
                         color: Color(0xFF0F172A),
                         letterSpacing: -0.3,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
                     ),
                   ),
                   IconButton(
@@ -304,7 +349,34 @@ class _HbpRegisterCustomerDialogState extends State<HbpRegisterCustomerDialog> {
                           final packageWidget = Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildInputLabel('প্যাকেজ নির্বাচন *'),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  _buildInputLabel('প্যাকেজ নির্বাচন *'),
+                                  GestureDetector(
+                                    onTap: () => _showPackageCheatSheet(context),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFE8F5E9),
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(color: const Color(0xFF81C784)),
+                                      ),
+                                      child: const Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(Icons.info_outline_rounded, size: 13, color: Color(0xFF0F9D58)),
+                                          SizedBox(width: 4),
+                                          Text(
+                                            'প্যাকেজ সুবিধা তালিকা',
+                                            style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w800, color: Color(0xFF0F9D58)),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                               Container(
                                 height: 48,
                                 padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -480,14 +552,155 @@ class _HbpRegisterCustomerDialogState extends State<HbpRegisterCustomerDialog> {
         borderRadius: BorderRadius.circular(24),
         borderSide: const BorderSide(color: Color(0xFF00796B), width: 1.5),
       ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(24),
-        borderSide: const BorderSide(color: Color(0xFFEF4444)),
-      ),
       focusedErrorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(24),
         borderSide: const BorderSide(color: Color(0xFFEF4444), width: 1.5),
       ),
+    );
+  }
+
+  void _showPackageCheatSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.8,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFCBD5E1),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Row(
+                      children: [
+                        Icon(Icons.stars_rounded, color: Color(0xFF0F9D58), size: 22),
+                        SizedBox(width: 8),
+                        Text(
+                          'মেডিসেবা হেলথ প্যাকেজ সুবিধা তালিকা',
+                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: Color(0xFF0F172A)),
+                        ),
+                      ],
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close_rounded, size: 20),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(height: 1),
+              Expanded(
+                child: ListView.separated(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: _packages.where((p) => p['id'] != 'none').length,
+                  separatorBuilder: (context, index) => const SizedBox(height: 12),
+                  itemBuilder: (context, index) {
+                    final pkg = _packages.where((p) => p['id'] != 'none').toList()[index];
+                    final features = pkg['features'] as List<String>? ?? [];
+
+                    return Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF8FAFC),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: const Color(0xFFE2E8F0)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  pkg['shortName'] as String,
+                                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Color(0xFF0F172A)),
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFDCFCE7),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  'মেয়াদ: ${pkg['validity']}',
+                                  style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w800, color: Color(0xFF15803D)),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            pkg['subtitle'] as String,
+                            style: const TextStyle(fontSize: 11.5, color: Color(0xFF64748B)),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Text(
+                                'মূল্য: ৳ ${pkg['price']}',
+                                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: Color(0xFF0F9D58)),
+                              ),
+                              const SizedBox(width: 12),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFEF3C7),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  'বোনাস: +${pkg['points']} Pts',
+                                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Color(0xFFB45309)),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          ...features.map((feat) {
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 4),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Icon(Icons.check_circle_rounded, size: 14, color: Color(0xFF0F9D58)),
+                                  const SizedBox(width: 6),
+                                  Expanded(
+                                    child: Text(
+                                      feat,
+                                      style: const TextStyle(fontSize: 11.5, color: Color(0xFF334155), height: 1.3),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
