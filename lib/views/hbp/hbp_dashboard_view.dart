@@ -37,7 +37,7 @@ class _HbpDashboardViewState extends State<HbpDashboardView> {
   final String _referralPhone = '01710000010';
 
   // Target and Progress state
-  final int _monthlyTarget = 214;
+  int _monthlyTarget = 214;
   int _totalSold = 1;
   int _todaySold = 1;
   int _collectedAmount = 350;
@@ -98,25 +98,52 @@ class _HbpDashboardViewState extends State<HbpDashboardView> {
       final data = await ApiService.fetchHbpMetrics(token);
       if (data != null && mounted) {
         setState(() {
-          _totalSold = data['total_packages_sold'] ?? _totalSold;
-          _collectedAmount = data['total_sales_amount'] ?? _collectedAmount;
-          if (data['sales_history'] is List) {
-            final apiHistory = (data['sales_history'] as List).map((item) {
+          final stats = data['stats'] as Map<String, dynamic>?;
+          final targets = data['targets'] as Map<String, dynamic>?;
+
+          if (stats != null) {
+            _totalSold = stats['monthly_total'] ?? stats['total_packages_sold'] ?? _totalSold;
+            _todaySold = stats['today_sales'] ?? _todaySold;
+            if (stats['total_sales_amount'] != null) {
+              _collectedAmount = stats['total_sales_amount'] as int;
+            }
+          } else {
+            _totalSold = data['total_packages_sold'] ?? _totalSold;
+            _collectedAmount = data['total_sales_amount'] ?? _collectedAmount;
+          }
+
+          if (targets != null) {
+            _monthlyTarget = targets['min_threshold_33_percent'] ?? targets['monthly_target'] ?? _monthlyTarget;
+          }
+
+          final rawHistory = data['sales_history'] ?? data['recent_sales'] ?? data['customers'];
+          if (rawHistory is List && rawHistory.isNotEmpty) {
+            final apiHistory = rawHistory.map((item) {
+              final map = Map<String, dynamic>.from(item as Map);
               return {
-                'id': item['id'] ?? 'REG-000',
-                'name': item['customer_name'] ?? 'গ্রাহক',
-                'phone': item['customer_phone'] ?? '',
-                'package': item['package_name'] ?? 'প্যাকেজ',
-                'price': item['purchased_price'] ?? item['price'] ?? 99,
-                'paymentMethod': item['payment_method'] == 'cash' ? 'ক্যাশ কালেকশন' : (item['payment_method'] == 'qr' ? 'বিকাশ QR' : 'ডিজিটাল গেটওয়ে'),
-                'status': 'সক্রিয় (Verified)',
-                'date': item['date'] ?? '',
-                'address': 'মাঠ পর্যায়',
+                'id': map['id']?.toString() ?? map['uuid']?.toString() ?? 'REG-000',
+                'name': map['customer_name'] ?? map['name'] ?? map['user']?['name'] ?? 'গ্রাহক',
+                'phone': map['customer_phone'] ?? map['phone'] ?? map['user']?['phone'] ?? '',
+                'package': map['package_name'] ?? map['package']?['name'] ?? 'প্যাকেজ',
+                'price': map['purchased_price'] ?? map['price'] ?? 99,
+                'paymentMethod': map['payment_method'] == 'cash'
+                    ? 'ক্যাশ কালেকশন'
+                    : (map['payment_method'] == 'qr' ? 'বিকাশ QR' : 'ডিজিটাল গেটওয়ে'),
+                'status': map['status'] ?? 'সক্রিয় (Verified)',
+                'date': map['created_at'] != null ? map['created_at'].toString().split('T')[0] : (map['date'] ?? ''),
+                'address': map['address'] ?? 'মাঠ পর্যায়',
               };
             }).toList();
-            if (apiHistory.isNotEmpty) {
-              _customers = List<Map<String, dynamic>>.from(apiHistory);
-            }
+
+            _customers = List<Map<String, dynamic>>.from(apiHistory);
+          }
+
+          // Dynamically sum collected amount from customers list if API total_sales_amount is null
+          if (stats?['total_sales_amount'] == null && data['total_sales_amount'] == null) {
+            _collectedAmount = _customers.fold<int>(
+              0,
+              (sum, item) => sum + ((item['price'] as num?)?.toInt() ?? 0),
+            );
           }
         });
       }
