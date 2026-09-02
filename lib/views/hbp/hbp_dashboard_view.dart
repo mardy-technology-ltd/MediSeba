@@ -48,47 +48,7 @@ class _HbpDashboardViewState extends State<HbpDashboardView> {
   @override
   void initState() {
     super.initState();
-    _customers = [
-      {
-        'id': 'REG-17251842',
-        'name': 'মোঃ রফিকুল ইসলাম',
-        'phone': '01712345678',
-        'age': '৪৫',
-        'gender': 'পুরুষ',
-        'address': 'মাঠ পর্যায়',
-        'package': 'প্রথমা প্যাকেজ',
-        'price': 99,
-        'paymentMethod': 'ক্যাশ কালেকশন',
-        'status': 'সক্রিয় (Verified)',
-        'date': 'আজ, ১০:১৫ AM',
-      },
-      {
-        'id': 'CUST-8022',
-        'name': 'সুলতানা বেগম',
-        'phone': '01839201948',
-        'age': '৩২',
-        'gender': 'মহিলা',
-        'address': 'মতিহার, রাজশাহী',
-        'package': 'আস্থা প্যাকেজ',
-        'price': 199,
-        'paymentMethod': 'বিকাশ QR',
-        'status': 'সক্রিয় (Active)',
-        'date': 'গতকাল, ০৪:৩০ PM',
-      },
-      {
-        'id': 'CUST-8023',
-        'name': 'মোস্তাফিজুর রহমান',
-        'phone': '01912837465',
-        'age': '৫২',
-        'gender': 'পুরুষ',
-        'address': 'তালাইমারী, রাজশাহী',
-        'package': 'আপনজন প্যাকেজ',
-        'price': 999,
-        'paymentMethod': 'ডিজিটাল গেটওয়ে',
-        'status': 'সক্রিয় (Active)',
-        'date': '২৮ আগস্ট, ১১:০০ AM',
-      },
-    ];
+    _customers = [];
     _fetchApiMetrics();
   }
 
