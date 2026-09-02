@@ -73,6 +73,29 @@ class OfferListView extends StatelessWidget {
               ),
             ),
 
+            if (!showAppBar && Navigator.canPop(context))
+              Positioned(
+                top: 8,
+                left: 8,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.arrow_back_rounded, color: textDark),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ),
+              ),
+
             SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               padding: const EdgeInsets.all(16.0),

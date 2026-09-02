@@ -191,7 +191,12 @@ class HbpDrawer extends StatelessWidget {
                       Navigator.pop(context);
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const OfferListView()),
+                        MaterialPageRoute(
+                          builder: (_) => OfferListView(
+                            showAppBar: true,
+                            languageController: languageController,
+                          ),
+                        ),
                       );
                     },
                   ),
