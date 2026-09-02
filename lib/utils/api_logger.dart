@@ -175,9 +175,18 @@ class ApiLogger {
     required String body,
     required int durationMs,
   }) {
+    final screenName = _requestScreen[requestId] ?? 'App Context';
+    final buttonName = _requestButton[requestId] ?? 'User Action / Auto';
+    final funcName = _requestFunction[requestId] ?? 'apiCall()';
+    final userActionFlag = _requestIsUserAction[requestId] ?? true;
+
+    debugPrint('');
     debugPrint('════════════════════════════════════════════════════════════');
     debugPrint('📥 API RESPONSE ${formatId(requestId)}');
     debugPrint('════════════════════════════════════════════════════════════');
+    debugPrint('Screen       : $screenName');
+    debugPrint('${userActionFlag ? 'Button      ' : 'Trigger     '} : $buttonName');
+    debugPrint('Function     : $funcName()');
     debugPrint('Status Code  : $statusCode');
     debugPrint('Response Time: $durationMs ms');
     debugPrint('');
