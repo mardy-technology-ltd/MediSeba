@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../models/user_model.dart';
 import '../services/cache_service.dart';
+import '../utils/api_logger.dart';
 
 class AuthRepository {
   static const String baseUrl = 'https://api.mediseba.org/api/v1';
@@ -36,34 +37,43 @@ class AuthRepository {
   }
 
   Future<bool> login(String emailOrPhone, String password) async {
+    final stopwatch = Stopwatch()..start();
+    final String url = '$baseUrl/auth/login';
+    final Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    };
+    final Map<String, dynamic> payload = {
+      'login': emailOrPhone,
+      'password': password,
+    };
+
+    final reqId = ApiLogger.logRequest(
+      screen: 'Login View',
+      trigger: 'Login Button',
+      functionName: 'login',
+      isUserAction: true,
+      method: 'POST',
+      url: url,
+      headers: headers,
+      body: payload,
+    );
+
     try {
-      final String url = '$baseUrl/auth/login';
-      final Map<String, String> headers = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      };
-      final Map<String, dynamic> payload = {
-        'login': emailOrPhone,
-        'password': password,
-      };
-
-      debugPrint('🚀 [API REQUEST] =======================================');
-      debugPrint('👉 URL: $url');
-      debugPrint('👉 METHOD: POST');
-      debugPrint('👉 HEADERS: $headers');
-      debugPrint('👉 PAYLOAD: ${jsonEncode(payload)}');
-      debugPrint('========================================================');
-
       final response = await http.post(
         Uri.parse(url),
         headers: headers,
         body: jsonEncode(payload),
       ).timeout(const Duration(seconds: 8));
 
-      debugPrint('🎯 [API RESPONSE] ======================================');
-      debugPrint('👈 STATUS CODE: ${response.statusCode}');
-      debugPrint('👈 BODY: ${response.body}');
-      debugPrint('========================================================');
+      stopwatch.stop();
+
+      ApiLogger.logResponse(
+        requestId: reqId,
+        statusCode: response.statusCode,
+        body: response.body,
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
 
       final Map<String, dynamic> body = jsonDecode(response.body);
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -76,7 +86,6 @@ class AuthRepository {
           await CacheService.put('auth_token', _token);
           await CacheService.put('auth_login_identifier', _loginIdentifier);
 
-          // Construct or parse UserModel
           if (userJson != null) {
             final Map<String, dynamic> map = Map<String, dynamic>.from(userJson as Map);
             final String uid = map['id']?.toString() ?? map['uuid']?.toString() ?? 'user_id';
@@ -93,7 +102,6 @@ class AuthRepository {
               createdAt: DateTime.now(),
             );
           } else {
-            // Fallback default model
             _currentUserData = UserModel(
               uid: 'user_id',
               name: 'User',
@@ -106,14 +114,6 @@ class AuthRepository {
             );
           }
           await CacheService.put('auth_user', _currentUserData!.toMap());
-
-          debugPrint('🔑 [LOGIN SUCCESS] =====================================');
-          debugPrint('👉 TOKEN: $_token');
-          debugPrint('👉 USER NAME: ${_currentUserData?.name}');
-          debugPrint('👉 USER PHONE: ${_currentUserData?.phone}');
-          debugPrint('👉 USER UID: ${_currentUserData?.uid}');
-          debugPrint('========================================================');
-
           return true;
         }
       }
@@ -121,10 +121,18 @@ class AuthRepository {
       final msg = body['message'] ?? body['error'] ?? 'Login failed';
       throw Exception(msg);
     } catch (e) {
-      debugPrint('❌ [API ERROR] =========================================');
-      debugPrint('👉 TYPE: Login Exception');
-      debugPrint('👉 ERROR: $e');
-      debugPrint('========================================================');
+      stopwatch.stop();
+      ApiLogger.logError(
+        requestId: reqId,
+        screen: 'Login View',
+        trigger: 'Login Button',
+        functionName: 'login',
+        method: 'POST',
+        url: url,
+        statusCode: 401,
+        errorDetails: e.toString(),
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
       rethrow;
     }
   }
@@ -139,37 +147,46 @@ class AuthRepository {
     required String union,
     String? referId,
   }) async {
+    final stopwatch = Stopwatch()..start();
+    final String url = '$baseUrl/auth/register';
+    final Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    };
+    final Map<String, dynamic> payload = {
+      'name': name,
+      'email': phone.contains('@') ? phone : '$phone@mediseba.com',
+      'phone': phone,
+      'password': password,
+      'password_confirmation': password,
+    };
+
+    final reqId = ApiLogger.logRequest(
+      screen: 'Register View',
+      trigger: 'Register Button',
+      functionName: 'signUp',
+      isUserAction: true,
+      method: 'POST',
+      url: url,
+      headers: headers,
+      body: payload,
+    );
+
     try {
-      final String url = '$baseUrl/auth/register';
-      final Map<String, String> headers = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      };
-      final Map<String, dynamic> payload = {
-        'name': name,
-        'email': phone.contains('@') ? phone : '$phone@mediseba.com',
-        'phone': phone,
-        'password': password,
-        'password_confirmation': password,
-      };
-
-      debugPrint('🚀 [API REQUEST] =======================================');
-      debugPrint('👉 URL: $url');
-      debugPrint('👉 METHOD: POST');
-      debugPrint('👉 HEADERS: $headers');
-      debugPrint('👉 PAYLOAD: ${jsonEncode(payload)}');
-      debugPrint('========================================================');
-
       final response = await http.post(
         Uri.parse(url),
         headers: headers,
         body: jsonEncode(payload),
       ).timeout(const Duration(seconds: 8));
 
-      debugPrint('🎯 [API RESPONSE] ======================================');
-      debugPrint('👈 STATUS CODE: ${response.statusCode}');
-      debugPrint('👈 BODY: ${response.body}');
-      debugPrint('========================================================');
+      stopwatch.stop();
+
+      ApiLogger.logResponse(
+        requestId: reqId,
+        statusCode: response.statusCode,
+        body: response.body,
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
 
       final Map<String, dynamic> body = jsonDecode(response.body);
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -201,10 +218,18 @@ class AuthRepository {
       final msg = body['message'] ?? body['error'] ?? 'Registration failed';
       throw Exception(msg);
     } catch (e) {
-      debugPrint('❌ [API ERROR] =========================================');
-      debugPrint('👉 TYPE: Registration Exception');
-      debugPrint('👉 ERROR: $e');
-      debugPrint('========================================================');
+      stopwatch.stop();
+      ApiLogger.logError(
+        requestId: reqId,
+        screen: 'Register View',
+        trigger: 'Register Button',
+        functionName: 'signUp',
+        method: 'POST',
+        url: url,
+        statusCode: 400,
+        errorDetails: e.toString(),
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
       rethrow;
     }
   }

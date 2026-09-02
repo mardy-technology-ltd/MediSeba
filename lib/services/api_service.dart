@@ -5,6 +5,7 @@ import '../models/doctor_model.dart';
 import '../models/doctor_availability_model.dart';
 import '../models/appointment_model.dart';
 import '../models/medicine_model.dart';
+import '../utils/api_logger.dart';
 import 'cache_service.dart';
 
 class ApiService {
@@ -19,7 +20,6 @@ class ApiService {
 
   /// Fetch all doctor availabilities with Hive caching
   static Future<List<DoctorAvailabilityModel>> getDoctorAvailabilities({bool forceRefresh = false}) async {
-    // 1. Check local Hive cache
     if (!forceRefresh && !CacheService.isExpired(_availabilitiesCacheKey, _cacheTTL)) {
       final cachedData = CacheService.get(_availabilitiesCacheKey);
       if (cachedData is List && cachedData.isNotEmpty) {
@@ -35,16 +35,36 @@ class ApiService {
       }
     }
 
-    // 2. Fetch from Network API
+    final stopwatch = Stopwatch()..start();
+    final headers = {
+      'Accept': 'application/json',
+      'User-Agent': 'MediSebaApp/1.0',
+    };
+
+    final reqId = ApiLogger.logRequest(
+      screen: 'Doctor Availabilities View',
+      trigger: 'initState() / Screen Load',
+      functionName: 'getDoctorAvailabilities',
+      isUserAction: false,
+      method: 'GET',
+      url: availabilitiesEndpoint,
+      headers: headers,
+    );
+
     try {
-      debugPrint('Fetching availabilities from network API...');
       final response = await http.get(
         Uri.parse(availabilitiesEndpoint),
-        headers: {
-          'Accept': 'application/json',
-          'User-Agent': 'MediSebaApp/1.0',
-        },
+        headers: headers,
       ).timeout(const Duration(seconds: 4));
+
+      stopwatch.stop();
+
+      ApiLogger.logResponse(
+        requestId: reqId,
+        statusCode: response.statusCode,
+        body: response.body,
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
@@ -53,23 +73,31 @@ class ApiService {
           final items = list.map((item) => DoctorAvailabilityModel.fromJson(item as Map<String, dynamic>)).toList();
           if (items.isNotEmpty) {
             await CacheService.put(_availabilitiesCacheKey, list);
-            debugPrint('Successfully fetched & cached ${items.length} availabilities to Hive.');
             return items;
           }
         }
       }
     } catch (e) {
-      debugPrint('ApiService.getDoctorAvailabilities exception: $e');
+      stopwatch.stop();
+      ApiLogger.logError(
+        requestId: reqId,
+        screen: 'Doctor Availabilities View',
+        trigger: 'initState() / Screen Load',
+        functionName: 'getDoctorAvailabilities',
+        method: 'GET',
+        url: availabilitiesEndpoint,
+        statusCode: 500,
+        errorDetails: e.toString(),
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
     }
 
-    // 3. Network failed: Fallback to existing Hive cache if available
     final fallbackCache = CacheService.get(_availabilitiesCacheKey);
     if (fallbackCache is List && fallbackCache.isNotEmpty) {
       try {
         final items = fallbackCache
             .map((item) => DoctorAvailabilityModel.fromJson(Map<String, dynamic>.from(item as Map)))
             .toList();
-        debugPrint('Fallback: Loaded ${items.length} availabilities from Hive cache.');
         return items;
       } catch (_) {}
     }
@@ -78,7 +106,6 @@ class ApiService {
   }
 
   static Future<List<DoctorModel>> getDoctors({bool forceRefresh = false}) async {
-    // 1. Check local Hive cache if forceRefresh is false
     if (!forceRefresh && !CacheService.isExpired(_doctorsCacheKey, _cacheTTL)) {
       final cachedData = CacheService.get(_doctorsCacheKey);
       if (cachedData is List && cachedData.isNotEmpty) {
@@ -86,7 +113,6 @@ class ApiService {
           final doctors = cachedData
               .map((item) => DoctorModel.fromJson(Map<String, dynamic>.from(item as Map)))
               .toList();
-          debugPrint('Loaded ${doctors.length} doctors from Hive cache.');
           return doctors;
         } catch (e) {
           debugPrint('Error parsing Hive cached doctors: $e');
@@ -94,16 +120,36 @@ class ApiService {
       }
     }
 
-    // 2. Fetch fresh data from API
+    final stopwatch = Stopwatch()..start();
+    final headers = {
+      'Accept': 'application/json',
+      'User-Agent': 'MediSebaApp/1.0',
+    };
+
+    final reqId = ApiLogger.logRequest(
+      screen: 'Doctor Catalog View',
+      trigger: 'initState() / Screen Load',
+      functionName: 'getDoctors',
+      isUserAction: false,
+      method: 'GET',
+      url: doctorsEndpoint,
+      headers: headers,
+    );
+
     try {
-      debugPrint('Fetching doctors from network API...');
       final response = await http.get(
         Uri.parse(doctorsEndpoint),
-        headers: {
-          'Accept': 'application/json',
-          'User-Agent': 'MediSebaApp/1.0',
-        },
+        headers: headers,
       ).timeout(const Duration(seconds: 4));
+
+      stopwatch.stop();
+
+      ApiLogger.logResponse(
+        requestId: reqId,
+        statusCode: response.statusCode,
+        body: response.body,
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
@@ -111,34 +157,39 @@ class ApiService {
           final List<dynamic> list = body['data'];
           final doctors = list.map((item) => DoctorModel.fromJson(item as Map<String, dynamic>)).toList();
           if (doctors.isNotEmpty) {
-            // Save to Hive cache
             await CacheService.put(_doctorsCacheKey, list);
-            debugPrint('Successfully fetched & cached ${doctors.length} doctors to Hive.');
             return doctors;
           }
         }
       }
     } catch (e) {
-      debugPrint('ApiService.getDoctors exception: $e.');
+      stopwatch.stop();
+      ApiLogger.logError(
+        requestId: reqId,
+        screen: 'Doctor Catalog View',
+        trigger: 'initState() / Screen Load',
+        functionName: 'getDoctors',
+        method: 'GET',
+        url: doctorsEndpoint,
+        statusCode: 500,
+        errorDetails: e.toString(),
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
     }
 
-    // 3. Network failed: Fallback to existing Hive cache if available
     final fallbackCache = CacheService.get(_doctorsCacheKey);
     if (fallbackCache is List && fallbackCache.isNotEmpty) {
       try {
         final doctors = fallbackCache
             .map((item) => DoctorModel.fromJson(Map<String, dynamic>.from(item as Map)))
             .toList();
-        debugPrint('Fallback: Loaded ${doctors.length} doctors from Hive cache.');
         return doctors;
       } catch (_) {}
     }
 
-    // 4. Default fallback sample doctors
     return getSampleDoctors();
   }
 
-  // Mock Data for Doctors
   static List<DoctorModel> getSampleDoctors() {
     return [
       DoctorModel(
@@ -238,12 +289,10 @@ class ApiService {
     ];
   }
 
-  /// Search or fetch database medicines with Hive caching
   static Future<List<MedicineModel>> searchMedicines({String query = '', bool forceRefresh = false}) async {
     final cleanQuery = query.trim();
     final cacheKey = cleanQuery.isEmpty ? _medicinesCacheKey : '${_medicinesCacheKey}_$cleanQuery';
 
-    // 1. Check local Hive cache
     if (!forceRefresh && !CacheService.isExpired(cacheKey, _cacheTTL)) {
       final cachedData = CacheService.get(cacheKey);
       if (cachedData is List && cachedData.isNotEmpty) {
@@ -251,7 +300,6 @@ class ApiService {
           final items = cachedData
               .map((item) => MedicineModel.fromJson(Map<String, dynamic>.from(item as Map)))
               .toList();
-          debugPrint('Loaded ${items.length} medicines from Hive cache.');
           return items;
         } catch (e) {
           debugPrint('Error parsing Hive cached medicines: $e');
@@ -259,18 +307,38 @@ class ApiService {
       }
     }
 
-    // 2. Fetch fresh data from network API
+    final stopwatch = Stopwatch()..start();
+    final encodedQuery = Uri.encodeComponent(cleanQuery);
+    final url = '$medicinesEndpoint$encodedQuery';
+    final headers = {
+      'Accept': 'application/json',
+      'User-Agent': 'MediSebaApp/1.0',
+    };
+
+    final reqId = ApiLogger.logRequest(
+      screen: 'Medicine Inventory Search',
+      trigger: cleanQuery.isEmpty ? 'initState()' : 'Search Query Input',
+      functionName: 'searchMedicines',
+      isUserAction: cleanQuery.isNotEmpty,
+      method: 'GET',
+      url: url,
+      headers: headers,
+    );
+
     try {
-      final encodedQuery = Uri.encodeComponent(cleanQuery);
-      final url = '$medicinesEndpoint$encodedQuery';
-      debugPrint('Fetching medicines from network API: $url');
       final response = await http.get(
         Uri.parse(url),
-        headers: {
-          'Accept': 'application/json',
-          'User-Agent': 'MediSebaApp/1.0',
-        },
+        headers: headers,
       ).timeout(const Duration(seconds: 6));
+
+      stopwatch.stop();
+
+      ApiLogger.logResponse(
+        requestId: reqId,
+        statusCode: response.statusCode,
+        body: response.body,
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
@@ -279,23 +347,31 @@ class ApiService {
           final items = list.map((item) => MedicineModel.fromJson(item as Map<String, dynamic>)).toList();
           if (items.isNotEmpty) {
             await CacheService.put(cacheKey, list);
-            debugPrint('Successfully fetched & cached ${items.length} medicines to Hive.');
             return items;
           }
         }
       }
     } catch (e) {
-      debugPrint('ApiService.searchMedicines exception: $e');
+      stopwatch.stop();
+      ApiLogger.logError(
+        requestId: reqId,
+        screen: 'Medicine Inventory Search',
+        trigger: cleanQuery.isEmpty ? 'initState()' : 'Search Query Input',
+        functionName: 'searchMedicines',
+        method: 'GET',
+        url: url,
+        statusCode: 500,
+        errorDetails: e.toString(),
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
     }
 
-    // 3. Fallback to existing Hive cache if network fails
     final fallbackCache = CacheService.get(cacheKey);
     if (fallbackCache is List && fallbackCache.isNotEmpty) {
       try {
         final items = fallbackCache
             .map((item) => MedicineModel.fromJson(Map<String, dynamic>.from(item as Map)))
             .toList();
-        debugPrint('Fallback: Loaded ${items.length} medicines from Hive cache.');
         return items;
       } catch (_) {}
     }
@@ -303,18 +379,39 @@ class ApiService {
     return [];
   }
 
-  /// Fetch Admin Dashboard metrics
   static Future<Map<String, dynamic>?> getAdminDashboard(String token) async {
+    final stopwatch = Stopwatch()..start();
+    const url = 'https://api.mediseba.org/api/v1/admin/dashboard';
+    final headers = {
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
+      'User-Agent': 'MediSebaApp/1.0',
+    };
+
+    final reqId = ApiLogger.logRequest(
+      screen: 'Admin Dashboard View',
+      trigger: 'initState() / Refresh',
+      functionName: 'getAdminDashboard',
+      isUserAction: false,
+      method: 'GET',
+      url: url,
+      headers: headers,
+    );
+
     try {
-      debugPrint('Fetching admin dashboard data from API...');
       final response = await http.get(
-        Uri.parse('https://api.mediseba.org/api/v1/admin/dashboard'),
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $token',
-          'User-Agent': 'MediSebaApp/1.0',
-        },
+        Uri.parse(url),
+        headers: headers,
       ).timeout(const Duration(seconds: 8));
+
+      stopwatch.stop();
+
+      ApiLogger.logResponse(
+        requestId: reqId,
+        statusCode: response.statusCode,
+        body: response.body,
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
@@ -323,32 +420,58 @@ class ApiService {
         }
       }
     } catch (e) {
-      debugPrint('ApiService.getAdminDashboard exception: $e');
+      stopwatch.stop();
+      ApiLogger.logError(
+        requestId: reqId,
+        screen: 'Admin Dashboard View',
+        trigger: 'initState() / Refresh',
+        functionName: 'getAdminDashboard',
+        method: 'GET',
+        url: url,
+        statusCode: 500,
+        errorDetails: e.toString(),
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
     }
     return null;
   }
 
-  /// 1. Fetch Sales Agents list
   static Future<List<Map<String, dynamic>>?> getSalesAgents({String? role, required String token}) async {
-    try {
-      String url = 'https://api.mediseba.org/api/v1/sales-agents';
-      if (role != null && role.isNotEmpty) {
-        url += '?role=$role';
-      }
-      debugPrint('🚀 [API REQ] GET: $url');
-      debugPrint('Headers: {"Authorization": "Bearer $token"}');
+    final stopwatch = Stopwatch()..start();
+    String url = 'https://api.mediseba.org/api/v1/sales-agents';
+    if (role != null && role.isNotEmpty) {
+      url += '?role=$role';
+    }
+    final headers = {
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
+      'User-Agent': 'MediSebaApp/1.0',
+    };
 
+    final reqId = ApiLogger.logRequest(
+      screen: 'Admin Sales Agents View',
+      trigger: 'initState() / Filter Role',
+      functionName: 'getSalesAgents',
+      isUserAction: role != null,
+      method: 'GET',
+      url: url,
+      headers: headers,
+    );
+
+    try {
       final response = await http.get(
         Uri.parse(url),
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $token',
-          'User-Agent': 'MediSebaApp/1.0',
-        },
+        headers: headers,
       ).timeout(const Duration(seconds: 8));
 
-      debugPrint('👈 [API RES] STATUS: ${response.statusCode}');
-      debugPrint('👈 [API RES] BODY: ${response.body}');
+      stopwatch.stop();
+
+      ApiLogger.logResponse(
+        requestId: reqId,
+        statusCode: response.statusCode,
+        body: response.body,
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
@@ -358,29 +481,55 @@ class ApiService {
         }
       }
     } catch (e) {
-      debugPrint('❌ ApiService.getSalesAgents exception: $e');
+      stopwatch.stop();
+      ApiLogger.logError(
+        requestId: reqId,
+        screen: 'Admin Sales Agents View',
+        trigger: 'initState() / Filter Role',
+        functionName: 'getSalesAgents',
+        method: 'GET',
+        url: url,
+        statusCode: 500,
+        errorDetails: e.toString(),
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
     }
     return null;
   }
 
-  /// 2. Fetch Supervisors dropdown list
   static Future<List<Map<String, dynamic>>?> getSupervisors(String token) async {
-    try {
-      const url = 'https://api.mediseba.org/api/v1/sales-agents/supervisors';
-      debugPrint('🚀 [API REQ] GET: $url');
-      debugPrint('Headers: {"Authorization": "Bearer $token"}');
+    final stopwatch = Stopwatch()..start();
+    const url = 'https://api.mediseba.org/api/v1/sales-agents/supervisors';
+    final headers = {
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
+      'User-Agent': 'MediSebaApp/1.0',
+    };
 
+    final reqId = ApiLogger.logRequest(
+      screen: 'Supervisors List',
+      trigger: 'Dropdown Init',
+      functionName: 'getSupervisors',
+      isUserAction: false,
+      method: 'GET',
+      url: url,
+      headers: headers,
+    );
+
+    try {
       final response = await http.get(
         Uri.parse(url),
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $token',
-          'User-Agent': 'MediSebaApp/1.0',
-        },
+        headers: headers,
       ).timeout(const Duration(seconds: 8));
 
-      debugPrint('👈 [API RES] STATUS: ${response.statusCode}');
-      debugPrint('👈 [API RES] BODY: ${response.body}');
+      stopwatch.stop();
+
+      ApiLogger.logResponse(
+        requestId: reqId,
+        statusCode: response.statusCode,
+        body: response.body,
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
@@ -390,12 +539,22 @@ class ApiService {
         }
       }
     } catch (e) {
-      debugPrint('❌ ApiService.getSupervisors exception: $e');
+      stopwatch.stop();
+      ApiLogger.logError(
+        requestId: reqId,
+        screen: 'Supervisors List',
+        trigger: 'Dropdown Init',
+        functionName: 'getSupervisors',
+        method: 'GET',
+        url: url,
+        statusCode: 500,
+        errorDetails: e.toString(),
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
     }
     return null;
   }
 
-  /// 3. Create a new Sales Agent
   static Future<bool> createSalesAgent({
     required String name,
     required String email,
@@ -405,234 +564,306 @@ class ApiService {
     int? supervisorId,
     required String token,
   }) async {
+    final stopwatch = Stopwatch()..start();
+    const url = 'https://api.mediseba.org/api/v1/sales-agents';
+    final payload = {
+      'name': name,
+      'email': email,
+      'phone': phone,
+      'password': password,
+      'role': role,
+      if (supervisorId != null) 'supervisor_id': supervisorId,
+    };
+    final headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+      'User-Agent': 'MediSebaApp/1.0',
+    };
+
+    final reqId = ApiLogger.logRequest(
+      screen: 'Create Sales Agent Form',
+      trigger: 'Create Agent Button',
+      functionName: 'createSalesAgent',
+      isUserAction: true,
+      method: 'POST',
+      url: url,
+      headers: headers,
+      body: payload,
+    );
+
     try {
-      const url = 'https://api.mediseba.org/api/v1/sales-agents';
-      final payload = {
-        'name': name,
-        'email': email,
-        'phone': phone,
-        'password': password,
-        'role': role,
-        if (supervisorId != null) 'supervisor_id': supervisorId,
-      };
-
-      debugPrint('🚀 [API REQ] POST: $url');
-      debugPrint('Headers: {"Authorization": "Bearer $token"}');
-      debugPrint('Body: ${jsonEncode(payload)}');
-
       final response = await http.post(
         Uri.parse(url),
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-          'User-Agent': 'MediSebaApp/1.0',
-        },
+        headers: headers,
         body: jsonEncode(payload),
       ).timeout(const Duration(seconds: 8));
 
-      debugPrint('👈 [API RES] STATUS: ${response.statusCode}');
-      debugPrint('👈 [API RES] BODY: ${response.body}');
+      stopwatch.stop();
+
+      ApiLogger.logResponse(
+        requestId: reqId,
+        statusCode: response.statusCode,
+        body: response.body,
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final Map<String, dynamic> body = jsonDecode(response.body);
         return body['success'] == true || body['status'] == 'success';
       }
     } catch (e) {
-      debugPrint('❌ ApiService.createSalesAgent exception: $e');
+      stopwatch.stop();
+      ApiLogger.logError(
+        requestId: reqId,
+        screen: 'Create Sales Agent Form',
+        trigger: 'Create Agent Button',
+        functionName: 'createSalesAgent',
+        method: 'POST',
+        url: url,
+        statusCode: 500,
+        errorDetails: e.toString(),
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
     }
     return false;
   }
 
-  /// 4. Assign or change supervisor
   static Future<bool> assignSupervisor({
     required int userId,
     required int supervisorId,
     required String token,
   }) async {
+    final stopwatch = Stopwatch()..start();
+    final url = 'https://api.mediseba.org/api/v1/sales-agents/$userId/assign-supervisor';
+    final payload = {
+      'supervisor_id': supervisorId,
+    };
+    final headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+      'User-Agent': 'MediSebaApp/1.0',
+    };
+
+    final reqId = ApiLogger.logRequest(
+      screen: 'Sales Agent Details',
+      trigger: 'Assign Supervisor Button',
+      functionName: 'assignSupervisor',
+      isUserAction: true,
+      method: 'PATCH',
+      url: url,
+      headers: headers,
+      body: payload,
+    );
+
     try {
-      final url = 'https://api.mediseba.org/api/v1/sales-agents/$userId/assign-supervisor';
-      final payload = {
-        'supervisor_id': supervisorId,
-      };
-
-      debugPrint('🚀 [API REQ] PATCH: $url');
-      debugPrint('Headers: {"Authorization": "Bearer $token"}');
-      debugPrint('Body: ${jsonEncode(payload)}');
-
       final response = await http.patch(
         Uri.parse(url),
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-          'User-Agent': 'MediSebaApp/1.0',
-        },
+        headers: headers,
         body: jsonEncode(payload),
       ).timeout(const Duration(seconds: 8));
 
-      debugPrint('👈 [API RES] STATUS: ${response.statusCode}');
-      debugPrint('👈 [API RES] BODY: ${response.body}');
+      stopwatch.stop();
+
+      ApiLogger.logResponse(
+        requestId: reqId,
+        statusCode: response.statusCode,
+        body: response.body,
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
         return body['success'] == true || body['status'] == 'success';
       }
     } catch (e) {
-      debugPrint('❌ ApiService.assignSupervisor exception: $e');
+      stopwatch.stop();
+      ApiLogger.logError(
+        requestId: reqId,
+        screen: 'Sales Agent Details',
+        trigger: 'Assign Supervisor Button',
+        functionName: 'assignSupervisor',
+        method: 'PATCH',
+        url: url,
+        statusCode: 500,
+        errorDetails: e.toString(),
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
     }
     return false;
   }
 
-  /// 5. Update agent role/promotion
   static Future<bool> updateAgentRole({
     required int userId,
     required String role,
     required String token,
   }) async {
+    final stopwatch = Stopwatch()..start();
+    final url = 'https://api.mediseba.org/api/v1/sales-agents/$userId/role';
+    final payload = {
+      'role': role,
+    };
+    final headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+      'User-Agent': 'MediSebaApp/1.0',
+    };
+
+    final reqId = ApiLogger.logRequest(
+      screen: 'Sales Agent Details',
+      trigger: 'Update Role Button',
+      functionName: 'updateAgentRole',
+      isUserAction: true,
+      method: 'PATCH',
+      url: url,
+      headers: headers,
+      body: payload,
+    );
+
     try {
-      final url = 'https://api.mediseba.org/api/v1/sales-agents/$userId/role';
-      final payload = {
-        'role': role,
-      };
-
-      debugPrint('🚀 [API REQ] PATCH: $url');
-      debugPrint('Headers: {"Authorization": "Bearer $token"}');
-      debugPrint('Body: ${jsonEncode(payload)}');
-
       final response = await http.patch(
         Uri.parse(url),
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-          'User-Agent': 'MediSebaApp/1.0',
-        },
+        headers: headers,
         body: jsonEncode(payload),
       ).timeout(const Duration(seconds: 8));
 
-      debugPrint('👈 [API RES] STATUS: ${response.statusCode}');
-      debugPrint('👈 [API RES] BODY: ${response.body}');
+      stopwatch.stop();
+
+      ApiLogger.logResponse(
+        requestId: reqId,
+        statusCode: response.statusCode,
+        body: response.body,
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
         return body['success'] == true || body['status'] == 'success';
       }
     } catch (e) {
-      debugPrint('❌ ApiService.updateAgentRole exception: $e');
+      stopwatch.stop();
+      ApiLogger.logError(
+        requestId: reqId,
+        screen: 'Sales Agent Details',
+        trigger: 'Update Role Button',
+        functionName: 'updateAgentRole',
+        method: 'PATCH',
+        url: url,
+        statusCode: 500,
+        errorDetails: e.toString(),
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
     }
     return false;
   }
 
-  /// 6. Delete Sales Agent
   static Future<bool> deleteSalesAgent({
     required int userId,
     required String token,
   }) async {
+    final stopwatch = Stopwatch()..start();
+    const url = 'https://api.mediseba.org/api/v1/sales-agents';
+    final payload = {
+      'user_id': userId,
+    };
+    final headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+      'User-Agent': 'MediSebaApp/1.0',
+    };
+
+    final reqId = ApiLogger.logRequest(
+      screen: 'Sales Agent Management',
+      trigger: 'Delete Agent Button',
+      functionName: 'deleteSalesAgent',
+      isUserAction: true,
+      method: 'DELETE',
+      url: url,
+      headers: headers,
+      body: payload,
+    );
+
     try {
-      const url = 'https://api.mediseba.org/api/v1/sales-agents';
-      final payload = {
-        'user_id': userId,
-      };
-
-      debugPrint('🚀 [API REQ] DELETE: $url');
-      debugPrint('Headers: {"Authorization": "Bearer $token"}');
-      debugPrint('Body: ${jsonEncode(payload)}');
-
       final response = await http.delete(
         Uri.parse(url),
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-          'User-Agent': 'MediSebaApp/1.0',
-        },
+        headers: headers,
         body: jsonEncode(payload),
       ).timeout(const Duration(seconds: 8));
 
-      debugPrint('👈 [API RES] STATUS: ${response.statusCode}');
-      debugPrint('👈 [API RES] BODY: ${response.body}');
+      stopwatch.stop();
+
+      ApiLogger.logResponse(
+        requestId: reqId,
+        statusCode: response.statusCode,
+        body: response.body,
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
         return body['success'] == true || body['status'] == 'success';
       }
     } catch (e) {
-      debugPrint('❌ ApiService.deleteSalesAgent exception: $e');
+      stopwatch.stop();
+      ApiLogger.logError(
+        requestId: reqId,
+        screen: 'Sales Agent Management',
+        trigger: 'Delete Agent Button',
+        functionName: 'deleteSalesAgent',
+        method: 'DELETE',
+        url: url,
+        statusCode: 500,
+        errorDetails: e.toString(),
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
     }
     return false;
   }
 
-  /// 7. HBP Field Agent Patient Registration
-  static Future<bool> hbpRegisterPatient({
-    required String name,
-    required String phone,
-    required int age,
-    required String gender,
-    required String token,
-  }) async {
-    try {
-      const url = 'https://api.mediseba.org/api/v1/hbp/register-patient';
-      final payload = {
-        'name': name,
-        'phone': phone,
-        'age': age,
-        'gender': gender,
-      };
-
-      debugPrint('🚀 [API REQ] POST: $url');
-      debugPrint('Headers: {"Authorization": "Bearer $token"}');
-      debugPrint('Body: ${jsonEncode(payload)}');
-
-      final response = await http.post(
-        Uri.parse(url),
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-          'User-Agent': 'MediSebaApp/1.0',
-        },
-        body: jsonEncode(payload),
-      ).timeout(const Duration(seconds: 8));
-
-      debugPrint('👈 [API RES] STATUS: ${response.statusCode}');
-      debugPrint('👈 [API RES] BODY: ${response.body}');
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final Map<String, dynamic> body = jsonDecode(response.body);
-        return body['success'] == true || body['status'] == 'success';
-      }
-    } catch (e) {
-      debugPrint('❌ ApiService.hbpRegisterPatient exception: $e');
-    }
-    return false;
-  }
-
-  /// 8. Get Admin Doctors List
   static Future<List<Map<String, dynamic>>> getAdminDoctors({
     required String token,
     String? search,
     int page = 1,
     int perPage = 15,
   }) async {
-    try {
-      String url = 'https://api.mediseba.org/api/v1/admin/doctors?page=$page&per_page=$perPage';
-      if (search != null && search.trim().isNotEmpty) {
-        url += '&search=${Uri.encodeComponent(search.trim())}';
-      }
+    final stopwatch = Stopwatch()..start();
+    String url = 'https://api.mediseba.org/api/v1/admin/doctors?page=$page&per_page=$perPage';
+    if (search != null && search.trim().isNotEmpty) {
+      url += '&search=${Uri.encodeComponent(search.trim())}';
+    }
+    final headers = {
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
+      'User-Agent': 'MediSebaApp/1.0',
+    };
 
-      debugPrint('🚀 [API REQ] GET: $url');
+    final reqId = ApiLogger.logRequest(
+      screen: 'Admin Doctors Management',
+      trigger: search != null ? 'Search Input' : 'initState()',
+      functionName: 'getAdminDoctors',
+      isUserAction: search != null,
+      method: 'GET',
+      url: url,
+      headers: headers,
+    );
+
+    try {
       final response = await http.get(
         Uri.parse(url),
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $token',
-          'User-Agent': 'MediSebaApp/1.0',
-        },
+        headers: headers,
       ).timeout(const Duration(seconds: 8));
 
-      debugPrint('👈 [API RES] STATUS: ${response.statusCode}');
-      debugPrint('👈 [API RES] BODY: ${response.body}');
+      stopwatch.stop();
+
+      ApiLogger.logResponse(
+        requestId: reqId,
+        statusCode: response.statusCode,
+        body: response.body,
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
@@ -643,106 +874,198 @@ class ApiService {
         }
       }
     } catch (e) {
-      debugPrint('❌ ApiService.getAdminDoctors exception: $e');
+      stopwatch.stop();
+      ApiLogger.logError(
+        requestId: reqId,
+        screen: 'Admin Doctors Management',
+        trigger: 'initState()',
+        functionName: 'getAdminDoctors',
+        method: 'GET',
+        url: url,
+        statusCode: 500,
+        errorDetails: e.toString(),
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
     }
     return [];
   }
 
-  /// 9. Create Admin Doctor
   static Future<bool> createAdminDoctor({
     required String token,
     required Map<String, dynamic> payload,
   }) async {
-    try {
-      const url = 'https://api.mediseba.org/api/v1/admin/doctors';
-      debugPrint('🚀 [API REQ] POST: $url');
-      debugPrint('Body: ${jsonEncode(payload)}');
+    final stopwatch = Stopwatch()..start();
+    const url = 'https://api.mediseba.org/api/v1/admin/doctors';
+    final headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+      'User-Agent': 'MediSebaApp/1.0',
+    };
 
+    final reqId = ApiLogger.logRequest(
+      screen: 'Admin Doctors Management',
+      trigger: 'Add Doctor Button',
+      functionName: 'createAdminDoctor',
+      isUserAction: true,
+      method: 'POST',
+      url: url,
+      headers: headers,
+      body: payload,
+    );
+
+    try {
       final response = await http.post(
         Uri.parse(url),
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-          'User-Agent': 'MediSebaApp/1.0',
-        },
+        headers: headers,
         body: jsonEncode(payload),
       ).timeout(const Duration(seconds: 8));
 
-      debugPrint('👈 [API RES] STATUS: ${response.statusCode}');
-      debugPrint('👈 [API RES] BODY: ${response.body}');
+      stopwatch.stop();
+
+      ApiLogger.logResponse(
+        requestId: reqId,
+        statusCode: response.statusCode,
+        body: response.body,
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final Map<String, dynamic> body = jsonDecode(response.body);
         return body['success'] == true;
       }
     } catch (e) {
-      debugPrint('❌ ApiService.createAdminDoctor exception: $e');
+      stopwatch.stop();
+      ApiLogger.logError(
+        requestId: reqId,
+        screen: 'Admin Doctors Management',
+        trigger: 'Add Doctor Button',
+        functionName: 'createAdminDoctor',
+        method: 'POST',
+        url: url,
+        statusCode: 500,
+        errorDetails: e.toString(),
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
     }
     return false;
   }
 
-  /// 10. Update Admin Doctor
   static Future<bool> updateAdminDoctor({
     required String token,
     required Map<String, dynamic> payload,
   }) async {
-    try {
-      const url = 'https://api.mediseba.org/api/v1/admin/doctors';
-      debugPrint('🚀 [API REQ] PUT: $url');
-      debugPrint('Body: ${jsonEncode(payload)}');
+    final stopwatch = Stopwatch()..start();
+    const url = 'https://api.mediseba.org/api/v1/admin/doctors';
+    final headers = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+      'User-Agent': 'MediSebaApp/1.0',
+    };
 
+    final reqId = ApiLogger.logRequest(
+      screen: 'Admin Doctors Management',
+      trigger: 'Update Doctor Button',
+      functionName: 'updateAdminDoctor',
+      isUserAction: true,
+      method: 'PUT',
+      url: url,
+      headers: headers,
+      body: payload,
+    );
+
+    try {
       final response = await http.put(
         Uri.parse(url),
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-          'User-Agent': 'MediSebaApp/1.0',
-        },
+        headers: headers,
         body: jsonEncode(payload),
       ).timeout(const Duration(seconds: 8));
 
-      debugPrint('👈 [API RES] STATUS: ${response.statusCode}');
-      debugPrint('👈 [API RES] BODY: ${response.body}');
+      stopwatch.stop();
+
+      ApiLogger.logResponse(
+        requestId: reqId,
+        statusCode: response.statusCode,
+        body: response.body,
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
         return body['success'] == true;
       }
     } catch (e) {
-      debugPrint('❌ ApiService.updateAdminDoctor exception: $e');
+      stopwatch.stop();
+      ApiLogger.logError(
+        requestId: reqId,
+        screen: 'Admin Doctors Management',
+        trigger: 'Update Doctor Button',
+        functionName: 'updateAdminDoctor',
+        method: 'PUT',
+        url: url,
+        statusCode: 500,
+        errorDetails: e.toString(),
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
     }
     return false;
   }
 
-  /// 11. Delete Admin Doctor
   static Future<bool> deleteAdminDoctor({
     required String token,
     required String idOrUuid,
   }) async {
-    try {
-      final url = 'https://api.mediseba.org/api/v1/admin/doctors?id=$idOrUuid';
-      debugPrint('🚀 [API REQ] DELETE: $url');
+    final stopwatch = Stopwatch()..start();
+    final url = 'https://api.mediseba.org/api/v1/admin/doctors?id=$idOrUuid';
+    final headers = {
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
+      'User-Agent': 'MediSebaApp/1.0',
+    };
 
+    final reqId = ApiLogger.logRequest(
+      screen: 'Admin Doctors Management',
+      trigger: 'Delete Doctor Button',
+      functionName: 'deleteAdminDoctor',
+      isUserAction: true,
+      method: 'DELETE',
+      url: url,
+      headers: headers,
+    );
+
+    try {
       final response = await http.delete(
         Uri.parse(url),
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $token',
-          'User-Agent': 'MediSebaApp/1.0',
-        },
+        headers: headers,
       ).timeout(const Duration(seconds: 8));
 
-      debugPrint('👈 [API RES] STATUS: ${response.statusCode}');
-      debugPrint('👈 [API RES] BODY: ${response.body}');
+      stopwatch.stop();
+
+      ApiLogger.logResponse(
+        requestId: reqId,
+        statusCode: response.statusCode,
+        body: response.body,
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
         return body['success'] == true;
       }
     } catch (e) {
-      debugPrint('❌ ApiService.deleteAdminDoctor exception: $e');
+      stopwatch.stop();
+      ApiLogger.logError(
+        requestId: reqId,
+        screen: 'Admin Doctors Management',
+        trigger: 'Delete Doctor Button',
+        functionName: 'deleteAdminDoctor',
+        method: 'DELETE',
+        url: url,
+        statusCode: 500,
+        errorDetails: e.toString(),
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
     }
     return false;
   }
@@ -751,47 +1074,72 @@ class ApiService {
   // 🌐 HBP PORTAL API ENDPOINTS (Developer Documentation Integration)
   // ===========================================================================
 
-  /// 1️⃣ Fetch HBP Dashboard Metrics & Sales History
   static Future<Map<String, dynamic>?> fetchHbpMetrics(String token) async {
-    try {
-      // 1. Try primary endpoint: /hbp/metrics
-      var url = '$baseUrl/hbp/metrics';
-      debugPrint('🚀 [API REQ] GET HBP Metrics: $url');
+    final stopwatch = Stopwatch()..start();
+    var url = '$baseUrl/hbp/metrics';
+    final headers = {
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
+      'User-Agent': 'MediSebaApp/1.0',
+    };
 
+    final reqId = ApiLogger.logRequest(
+      screen: 'HBP Agent Dashboard',
+      trigger: 'initState() / Metrics Sync',
+      functionName: 'fetchHbpMetrics',
+      isUserAction: false,
+      method: 'GET',
+      url: url,
+      headers: headers,
+    );
+
+    try {
       var response = await http.get(
         Uri.parse(url),
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $token',
-          'User-Agent': 'MediSebaApp/1.0',
-        },
+        headers: headers,
       ).timeout(const Duration(seconds: 8));
 
-      debugPrint('👈 [API RES] HBP Metrics STATUS: ${response.statusCode}');
-      debugPrint('👈 [API RES] HBP Metrics BODY: ${response.body}');
+      stopwatch.stop();
 
       if (response.statusCode == 200) {
+        ApiLogger.logResponse(
+          requestId: reqId,
+          statusCode: response.statusCode,
+          body: response.body,
+          durationMs: stopwatch.elapsedMilliseconds,
+        );
         final Map<String, dynamic> body = jsonDecode(response.body);
         if (body['status'] == 'success' || body['success'] == true) {
           return body['data'] as Map<String, dynamic>?;
         }
       }
 
-      // 2. Try fallback endpoint: /hbp/dashboard (as noted in developer documentation)
+      // Try fallback endpoint: /hbp/dashboard
       url = '$baseUrl/hbp/dashboard';
-      debugPrint('🚀 [API REQ] GET HBP Dashboard (Fallback): $url');
+      final fallbackStopwatch = Stopwatch()..start();
+      final fallbackReqId = ApiLogger.logRequest(
+        screen: 'HBP Agent Dashboard (Fallback)',
+        trigger: 'Primary Endpoint Failed (500)',
+        functionName: 'fetchHbpMetricsFallback',
+        isUserAction: false,
+        method: 'GET',
+        url: url,
+        headers: headers,
+      );
 
       response = await http.get(
         Uri.parse(url),
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $token',
-          'User-Agent': 'MediSebaApp/1.0',
-        },
+        headers: headers,
       ).timeout(const Duration(seconds: 8));
 
-      debugPrint('👈 [API RES] HBP Dashboard STATUS: ${response.statusCode}');
-      debugPrint('👈 [API RES] HBP Dashboard BODY: ${response.body}');
+      fallbackStopwatch.stop();
+
+      ApiLogger.logResponse(
+        requestId: fallbackReqId,
+        statusCode: response.statusCode,
+        body: response.body,
+        durationMs: fallbackStopwatch.elapsedMilliseconds,
+      );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
@@ -800,12 +1148,22 @@ class ApiService {
         }
       }
     } catch (e) {
-      debugPrint('❌ ApiService.fetchHbpMetrics exception: $e');
+      stopwatch.stop();
+      ApiLogger.logError(
+        requestId: reqId,
+        screen: 'HBP Agent Dashboard',
+        trigger: 'initState() / Metrics Sync',
+        functionName: 'fetchHbpMetrics',
+        method: 'GET',
+        url: url,
+        statusCode: 500,
+        errorDetails: e.toString(),
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
     }
     return null;
   }
 
-  /// 2️⃣ Register New Patient Account by HBP Field Agent
   static Future<Map<String, dynamic>> registerPatientByHbp({
     required String token,
     required String name,
@@ -815,33 +1173,49 @@ class ApiService {
     required String packageId,
     required String paymentMethod,
   }) async {
+    final stopwatch = Stopwatch()..start();
+    final url = '$baseUrl/hbp/register-patient';
+    final payload = {
+      'name': name,
+      'phone': phone,
+      'password': password,
+      if (email != null && email.isNotEmpty) 'email': email,
+      'package_id': packageId,
+      'payment_method': paymentMethod,
+    };
+    final headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
+      'User-Agent': 'MediSebaApp/1.0',
+    };
+
+    final reqId = ApiLogger.logRequest(
+      screen: 'HBP Register Customer Dialog',
+      trigger: 'অ্যাকাউন্ট ও প্যাকেজ নিশ্চিত করুন',
+      functionName: 'registerPatientByHbp',
+      isUserAction: true,
+      method: 'POST',
+      url: url,
+      headers: headers,
+      body: payload,
+    );
+
     try {
-      final url = '$baseUrl/hbp/register-patient';
-      final payload = {
-        'name': name,
-        'phone': phone,
-        'password': password,
-        if (email != null && email.isNotEmpty) 'email': email,
-        'package_id': packageId,
-        'payment_method': paymentMethod,
-      };
-
-      debugPrint('🚀 [API REQ] POST HBP Register Patient: $url');
-      debugPrint('👉 PAYLOAD: ${jsonEncode(payload)}');
-
       final response = await http.post(
         Uri.parse(url),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $token',
-          'User-Agent': 'MediSebaApp/1.0',
-        },
+        headers: headers,
         body: jsonEncode(payload),
       ).timeout(const Duration(seconds: 10));
 
-      debugPrint('👈 [API RES] HBP Register STATUS: ${response.statusCode}');
-      debugPrint('👈 [API RES] HBP Register BODY: ${response.body}');
+      stopwatch.stop();
+
+      ApiLogger.logResponse(
+        requestId: reqId,
+        statusCode: response.statusCode,
+        body: response.body,
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
 
       final Map<String, dynamic> body = jsonDecode(response.body);
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -857,7 +1231,18 @@ class ApiService {
         };
       }
     } catch (e) {
-      debugPrint('❌ ApiService.registerPatientByHbp exception: $e');
+      stopwatch.stop();
+      ApiLogger.logError(
+        requestId: reqId,
+        screen: 'HBP Register Customer Dialog',
+        trigger: 'অ্যাকাউন্ট ও প্যাকেজ নিশ্চিত করুন',
+        functionName: 'registerPatientByHbp',
+        method: 'POST',
+        url: url,
+        statusCode: 500,
+        errorDetails: e.toString(),
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
       return {
         'success': false,
         'message': 'নেটওয়ার্ক ত্রুটি: $e',
@@ -865,19 +1250,38 @@ class ApiService {
     }
   }
 
-  /// 3️⃣ Fetch Health Packages List
   static Future<List<Map<String, dynamic>>> fetchHealthPackages() async {
-    try {
-      final url = '$baseUrl/packages';
-      debugPrint('🚀 [API REQ] GET Packages: $url');
+    final stopwatch = Stopwatch()..start();
+    final url = '$baseUrl/packages';
+    final headers = {
+      'Accept': 'application/json',
+      'User-Agent': 'MediSebaApp/1.0',
+    };
 
+    final reqId = ApiLogger.logRequest(
+      screen: 'Health Packages List',
+      trigger: 'initState() / Dialog Load',
+      functionName: 'fetchHealthPackages',
+      isUserAction: false,
+      method: 'GET',
+      url: url,
+      headers: headers,
+    );
+
+    try {
       final response = await http.get(
         Uri.parse(url),
-        headers: {
-          'Accept': 'application/json',
-          'User-Agent': 'MediSebaApp/1.0',
-        },
+        headers: headers,
       ).timeout(const Duration(seconds: 8));
+
+      stopwatch.stop();
+
+      ApiLogger.logResponse(
+        requestId: reqId,
+        statusCode: response.statusCode,
+        body: response.body,
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
@@ -886,29 +1290,72 @@ class ApiService {
         }
       }
     } catch (e) {
-      debugPrint('❌ ApiService.fetchHealthPackages exception: $e');
+      stopwatch.stop();
+      ApiLogger.logError(
+        requestId: reqId,
+        screen: 'Health Packages List',
+        trigger: 'initState() / Dialog Load',
+        functionName: 'fetchHealthPackages',
+        method: 'GET',
+        url: url,
+        statusCode: 500,
+        errorDetails: e.toString(),
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
     }
     return [];
   }
 
-  /// 4️⃣ Fetch HBP Agent Profile
   static Future<Map<String, dynamic>?> fetchHbpProfile(String token) async {
+    final stopwatch = Stopwatch()..start();
+    final url = '$baseUrl/user/profile';
+    final headers = {
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    final reqId = ApiLogger.logRequest(
+      screen: 'HBP Agent Profile View',
+      trigger: 'initState() / Drawer Sync',
+      functionName: 'fetchHbpProfile',
+      isUserAction: false,
+      method: 'GET',
+      url: url,
+      headers: headers,
+    );
+
     try {
-      final url = '$baseUrl/user/profile';
       final response = await http.get(
         Uri.parse(url),
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
+        headers: headers,
       ).timeout(const Duration(seconds: 8));
+
+      stopwatch.stop();
+
+      ApiLogger.logResponse(
+        requestId: reqId,
+        statusCode: response.statusCode,
+        body: response.body,
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
         return body['data'] as Map<String, dynamic>?;
       }
     } catch (e) {
-      debugPrint('❌ ApiService.fetchHbpProfile exception: $e');
+      stopwatch.stop();
+      ApiLogger.logError(
+        requestId: reqId,
+        screen: 'HBP Agent Profile View',
+        trigger: 'initState() / Drawer Sync',
+        functionName: 'fetchHbpProfile',
+        method: 'GET',
+        url: url,
+        statusCode: 500,
+        errorDetails: e.toString(),
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
     }
     return null;
   }

@@ -2,23 +2,21 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/geo_models.dart';
 import '../services/cache_service.dart';
+import '../utils/api_logger.dart';
 
 class GeoRepository {
   static const String baseUrl = 'https://geo-bd-apis.onrender.com/api';
   static const Duration _geoTTL = Duration(days: 7);
 
-  // Memory Cache
   List<GeoDivision>? _cachedDivisions;
   final Map<int, List<GeoDistrict>> _cachedDistricts = {};
   final Map<int, List<GeoUpazila>> _cachedUpazilas = {};
   final Map<int, List<GeoUnion>> _cachedUnions = {};
 
-  // Fetch Divisions
   Future<List<GeoDivision>> getDivisions() async {
     if (_cachedDivisions != null) return _cachedDivisions!;
 
-    // Try Hive cache
-    final cacheKey = 'geo_divisions';
+    const cacheKey = 'geo_divisions';
     if (!CacheService.isExpired(cacheKey, _geoTTL)) {
       final cached = CacheService.get(cacheKey);
       if (cached is List && cached.isNotEmpty) {
@@ -27,8 +25,28 @@ class GeoRepository {
       }
     }
 
+    final stopwatch = Stopwatch()..start();
+    const url = '$baseUrl/divisions';
+    final reqId = ApiLogger.logRequest(
+      screen: 'Location Selector',
+      trigger: 'Division Dropdown Load',
+      functionName: 'getDivisions',
+      isUserAction: false,
+      method: 'GET',
+      url: url,
+    );
+
     try {
-      final response = await http.get(Uri.parse('$baseUrl/divisions'));
+      final response = await http.get(Uri.parse(url));
+      stopwatch.stop();
+
+      ApiLogger.logResponse(
+        requestId: reqId,
+        statusCode: response.statusCode,
+        body: response.body,
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
+
       if (response.statusCode == 200) {
         final parsed = json.decode(response.body);
         final List data = parsed is List ? parsed : (parsed['data'] ?? parsed['divisions'] ?? []);
@@ -36,9 +54,21 @@ class GeoRepository {
         await CacheService.put(cacheKey, data);
         return _cachedDivisions!;
       }
-    } catch (_) {}
+    } catch (e) {
+      stopwatch.stop();
+      ApiLogger.logError(
+        requestId: reqId,
+        screen: 'Location Selector',
+        trigger: 'Division Dropdown Load',
+        functionName: 'getDivisions',
+        method: 'GET',
+        url: url,
+        statusCode: 500,
+        errorDetails: e.toString(),
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
+    }
 
-    // Fallback to Hive cache even if expired
     final cached = CacheService.get(cacheKey);
     if (cached is List && cached.isNotEmpty) {
       _cachedDivisions = cached.map((e) => GeoDivision.fromJson(Map<String, dynamic>.from(e as Map))).toList();
@@ -48,7 +78,6 @@ class GeoRepository {
     throw Exception('Network error loading divisions');
   }
 
-  // Fetch Districts by Division ID
   Future<List<GeoDistrict>> getDistricts(int divisionId) async {
     if (_cachedDistricts.containsKey(divisionId)) {
       return _cachedDistricts[divisionId]!;
@@ -64,8 +93,28 @@ class GeoRepository {
       }
     }
 
+    final stopwatch = Stopwatch()..start();
+    final url = '$baseUrl/districts?division_id=$divisionId';
+    final reqId = ApiLogger.logRequest(
+      screen: 'Location Selector',
+      trigger: 'Division Selection',
+      functionName: 'getDistricts',
+      isUserAction: true,
+      method: 'GET',
+      url: url,
+    );
+
     try {
-      final response = await http.get(Uri.parse('$baseUrl/districts?division_id=$divisionId'));
+      final response = await http.get(Uri.parse(url));
+      stopwatch.stop();
+
+      ApiLogger.logResponse(
+        requestId: reqId,
+        statusCode: response.statusCode,
+        body: response.body,
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
+
       if (response.statusCode == 200) {
         final parsed = json.decode(response.body);
         final List data = parsed is List ? parsed : (parsed['data'] ?? parsed['districts'] ?? []);
@@ -74,7 +123,20 @@ class GeoRepository {
         await CacheService.put(cacheKey, data);
         return districts;
       }
-    } catch (_) {}
+    } catch (e) {
+      stopwatch.stop();
+      ApiLogger.logError(
+        requestId: reqId,
+        screen: 'Location Selector',
+        trigger: 'Division Selection',
+        functionName: 'getDistricts',
+        method: 'GET',
+        url: url,
+        statusCode: 500,
+        errorDetails: e.toString(),
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
+    }
 
     final cached = CacheService.get(cacheKey);
     if (cached is List && cached.isNotEmpty) {
@@ -86,7 +148,6 @@ class GeoRepository {
     throw Exception('Network error loading districts');
   }
 
-  // Fetch Upazilas by District ID
   Future<List<GeoUpazila>> getUpazilas(int districtId) async {
     if (_cachedUpazilas.containsKey(districtId)) {
       return _cachedUpazilas[districtId]!;
@@ -102,8 +163,28 @@ class GeoRepository {
       }
     }
 
+    final stopwatch = Stopwatch()..start();
+    final url = '$baseUrl/upazilas?district_id=$districtId';
+    final reqId = ApiLogger.logRequest(
+      screen: 'Location Selector',
+      trigger: 'District Selection',
+      functionName: 'getUpazilas',
+      isUserAction: true,
+      method: 'GET',
+      url: url,
+    );
+
     try {
-      final response = await http.get(Uri.parse('$baseUrl/upazilas?district_id=$districtId'));
+      final response = await http.get(Uri.parse(url));
+      stopwatch.stop();
+
+      ApiLogger.logResponse(
+        requestId: reqId,
+        statusCode: response.statusCode,
+        body: response.body,
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
+
       if (response.statusCode == 200) {
         final parsed = json.decode(response.body);
         final List data = parsed is List ? parsed : (parsed['data'] ?? parsed['upazilas'] ?? []);
@@ -112,7 +193,20 @@ class GeoRepository {
         await CacheService.put(cacheKey, data);
         return upazilas;
       }
-    } catch (_) {}
+    } catch (e) {
+      stopwatch.stop();
+      ApiLogger.logError(
+        requestId: reqId,
+        screen: 'Location Selector',
+        trigger: 'District Selection',
+        functionName: 'getUpazilas',
+        method: 'GET',
+        url: url,
+        statusCode: 500,
+        errorDetails: e.toString(),
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
+    }
 
     final cached = CacheService.get(cacheKey);
     if (cached is List && cached.isNotEmpty) {
@@ -124,7 +218,6 @@ class GeoRepository {
     throw Exception('Network error loading upazilas');
   }
 
-  // Fetch Unions by Upazila ID
   Future<List<GeoUnion>> getUnions(int upazilaId) async {
     if (_cachedUnions.containsKey(upazilaId)) {
       return _cachedUnions[upazilaId]!;
@@ -140,8 +233,28 @@ class GeoRepository {
       }
     }
 
+    final stopwatch = Stopwatch()..start();
+    final url = '$baseUrl/unions?upazila_id=$upazilaId';
+    final reqId = ApiLogger.logRequest(
+      screen: 'Location Selector',
+      trigger: 'Upazila Selection',
+      functionName: 'getUnions',
+      isUserAction: true,
+      method: 'GET',
+      url: url,
+    );
+
     try {
-      final response = await http.get(Uri.parse('$baseUrl/unions?upazila_id=$upazilaId'));
+      final response = await http.get(Uri.parse(url));
+      stopwatch.stop();
+
+      ApiLogger.logResponse(
+        requestId: reqId,
+        statusCode: response.statusCode,
+        body: response.body,
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
+
       if (response.statusCode == 200) {
         final parsed = json.decode(response.body);
         final List data = parsed is List ? parsed : (parsed['data'] ?? parsed['unions'] ?? []);
@@ -150,7 +263,20 @@ class GeoRepository {
         await CacheService.put(cacheKey, data);
         return unions;
       }
-    } catch (_) {}
+    } catch (e) {
+      stopwatch.stop();
+      ApiLogger.logError(
+        requestId: reqId,
+        screen: 'Location Selector',
+        trigger: 'Upazila Selection',
+        functionName: 'getUnions',
+        method: 'GET',
+        url: url,
+        statusCode: 500,
+        errorDetails: e.toString(),
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
+    }
 
     final cached = CacheService.get(cacheKey);
     if (cached is List && cached.isNotEmpty) {

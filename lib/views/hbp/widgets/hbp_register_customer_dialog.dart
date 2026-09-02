@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../services/api_service.dart';
+import '../../../services/cache_service.dart';
 
 class HbpRegisterCustomerDialog extends StatefulWidget {
   final Function(Map<String, dynamic> newCustomer) onCustomerAdded;
@@ -107,12 +109,27 @@ class _HbpRegisterCustomerDialogState extends State<HbpRegisterCustomerDialog> {
 
     final name = _nameController.text.trim();
     final phone = _phoneController.text.trim();
+    final password = _passwordController.text.trim();
+    final email = _emailController.text.trim();
+
+    final token = CacheService.get('auth_token')?.toString() ?? '';
+
+    // Call official backend API: POST /hbp/register-patient
+    final res = await ApiService.registerPatientByHbp(
+      token: token,
+      name: name,
+      phone: phone,
+      password: password,
+      email: email.isNotEmpty ? email : null,
+      packageId: _selectedPackageId,
+      paymentMethod: _selectedPaymentMethodId,
+    );
 
     final newCustomer = {
-      'id': 'REG-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}',
+      'id': res['data']?['id']?.toString() ?? 'REG-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}',
       'name': name,
       'phone': phone,
-      'email': _emailController.text.trim(),
+      'email': email,
       'package': _selectedPackageName,
       'price': _packagePrice,
       'paymentMethod': _selectedPaymentMethodLabel.contains('ক্যাশ')
@@ -133,12 +150,16 @@ class _HbpRegisterCustomerDialogState extends State<HbpRegisterCustomerDialog> {
         SnackBar(
           content: Row(
             children: [
-              const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+              Icon(
+                res['success'] == true ? Icons.check_circle_rounded : Icons.info_outline_rounded,
+                color: Colors.white,
+                size: 20,
+              ),
               const SizedBox(width: 8),
-              Expanded(child: Text('$name সফলভাবে নিবন্ধিত হয়েছেন!')),
+              Expanded(child: Text(res['message'] ?? '$name নিবন্ধিত হয়েছেন!')),
             ],
           ),
-          backgroundColor: const Color(0xFF0F9D58),
+          backgroundColor: res['success'] == true ? const Color(0xFF0F9D58) : const Color(0xFFE53935),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
