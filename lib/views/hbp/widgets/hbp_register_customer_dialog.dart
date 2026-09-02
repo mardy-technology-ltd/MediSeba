@@ -395,43 +395,33 @@ class _HbpRegisterCustomerDialogState extends State<HbpRegisterCustomerDialog> {
 
             // Bottom Action Bar
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text(
-                      'বাতিল',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w800,
-                        color: Color(0xFF334155),
-                      ),
-                    ),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _isSubmitting ? null : _handleSubmit,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF00695C),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
-                  const SizedBox(width: 16),
-                  ElevatedButton(
-                    onPressed: _isSubmitting ? null : _handleSubmit,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF00695C),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                    child: _isSubmitting
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                          )
-                        : const Text(
+                  child: _isSubmitting
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        )
+                      : const FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
                             'অ্যাকাউন্ট ও প্যাকেজ নিশ্চিত করুন',
-                            style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w900),
+                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900),
+                            maxLines: 1,
                           ),
-                  ),
-                ],
+                        ),
+                ),
               ),
             ),
           ],
