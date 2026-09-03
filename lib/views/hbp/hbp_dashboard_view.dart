@@ -5,6 +5,7 @@ import '../../controllers/home_controller.dart';
 import '../../controllers/language_controller.dart';
 import '../../services/api_service.dart';
 import '../../services/cache_service.dart';
+import 'hbp_profile_view.dart';
 import 'widgets/hbp_drawer.dart';
 import 'widgets/hbp_register_customer_dialog.dart';
 
@@ -285,7 +286,6 @@ class _HbpDashboardViewState extends State<HbpDashboardView> {
                   ),
                 ),
               ),
-              const SizedBox(height: 10),
             ],
           ),
         );
@@ -339,63 +339,40 @@ class _HbpDashboardViewState extends State<HbpDashboardView> {
         backgroundColor: Colors.white,
         elevation: 0.5,
         scrolledUnderElevation: 0,
-        titleSpacing: 0,
+        centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.menu_rounded, color: Color(0xFF0F172A), size: 24),
           onPressed: () => _scaffoldKey.currentState?.openDrawer(),
         ),
-        title: FittedBox(
-          fit: BoxFit.scaleDown,
-          alignment: Alignment.centerLeft,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Image.asset(
-                'assets/images/logo.png',
-                height: 26,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) => const Text(
-                  'মেডিসেবা',
-                  style: TextStyle(fontWeight: FontWeight.w900, color: Color(0xFF00A859), fontSize: 16),
-                ),
-              ),
-              const SizedBox(width: 6),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF00A859).withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: const Color(0xFF00A859).withValues(alpha: 0.3)),
-                ),
-                child: const Text(
-                  'HBP',
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w800,
-                    color: Color(0xFF00A859),
-                  ),
-                ),
-              ),
-            ],
+        title: Image.asset(
+          'assets/images/logo.png',
+          height: 35,
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) => const Text(
+            'মেডিসেবা',
+            style: TextStyle(fontWeight: FontWeight.w900, color: Color(0xFF00A859), fontSize: 18),
           ),
         ),
         actions: [
-          IconButton(
-            constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
-            padding: const EdgeInsets.all(6),
-            icon: const Icon(Icons.account_balance_wallet_outlined, color: Color(0xFF0F9D58), size: 22),
-            tooltip: 'ওয়ালেট ও আর্নিং',
-            onPressed: _showWalletDialog,
-          ),
           // Agent Profile Avatar Icon
           GestureDetector(
-            onTap: () => _scaffoldKey.currentState?.openDrawer(),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => HbpProfileView(
+                    authController: widget.authController,
+                    languageController: widget.languageController,
+                  ),
+                ),
+              );
+            },
             child: Container(
               margin: const EdgeInsets.only(right: 14, left: 4),
               child: const CircleAvatar(
-                radius: 16,
+                radius: 17,
                 backgroundColor: Color(0xFF00A859),
-                child: Icon(Icons.person_rounded, size: 20, color: Colors.white),
+                child: Icon(Icons.person_rounded, size: 21, color: Colors.white),
               ),
             ),
           ),
