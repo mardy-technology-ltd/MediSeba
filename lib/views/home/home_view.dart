@@ -1603,6 +1603,14 @@ class _HomeViewState extends State<HomeView> {
   // Sidebar Drawer (Redesigned Glassmorphic Modern Sidebar)
   Widget _buildSidebarDrawer(BuildContext context) {
     final isBangla = _langController.isBangla;
+    final userData = widget.authController.currentUserData;
+    final loginIdentifier = (widget.authController.loginIdentifier ?? '').toLowerCase();
+    final userPhone = (userData?.phone ?? '').toLowerCase();
+    final userName = (userData?.name ?? '').toLowerCase();
+    final bool isHbpUser = loginIdentifier.contains('hbp') ||
+        userPhone.contains('01798456879') ||
+        userName.contains('sojib') ||
+        userName.contains('hbp');
 
     return Drawer(
       width: MediaQuery.of(context).size.width * 0.82,
@@ -1820,23 +1828,24 @@ class _HomeViewState extends State<HomeView> {
                     physics: const BouncingScrollPhysics(),
                     padding: const EdgeInsets.symmetric(horizontal: 12.0),
                     children: [
-                      _buildBkashMenuItem(
-                        icon: Icons.shield_outlined,
-                        title: isBangla ? 'এইচবিপি ফিল্ড পোর্টাল' : 'HBP Field Portal',
-                        onTap: () {
-                          Navigator.pop(context);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => HbpDashboardView(
-                                homeController: widget.homeController,
-                                authController: widget.authController,
-                                languageController: _langController,
+                      if (isHbpUser)
+                        _buildBkashMenuItem(
+                          icon: Icons.shield_outlined,
+                          title: isBangla ? 'এইচবিপি ফিল্ড পোর্টাল' : 'HBP Field Portal',
+                          onTap: () {
+                            Navigator.pop(context);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => HbpDashboardView(
+                                  homeController: widget.homeController,
+                                  authController: widget.authController,
+                                  languageController: _langController,
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                      ),
+                            );
+                          },
+                        ),
                       _buildBkashMenuItem(
                         icon: Icons.assignment_ind_outlined,
                         title: isBangla ? 'পেশেন্ট পোর্টাল' : 'Patient Portal',
