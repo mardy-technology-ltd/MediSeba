@@ -99,20 +99,11 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
             );
           }
         } else {
-          final hasSeenOnboarding = CacheService.get('has_seen_onboarding') == true;
-          if (hasSeenOnboarding) {
-            destinationView = HomeView(
-              homeController: widget.homeController,
-              authController: widget.authController,
-              languageController: widget.languageController,
-            );
-          } else {
-            destinationView = OnboardingView(
-              homeController: widget.homeController,
-              authController: widget.authController,
-              languageController: widget.languageController,
-            );
-          }
+          destinationView = OnboardingView(
+            homeController: widget.homeController,
+            authController: widget.authController,
+            languageController: widget.languageController,
+          );
         }
 
         Navigator.of(context).pushReplacement(

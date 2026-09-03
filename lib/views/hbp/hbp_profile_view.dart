@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../controllers/auth_controller.dart';
+import '../../controllers/home_controller.dart';
 import '../../controllers/language_controller.dart';
 import '../customer_support/customer_support_view.dart';
+import '../onboarding/onboarding_view.dart';
 
 class HbpProfileView extends StatefulWidget {
   final AuthController authController;
+  final HomeController? homeController;
   final LanguageController? languageController;
 
   const HbpProfileView({
     super.key,
     required this.authController,
+    this.homeController,
     this.languageController,
   });
 
@@ -493,7 +497,18 @@ class _HbpProfileViewState extends State<HbpProfileView> {
             onPressed: () async {
               await widget.authController.logout();
               if (context.mounted) {
-                Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+                final homeCtrl = widget.homeController ?? HomeController();
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => OnboardingView(
+                      homeController: homeCtrl,
+                      authController: widget.authController,
+                      languageController: widget.languageController ?? LanguageController(),
+                    ),
+                  ),
+                  (route) => false,
+                );
               }
             },
             style: OutlinedButton.styleFrom(

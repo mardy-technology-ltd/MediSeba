@@ -361,6 +361,7 @@ class _HbpDashboardViewState extends State<HbpDashboardView> {
                 context,
                 MaterialPageRoute(
                   builder: (_) => HbpProfileView(
+                    homeController: widget.homeController,
                     authController: widget.authController,
                     languageController: widget.languageController,
                   ),

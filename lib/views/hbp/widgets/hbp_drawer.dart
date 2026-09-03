@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import '../../../controllers/auth_controller.dart';
 import '../../../controllers/home_controller.dart';
 import '../../../controllers/language_controller.dart';
-import '../../auth/login_view.dart';
 import '../../customer_support/customer_support_view.dart';
 import '../../offers/offer_list_view.dart';
+import '../../onboarding/onboarding_view.dart';
 
 class HbpDrawer extends StatelessWidget {
   final AuthController authController;
@@ -269,10 +269,10 @@ class HbpDrawer extends StatelessWidget {
                           Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => LoginView(
+                              builder: (context) => OnboardingView(
                                 homeController: homeController,
                                 authController: authController,
-                                languageController: languageController,
+                                languageController: languageController ?? LanguageController(),
                               ),
                             ),
                             (route) => false,

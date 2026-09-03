@@ -286,5 +286,6 @@ class AuthRepository {
     await CacheService.delete('auth_token');
     await CacheService.delete('auth_user');
     await CacheService.delete('auth_login_identifier');
+    await CacheService.delete('has_seen_onboarding');
   }
 }
