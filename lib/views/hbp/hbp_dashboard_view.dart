@@ -381,55 +381,21 @@ class _HbpDashboardViewState extends State<HbpDashboardView> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh_rounded, color: Color(0xFF475569), size: 22),
-            onPressed: () {
-              _fetchApiMetrics();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text('ড্যাশবোর্ড রিফ্রেশ হচ্ছে...'),
-                  duration: const Duration(seconds: 1),
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                ),
-              );
-            },
-          ),
-          IconButton(
-            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+            constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
             padding: const EdgeInsets.all(6),
             icon: const Icon(Icons.account_balance_wallet_outlined, color: Color(0xFF0F9D58), size: 22),
             tooltip: 'ওয়ালেট ও আর্নিং',
             onPressed: _showWalletDialog,
           ),
-          // Agent Profile Chip
+          // Agent Profile Avatar Icon
           GestureDetector(
             onTap: () => _scaffoldKey.currentState?.openDrawer(),
             child: Container(
-              margin: const EdgeInsets.only(right: 12, top: 10, bottom: 10),
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: const Color(0xFF005A36),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CircleAvatar(
-                    radius: 10,
-                    backgroundColor: Color(0xFF00A859),
-                    child: Text(
-                      'S',
-                      style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                  ),
-                  SizedBox(width: 5),
-                  Text(
-                    'Sojib',
-                    style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700, color: Colors.white),
-                  ),
-                  SizedBox(width: 2),
-                  Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white, size: 14),
-                ],
+              margin: const EdgeInsets.only(right: 14, left: 4),
+              child: const CircleAvatar(
+                radius: 16,
+                backgroundColor: Color(0xFF00A859),
+                child: Icon(Icons.person_rounded, size: 20, color: Colors.white),
               ),
             ),
           ),
@@ -445,36 +411,44 @@ class _HbpDashboardViewState extends State<HbpDashboardView> {
         ),
         elevation: 4,
       ),
-      body: SingleChildScrollView(
-        controller: _scrollController,
-        physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 1. Top Hero Header Card (Dark Pine Green)
-            _buildHeroHeaderCard(),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          _fetchApiMetrics();
+          await Future.delayed(const Duration(milliseconds: 500));
+        },
+        color: const Color(0xFF0F9D58),
+        backgroundColor: Colors.white,
+        child: SingleChildScrollView(
+          controller: _scrollController,
+          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 1. Top Hero Header Card (Dark Pine Green)
+              _buildHeroHeaderCard(),
 
-            const SizedBox(height: 16),
+              const SizedBox(height: 16),
 
-            // 2. Monthly Salary & Promotion Tracker Card
-            _buildSalaryTrackerCard(percentAchieved, remainingToTarget),
+              // 2. Monthly Salary & Promotion Tracker Card
+              _buildSalaryTrackerCard(percentAchieved, remainingToTarget),
 
-            const SizedBox(height: 16),
+              const SizedBox(height: 16),
 
-            // 3. 4 KPI Statistics Cards Grid
-            _buildKPIStatsGrid(remainingToTarget),
+              // 3. 4 KPI Statistics Cards Grid
+              _buildKPIStatsGrid(remainingToTarget),
 
-            const SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-            // 4. Registered Customer & Package List Section
-            Container(
-              key: _customerListKey,
-              child: _buildCustomerListSection(filteredCustomers),
-            ),
+              // 4. Registered Customer & Package List Section
+              Container(
+                key: _customerListKey,
+                child: _buildCustomerListSection(filteredCustomers),
+              ),
 
-            const SizedBox(height: 70), // Spacing for floating action button
-          ],
+              const SizedBox(height: 70), // Spacing for floating action button
+            ],
+          ),
         ),
       ),
     );

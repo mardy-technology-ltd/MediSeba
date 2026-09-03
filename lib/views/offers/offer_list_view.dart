@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../controllers/language_controller.dart';
 import '../../widgets/helpline_bottom_sheet.dart';
+import 'widgets/eps_payment_gateway_dialog.dart';
 
 class OfferListView extends StatelessWidget {
   final bool showAppBar;
@@ -96,11 +97,17 @@ class OfferListView extends StatelessWidget {
                 ),
               ),
 
-            SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            RefreshIndicator(
+              onRefresh: () async {
+                await Future.delayed(const Duration(milliseconds: 600));
+              },
+              color: const Color(0xFF0F9D58),
+              backgroundColor: Colors.white,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // 1. Hero Orange Banner Card
                   _buildHeroCard(langController),
@@ -214,11 +221,12 @@ class OfferListView extends StatelessWidget {
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   // 1. Hero Orange Banner Card
   Widget _buildHeroCard(LanguageController lang) {
@@ -976,7 +984,16 @@ class OfferListView extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () => showHelplineBottomSheet(context),
+              onPressed: () {
+                final cleanPrice = int.tryParse(price.replaceAll(',', '')) ?? 99;
+                final cleanPoints = int.tryParse(points.replaceAll(',', '')) ?? 999;
+                EpsPaymentGatewayDialog.show(
+                  context: context,
+                  packageName: name,
+                  price: cleanPrice,
+                  points: cleanPoints,
+                );
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryColor,
                 elevation: 0,
