@@ -89,39 +89,6 @@ class ProfileView extends StatelessWidget {
             title: 'আমার প্রোফাইল',
             showBackButton: showAppBarLeading,
             backgroundColor: bgCanvas,
-            actions: [
-              InkWell(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => EditProfileView(authController: authController),
-                  ),
-                ),
-                borderRadius: BorderRadius.circular(14),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-                  decoration: BoxDecoration(
-                    color: primaryGreen.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: primaryGreen.withValues(alpha: 0.2)),
-                  ),
-                  child: const Row(
-                    children: [
-                      Icon(Icons.edit_outlined, color: primaryGreen, size: 15),
-                      SizedBox(width: 5),
-                      Text(
-                        'সম্পাদনা',
-                        style: TextStyle(
-                          color: primaryGreen,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
           ),
           body: SafeArea(
             child: SingleChildScrollView(

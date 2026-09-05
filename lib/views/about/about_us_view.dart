@@ -525,8 +525,8 @@ class AboutUsView extends StatelessWidget {
             iconBg: const Color(0xFFF3E5F5),
             title: lang.tr('ঢাকা হেড অফিস', 'Dhaka Head Office'),
             subtitle: lang.tr(
-              'লেভেল ১৮, রোড ১০, সেক্টর ১১, উত্তরা, ঢাকা (১২৩০)।',
-              'Level 18, Road 10, Sector 11, Uttara, Dhaka (1230).',
+              'হোল্ডিং ৬৮, রোড ২০, সেক্টর ১১, উত্তরা, ঢাকা (২য় তলা)।',
+              'Holding 68, Road 20, Sector 11, Uttara, Dhaka (2nd Floor).',
             ),
           ),
 

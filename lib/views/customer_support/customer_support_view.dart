@@ -388,7 +388,7 @@ class _CustomerSupportViewState extends State<CustomerSupportView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _langController.tr('হেড অফিস ঠিকানা', 'Head Office Address'),
+                  _langController.tr('ঢাকা হেড অফিস ঠিকানা', 'Dhaka Head Office Address'),
                   style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
@@ -397,7 +397,7 @@ class _CustomerSupportViewState extends State<CustomerSupportView> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  _langController.tr('তালোড়মারী, বোয়ালিয়া / মতিহার', 'Talaimari, Boalia / Motihar'),
+                  _langController.tr('হোল্ডিং ৬৮, রোড ২০, সেক্টর ১১ (২য় তলা)', 'Holding 68, Rd 20, Sec 11 (2nd Floor)'),
                   style: const TextStyle(
                     fontSize: 12.5,
                     fontWeight: FontWeight.bold,
@@ -406,7 +406,7 @@ class _CustomerSupportViewState extends State<CustomerSupportView> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  _langController.tr('রাজশাহী, বাংলাদেশ', 'Rajshahi, Bangladesh'),
+                  _langController.tr('উত্তরা, ঢাকা-১২৩০, বাংলাদেশ', 'Uttara, Dhaka-1230, Bangladesh'),
                   style: const TextStyle(
                     fontSize: 10.5,
                     color: Color(0xFF64748B),

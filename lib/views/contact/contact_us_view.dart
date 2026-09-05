@@ -263,7 +263,7 @@ class _ContactUsViewState extends State<ContactUsView> {
           iconColor: const Color(0xFF0D9488),
           title: _langController.tr('ঢাকা হেড অফিস', 'Dhaka Head Office'),
           mainText: _langController.tr('উত্তরা, ঢাকা-১২৩০', 'Uttara, Dhaka-1230'),
-          subText: _langController.tr('হোল্ডিং ৬৮, রোড ২০, সেক্টর ১১', 'Holding 68, Rd 20, Sec 11'),
+          subText: _langController.tr('হোল্ডিং ৬৮, রোড ২০, সেক্টর ১১ (২য় তলা)', 'Holding 68, Rd 20, Sec 11 (2nd Floor)'),
         ),
         const SizedBox(height: 12),
         _buildContactBox(
@@ -455,7 +455,7 @@ class _ContactUsViewState extends State<ContactUsView> {
   Widget _buildMapLocationCard() {
     final dhakaAddress = _langController.tr(
       'ঢাকা হেড অফিস: হোল্ডিং ৬৮, রোড ২০, সেক্টর ১১, উত্তরা, ঢাকা (২য় তলা)',
-      'Dhaka Head Office: Holding 68, Rd 20, Sec 11, Uttara, Dhaka',
+      'Dhaka Head Office: Holding 68, Rd 20, Sec 11, Uttara, Dhaka (2nd Floor)',
     );
     final rajshahiAddress = _langController.tr(
       'রাজশাহী অফিস: তালাইমারী বাজার মসজিদের বিপরীতে পাশে, বোয়ালিয়া, রাজশাহী',
