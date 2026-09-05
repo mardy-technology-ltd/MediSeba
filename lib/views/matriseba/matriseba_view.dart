@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../controllers/language_controller.dart';
+import '../../widgets/custom_app_bar.dart';
 import '../../widgets/helpline_bottom_sheet.dart';
 import '../doctors/doctor_list_view.dart';
 
@@ -34,21 +35,11 @@ class _MatriSebaViewState extends State<MatriSebaView> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0.5,
-        iconTheme: const IconThemeData(color: textDark),
-        title: Text(
-          _langController.tr('মাতৃসেবা (মা ও শিশু স্বাস্থ্য)', 'Maternal & Child Care'),
-          style: const TextStyle(
-            fontSize: 17,
-            fontWeight: FontWeight.bold,
-            color: textDark,
-          ),
-        ),
+      appBar: CustomAppBar(
+        title: _langController.tr('মাতৃসেবা (মা ও শিশু স্বাস্থ্য)', 'Maternal & Child Care'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.phone_in_talk_rounded, color: brandPink),
+            icon: const Icon(Icons.phone_in_talk_rounded, color: brandPink, size: 22),
             onPressed: () => showHelplineBottomSheet(context),
           ),
         ],

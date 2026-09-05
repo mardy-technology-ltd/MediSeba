@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../controllers/language_controller.dart';
+import '../../widgets/custom_app_bar.dart';
 
 class HospitalListView extends StatefulWidget {
   final bool showAppBar;
@@ -90,18 +91,8 @@ class _HospitalListViewState extends State<HospitalListView> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: widget.showAppBar
-          ? AppBar(
-              backgroundColor: Colors.white,
-              elevation: 0,
-              scrolledUnderElevation: 0,
-              title: Text(
-                _langController.tr('হাসপাতাল ও ডায়াগনস্টিক', 'Hospitals & Diagnostics'),
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: textDark,
-                ),
-              ),
+          ? CustomAppBar(
+              title: _langController.tr('হাসপাতাল ও ডায়াগনস্টিক', 'Hospitals & Diagnostics'),
             )
           : null,
       body: SafeArea(

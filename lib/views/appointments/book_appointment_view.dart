@@ -3,6 +3,7 @@ import '../../constants/app_colors.dart';
 import '../../constants/app_text_styles.dart';
 import '../../models/doctor_model.dart';
 import '../../controllers/appointment_controller.dart';
+import '../../widgets/custom_app_bar.dart';
 import '../shared_widgets/custom_button.dart';
 import '../shared_widgets/custom_textfield.dart';
 import 'appointment_history_view.dart';
@@ -78,15 +79,8 @@ class _BookAppointmentViewState extends State<BookAppointmentView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.surface,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        title: Text('অ্যাপয়েন্টমেন্ট বুকিং', style: AppTextStyles.heading2),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 20),
-          onPressed: () => Navigator.pop(context),
-        ),
+      appBar: const CustomAppBar(
+        title: 'অ্যাপয়েন্টমেন্ট বুকিং',
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),

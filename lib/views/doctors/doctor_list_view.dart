@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../constants/app_constants.dart';
 import '../../controllers/doctor_controller.dart';
 import '../../controllers/language_controller.dart';
+import '../../widgets/custom_app_bar.dart';
 import '../appointments/book_appointment_view.dart';
 import '../payment/payment_view.dart';
 import '../../controllers/auth_controller.dart';
@@ -57,22 +58,8 @@ class _DoctorListViewState extends State<DoctorListView> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: widget.showAppBar
-          ? AppBar(
-              backgroundColor: Colors.white,
-              elevation: 0,
-              scrolledUnderElevation: 0,
-              title: Text(
-                _langController.tr('ডাক্তার খুঁজুন', 'Find Doctors'),
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1E293B),
-                ),
-              ),
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF1E293B), size: 20),
-                onPressed: () => Navigator.pop(context),
-              ),
+          ? CustomAppBar(
+              title: _langController.tr('ডাক্তার খুঁজুন', 'Find Doctors'),
             )
           : null,
       body: SafeArea(

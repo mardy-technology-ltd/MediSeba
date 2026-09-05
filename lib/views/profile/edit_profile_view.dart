@@ -3,6 +3,7 @@ import '../../controllers/auth_controller.dart';
 import '../../models/geo_models.dart';
 import '../../repositories/geo_repository.dart';
 import '../../widgets/searchable_dropdown.dart';
+import '../../widgets/custom_app_bar.dart';
 
 class EditProfileView extends StatefulWidget {
   final AuthController authController;
@@ -293,36 +294,8 @@ class _EditProfileViewState extends State<EditProfileView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        centerTitle: true,
-        title: const Text(
-          'প্রোফাইল সম্পাদনা',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: textDark,
-          ),
-        ),
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(
-                Icons.chevron_left_rounded,
-                color: textMuted,
-                size: 28,
-              ),
-            ),
-          ),
-        ),
+      appBar: const CustomAppBar(
+        title: 'প্রোফাইল সম্পাদনা',
       ),
       body: SafeArea(
         child: SingleChildScrollView(

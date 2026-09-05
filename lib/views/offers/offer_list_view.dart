@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../controllers/language_controller.dart';
+import '../../widgets/custom_app_bar.dart';
 import '../../widgets/helpline_bottom_sheet.dart';
 import 'widgets/eps_payment_gateway_dialog.dart';
 
@@ -24,22 +25,11 @@ class OfferListView extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: showAppBar
-          ? AppBar(
-              backgroundColor: Colors.white,
-              elevation: 0,
-              scrolledUnderElevation: 0,
-              iconTheme: const IconThemeData(color: textDark),
-              title: Text(
-                langController.tr('ডিসকাউন্ট অফার ও হেলথ প্যাকেজ', 'Discount Offers & Health Packages'),
-                style: const TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
-                  color: textDark,
-                ),
-              ),
+          ? CustomAppBar(
+              title: langController.tr('ডিসকাউন্ট অফার ও হেলথ প্যাকেজ', 'Discount Offers & Health Packages'),
               actions: [
                 IconButton(
-                  icon: const Icon(Icons.phone_in_talk_rounded, color: brandOrange),
+                  icon: const Icon(Icons.phone_in_talk_rounded, color: brandOrange, size: 22),
                   onPressed: () => showHelplineBottomSheet(context),
                 ),
               ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../controllers/language_controller.dart';
+import '../../widgets/custom_app_bar.dart';
 import '../doctors/doctor_list_view.dart';
 
 class PatientPortalView extends StatefulWidget {
@@ -72,51 +73,15 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
 
     return Scaffold(
       backgroundColor: const Color(0xFFF1F5F9),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        centerTitle: false,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF475569), size: 20),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.monitor_heart_outlined, color: Color(0xFF0F9D58), size: 18),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    isBangla ? 'পেশেন্ট পোর্টাল ওভারভিউ' : 'PATIENT PORTAL OVERVIEW',
-                    style: const TextStyle(
-                      fontSize: 13.5,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF0F172A),
-                      letterSpacing: 0.2,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-            Text(
-              isBangla ? 'স্বাস্থ্য ভাইটাল, অ্যাপয়েন্টমেন্ট ও রিসিট' : 'Health Vitals, Appointments & Receipts',
-              style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
+      appBar: CustomAppBar(
+        title: isBangla ? 'পেশেন্ট পোর্টাল ওভারভিউ' : 'Patient Portal Overview',
+        subtitle: isBangla ? 'স্বাস্থ্য ভাইটাল, অ্যাপয়েন্টমেন্ট ও রিসিট' : 'Health Vitals, Appointments & Receipts',
+        titleIcon: const Icon(Icons.monitor_heart_outlined, color: Color(0xFF0F9D58), size: 19),
         actions: [
-          // Notification Icon with Badge
           Stack(
             children: [
               IconButton(
-                icon: const Icon(Icons.notifications_none_rounded, color: Color(0xFF475569), size: 24),
+                icon: const Icon(Icons.notifications_none_rounded, color: Color(0xFF475569), size: 22),
                 onPressed: () {},
               ),
               Positioned(
@@ -136,7 +101,6 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
               ),
             ],
           ),
-          const SizedBox(width: 4),
         ],
       ),
       body: SingleChildScrollView(

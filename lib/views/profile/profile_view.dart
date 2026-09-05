@@ -6,6 +6,7 @@ import '../../controllers/language_controller.dart';
 import '../../models/user_model.dart';
 import '../auth/login_view.dart';
 import '../customer_support/customer_support_view.dart';
+import '../../widgets/custom_app_bar.dart';
 import 'edit_profile_view.dart';
 
 class ProfileView extends StatelessWidget {
@@ -84,74 +85,39 @@ class ProfileView extends StatelessWidget {
 
         return Scaffold(
           backgroundColor: bgCanvas,
-          appBar: AppBar(
+          appBar: CustomAppBar(
+            title: 'আমার প্রোফাইল',
+            showBackButton: showAppBarLeading,
             backgroundColor: bgCanvas,
-            elevation: 0,
-            scrolledUnderElevation: 0,
-            automaticallyImplyLeading: false,
-            titleSpacing: 16,
-            leading: showAppBarLeading
-                ? Padding(
-                    padding: const EdgeInsets.only(left: 12, top: 8, bottom: 8),
-                    child: InkWell(
-                      onTap: () => Navigator.pop(context),
-                      borderRadius: BorderRadius.circular(14),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: const Color(0xFFE2E8F0)),
-                        ),
-                        child: const Icon(
-                          Icons.arrow_back_ios_new_rounded,
-                          color: textDark,
-                          size: 18,
+            actions: [
+              InkWell(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => EditProfileView(authController: authController),
+                  ),
+                ),
+                borderRadius: BorderRadius.circular(14),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                  decoration: BoxDecoration(
+                    color: primaryGreen.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: primaryGreen.withValues(alpha: 0.2)),
+                  ),
+                  child: const Row(
+                    children: [
+                      Icon(Icons.edit_outlined, color: primaryGreen, size: 15),
+                      SizedBox(width: 5),
+                      Text(
+                        'সম্পাদনা',
+                        style: TextStyle(
+                          color: primaryGreen,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
                         ),
                       ),
-                    ),
-                  )
-                : null,
-            title: const Text(
-              'আমার প্রোফাইল',
-              style: TextStyle(
-                fontSize: 19,
-                fontWeight: FontWeight.bold,
-                color: textDark,
-                letterSpacing: -0.2,
-              ),
-            ),
-            actions: [
-              Padding(
-                padding: const EdgeInsets.only(right: 16),
-                child: InkWell(
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => EditProfileView(authController: authController),
-                    ),
-                  ),
-                  borderRadius: BorderRadius.circular(14),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: primaryGreen.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: primaryGreen.withValues(alpha: 0.2)),
-                    ),
-                    child: const Row(
-                      children: [
-                        Icon(Icons.edit_outlined, color: primaryGreen, size: 16),
-                        SizedBox(width: 6),
-                        Text(
-                          'সম্পাদনা',
-                          style: TextStyle(
-                            color: primaryGreen,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ],
-                    ),
+                    ],
                   ),
                 ),
               ),

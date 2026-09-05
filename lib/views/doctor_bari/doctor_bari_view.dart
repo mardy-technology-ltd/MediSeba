@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../controllers/doctor_controller.dart';
 import '../../controllers/language_controller.dart';
+import '../../widgets/custom_app_bar.dart';
 import '../appointments/book_appointment_view.dart';
 import '../payment/payment_view.dart';
 import '../doctors/widgets/doctor_card.dart';
@@ -17,7 +18,6 @@ class DoctorBariView extends StatefulWidget {
 class _DoctorBariViewState extends State<DoctorBariView> {
   static const brandGreen = Color(0xFF0F9D58);
   static const darkGreen = Color(0xFF006B4A);
-  static const textDark = Color(0xFF0F172A);
   
   final DoctorController _doctorController = DoctorController();
   final TextEditingController _searchController = TextEditingController();
@@ -51,36 +51,8 @@ class _DoctorBariViewState extends State<DoctorBariView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        centerTitle: true,
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFFF1F5F9),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(
-                Icons.chevron_left_rounded,
-                color: Color(0xFF475569),
-                size: 28,
-              ),
-            ),
-          ),
-        ),
-        title: Text(
-          _langController.tr('ডাক্তার ঘর', 'Doctor Ghar Portal'),
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w800,
-            color: textDark,
-          ),
-        ),
+      appBar: CustomAppBar(
+        title: _langController.tr('ডাক্তার ঘর', 'Doctor Ghar Portal'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_rounded, color: Color(0xFF475569)),

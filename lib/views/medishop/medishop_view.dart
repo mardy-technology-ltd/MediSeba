@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_text_styles.dart';
 import '../../controllers/language_controller.dart';
+import '../../widgets/custom_app_bar.dart';
 import '../../models/medicine_model.dart';
 import '../../services/api_service.dart';
 
@@ -137,27 +138,12 @@ class _MediShopViewState extends State<MediShopView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.surface,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 20),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(_langController.tr('মেডিশপ (MediShop)', 'MediShop Pharmacy'), style: AppTextStyles.heading2.copyWith(fontSize: 18)),
-            Text(
-              _langController.tr('১১,৯৯৯+ অরিজিনাল ওষুধ ক্যাটালগ', '11,999+ Genuine Medicine Catalog'),
-              style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
-            ),
-          ],
-        ),
+      appBar: CustomAppBar(
+        title: _langController.tr('মেডিশপ (MediShop)', 'MediShop Pharmacy'),
+        subtitle: _langController.tr('১১,৯৯৯+ অরিজিনাল ওষুধ ক্যাটালগ', '11,999+ Genuine Medicine Catalog'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.shopping_cart_outlined, color: AppColors.primary),
+            icon: const Icon(Icons.shopping_cart_outlined, color: AppColors.primary, size: 22),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
@@ -167,7 +153,6 @@ class _MediShopViewState extends State<MediShopView> {
               );
             },
           ),
-          const SizedBox(width: 4),
         ],
       ),
       body: RefreshIndicator(

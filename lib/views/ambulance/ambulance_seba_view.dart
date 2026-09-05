@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../controllers/language_controller.dart';
+import '../../widgets/custom_app_bar.dart';
 
 class AmbulanceSebaView extends StatefulWidget {
   final LanguageController? languageController;
@@ -53,23 +54,8 @@ class _AmbulanceSebaViewState extends State<AmbulanceSebaView> {
 
         return Scaffold(
           backgroundColor: const Color(0xFFF8FAFC),
-          appBar: AppBar(
-            backgroundColor: Colors.white,
-            elevation: 0,
-            scrolledUnderElevation: 0,
-            centerTitle: true,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new_rounded, color: textDark, size: 20),
-              onPressed: () => Navigator.pop(context),
-            ),
-            title: Text(
-              _langController.tr('অ্যাম্বুলেন্স সেবা', 'Ambulance Service'),
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: textDark,
-              ),
-            ),
+          appBar: CustomAppBar(
+            title: _langController.tr('অ্যাম্বুলেন্স সেবা', 'Ambulance Service'),
           ),
           body: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),

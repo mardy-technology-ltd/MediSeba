@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_text_styles.dart';
 import '../../controllers/appointment_controller.dart';
+import '../../widgets/custom_app_bar.dart';
 
 class AppointmentHistoryView extends StatelessWidget {
   const AppointmentHistoryView({super.key});
@@ -12,15 +13,8 @@ class AppointmentHistoryView extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.surface,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        title: Text('আমার অ্যাপয়েন্টমেন্টসমূহ', style: AppTextStyles.heading2),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 20),
-          onPressed: () => Navigator.pop(context),
-        ),
+      appBar: const CustomAppBar(
+        title: 'আমার অ্যাপয়েন্টমেন্টসমূহ',
       ),
       body: ListenableBuilder(
         listenable: appointmentController,
