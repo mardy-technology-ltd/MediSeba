@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'register_view.dart';
+import 'forgot_password_view.dart';
 import '../home/home_view.dart';
 import '../admin/admin_dashboard_view.dart';
 import '../hbp/hbp_dashboard_view.dart';
@@ -36,10 +37,6 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
-  static const brandGreen = Color(0xFF00A859);
-  static const textDark = Color(0xFF0F172A);
-  static const textMuted = Color(0xFF64748B);
-
   LoginRole _selectedRole = LoginRole.patient;
 
   final TextEditingController _inputController = TextEditingController();
@@ -180,6 +177,8 @@ class _LoginViewState extends State<LoginView> {
 
   @override
   Widget build(BuildContext context) {
+    final isBangla = widget.languageController?.isBangla ?? true;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -189,90 +188,46 @@ class _LoginViewState extends State<LoginView> {
             padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
             child: LayoutBuilder(
               builder: (context, constraints) {
-                final double containerWidth = constraints.maxWidth > 480 ? 440 : constraints.maxWidth;
-                final bool isSmallScreen = constraints.maxWidth < 420;
+                final double containerWidth = constraints.maxWidth > 480 ? 420 : constraints.maxWidth;
 
                 return SizedBox(
                   width: containerWidth,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const SizedBox(height: 10),
-                      // Top Logo Image
+                      const SizedBox(height: 20),
+
+                      // Top Logo Image (Clean without duplicate text)
                       Image.asset(
                         'assets/images/logo.png',
-                        height: isSmallScreen ? 50 : 60,
+                        height: 65,
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stackTrace) => Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(Icons.local_hospital_rounded, size: 36, color: brandGreen),
-                            const SizedBox(width: 8),
+                          children: const [
+                            Icon(Icons.local_hospital_rounded, size: 36, color: Color(0xFF0F9D58)),
+                            SizedBox(width: 8),
                             Text(
                               'মেডিসেবা',
                               style: TextStyle(
-                                fontSize: isSmallScreen ? 22 : 26,
+                                fontSize: 24,
                                 fontWeight: FontWeight.w900,
-                                color: const Color(0xFFED1C24),
+                                color: Color(0xFFED1C24),
                               ),
                             ),
                           ],
                         ),
                       ),
 
-                      const SizedBox(height: 8),
-
-                      // Tagline under logo
-                      Text(
-                        '“সেবা নিন ঘরে বসে, সুস্থ থাকুন নির্বিশেষে”',
-                        style: TextStyle(
-                          fontSize: isSmallScreen ? 11 : 12.5,
-                          fontWeight: FontWeight.w700,
-                          color: const Color(0xFFED1C24),
-                          letterSpacing: 0.1,
-                        ),
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      // Secured Service Account Login Badge
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFE6F7F4), // Light teal background
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0xFFB2DFDB), width: 1.0),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: const [
-                            Icon(
-                              Icons.gpp_good_outlined,
-                              color: Color(0xFF009688), // Teal color
-                              size: 18,
-                            ),
-                            SizedBox(width: 6),
-                            Text(
-                              'সিকিউরড সার্ভিস অ্যাকাউন্ট লগইন',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF009688),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 32),
 
                       // Main Heading Title
-                      const Text(
-                        'মেডিসেবা পোর্টালে সাইন-ইন করুন',
-                        style: TextStyle(
-                          fontSize: 22,
+                      Text(
+                        isBangla ? 'সাইন-ইন করুন' : 'Sign In',
+                        style: const TextStyle(
+                          fontSize: 24,
                           fontWeight: FontWeight.w900,
-                          color: textDark,
+                          color: Color(0xFF0F172A),
                           letterSpacing: -0.3,
                         ),
                         textAlign: TextAlign.center,
@@ -281,11 +236,13 @@ class _LoginViewState extends State<LoginView> {
                       const SizedBox(height: 8),
 
                       // Subtitle Description
-                      const Text(
-                        'আপনার নিবন্ধিত ইমেইল/মোবাইল নম্বর ও পাসওয়ার্ড প্রদান করুন',
-                        style: TextStyle(
+                      Text(
+                        isBangla
+                            ? 'আপনার অ্যাকাউন্টে প্রবেশ করতে নিচের তথ্য প্রদান করুন'
+                            : 'Enter your credentials to access your account',
+                        style: const TextStyle(
                           fontSize: 13.5,
-                          color: textMuted,
+                          color: Color(0xFF64748B),
                           height: 1.4,
                         ),
                         textAlign: TextAlign.center,
@@ -294,14 +251,14 @@ class _LoginViewState extends State<LoginView> {
                       const SizedBox(height: 32),
 
                       // Section: Email/Mobile label
-                      const Align(
+                      Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          'ইমেইল অথবা মোবাইল নম্বর *',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: textDark,
+                          isBangla ? 'ইমেইল অথবা মোবাইল নম্বর *' : 'Email or Mobile Number *',
+                          style: const TextStyle(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF1E293B),
                           ),
                         ),
                       ),
@@ -314,22 +271,22 @@ class _LoginViewState extends State<LoginView> {
                         style: const TextStyle(
                           fontSize: 14.5,
                           fontWeight: FontWeight.w500,
-                          color: textDark,
+                          color: Color(0xFF0F172A),
                         ),
                         decoration: InputDecoration(
-                          prefixIcon: const Icon(Icons.mail_outline_rounded, color: Color(0xFF94A3B8), size: 22),
-                          hintText: 'যেমন: patient@mediseba.org অথবা 01700000000',
+                          prefixIcon: const Icon(Icons.person_outline_rounded, color: Color(0xFF94A3B8), size: 22),
+                          hintText: isBangla ? '017XXXXXXXX অথবা ইমেইল' : '017XXXXXXXX or email',
                           hintStyle: const TextStyle(fontSize: 13.5, color: Color(0xFF94A3B8)),
                           filled: true,
                           fillColor: const Color(0xFFF8FAFC),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
                           enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(28),
+                            borderRadius: BorderRadius.circular(16),
                             borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1.2),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(28),
-                            borderSide: const BorderSide(color: Color(0xFF009688), width: 1.5),
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: const BorderSide(color: Color(0xFF0F9D58), width: 1.6),
                           ),
                         ),
                       ),
@@ -340,32 +297,33 @@ class _LoginViewState extends State<LoginView> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            'পাসওয়ার্ড *',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: textDark,
+                          Text(
+                            isBangla ? 'পাসওয়ার্ড *' : 'Password *',
+                            style: const TextStyle(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF1E293B),
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          Flexible(
-                            child: GestureDetector(
-                              onTap: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('পাসওয়ার্ড পুনরুদ্ধারের জন্য অ্যাডমিনের সাথে যোগাযোগ করুন।')),
-                                );
-                              },
-                              child: const FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: Text(
-                                  'পাসওয়ার্ড ভুলে গেছেন?',
-                                  style: TextStyle(
-                                    fontSize: 12.5,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF009688),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ForgotPasswordView(
+                                    homeController: widget.homeController,
+                                    authController: widget.authController,
+                                    languageController: widget.languageController,
                                   ),
                                 ),
+                              );
+                            },
+                            child: Text(
+                              isBangla ? 'পাসওয়ার্ড ভুলে গেছেন?' : 'Forgot Password?',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF0F9D58),
                               ),
                             ),
                           ),
@@ -380,7 +338,7 @@ class _LoginViewState extends State<LoginView> {
                         style: const TextStyle(
                           fontSize: 14.5,
                           fontWeight: FontWeight.w500,
-                          color: textDark,
+                          color: Color(0xFF0F172A),
                         ),
                         decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.lock_outline_rounded, color: Color(0xFF94A3B8), size: 22),
@@ -388,14 +346,14 @@ class _LoginViewState extends State<LoginView> {
                           hintStyle: const TextStyle(fontSize: 13.5, color: Color(0xFF94A3B8)),
                           filled: true,
                           fillColor: const Color(0xFFF8FAFC),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
                           enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(28),
+                            borderRadius: BorderRadius.circular(16),
                             borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1.2),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(28),
-                            borderSide: const BorderSide(color: Color(0xFF009688), width: 1.5),
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: const BorderSide(color: Color(0xFF0F9D58), width: 1.6),
                           ),
                           suffixIcon: IconButton(
                             icon: Icon(
@@ -412,21 +370,21 @@ class _LoginViewState extends State<LoginView> {
                         ),
                       ),
 
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 28),
 
                       // Submit Button
                       SizedBox(
                         width: double.infinity,
-                        height: 54,
+                        height: 52,
                         child: ElevatedButton(
                           onPressed: _isLoggingIn ? null : _handleLogin,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF009688),
+                            backgroundColor: const Color(0xFF0F9D58),
                             foregroundColor: Colors.white,
-                            elevation: 4,
-                            shadowColor: const Color(0xFF009688).withValues(alpha: 0.3),
+                            elevation: 3,
+                            shadowColor: const Color(0xFF0F9D58).withValues(alpha: 0.3),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(28),
+                              borderRadius: BorderRadius.circular(16),
                             ),
                           ),
                           child: _isLoggingIn
@@ -437,31 +395,23 @@ class _LoginViewState extends State<LoginView> {
                                 )
                               : Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
-                                  children: const [
+                                  children: [
                                     Text(
-                                      'পোর্টালে সাইন-ইন করুন',
-                                      style: TextStyle(
-                                        fontSize: 15.5,
+                                      isBangla ? 'সাইন-ইন করুন' : 'Sign In',
+                                      style: const TextStyle(
+                                        fontSize: 16,
                                         fontWeight: FontWeight.bold,
                                         letterSpacing: 0.2,
                                       ),
                                     ),
-                                    SizedBox(width: 8),
-                                    Icon(Icons.arrow_forward_rounded, size: 20),
+                                    const SizedBox(width: 8),
+                                    const Icon(Icons.arrow_forward_rounded, size: 20),
                                   ],
                                 ),
                         ),
                       ),
 
-                      const SizedBox(height: 24),
-
-                      // Under-button divider
-                      const Divider(
-                        color: Color(0xFFF1F5F9),
-                        thickness: 1.2,
-                      ),
-
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 32),
 
                       // Sign up Link
                       GestureDetector(
@@ -476,20 +426,20 @@ class _LoginViewState extends State<LoginView> {
                             ),
                           );
                         },
-                        child: const Text.rich(
+                        child: Text.rich(
                           TextSpan(
-                            text: 'নতুন অ্যাকাউন্ট খুলতে চান? ',
-                            style: TextStyle(
-                              fontSize: 13.5,
+                            text: isBangla ? 'নতুন অ্যাকাউন্ট খুলতে চান? ' : "Don't have an account? ",
+                            style: const TextStyle(
+                              fontSize: 14,
                               fontWeight: FontWeight.w500,
-                              color: Color(0xFF334155),
+                              color: Color(0xFF475569),
                             ),
                             children: [
                               TextSpan(
-                                text: 'এখানে নিবন্ধন করুন',
-                                style: TextStyle(
+                                text: isBangla ? 'নিবন্ধন করুন' : 'Register Now',
+                                style: const TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFF009688),
+                                  color: Color(0xFF0F9D58),
                                 ),
                               ),
                             ],
@@ -497,32 +447,7 @@ class _LoginViewState extends State<LoginView> {
                         ),
                       ),
 
-                      const SizedBox(height: 32),
-
-                      // Secure SSL Badge Footer
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Icon(
-                              Icons.gpp_good_outlined,
-                              color: Color(0xFF94A3B8),
-                              size: 16,
-                            ),
-                            SizedBox(width: 6),
-                            Text(
-                              '256-Bit SSL Encrypted Enterprise Portal',
-                              style: TextStyle(
-                                fontSize: 11.5,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF94A3B8),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 20),
                     ],
                   ),
                 );

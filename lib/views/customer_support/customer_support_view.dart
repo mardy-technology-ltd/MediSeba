@@ -500,7 +500,7 @@ class _CustomerSupportViewState extends State<CustomerSupportView> {
             TextFormField(
               controller: _phoneController,
               keyboardType: TextInputType.phone,
-              decoration: _buildInputDecoration('01700000000'),
+              decoration: _buildInputDecoration('017XXXXXXXX'),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
                   return _langController.tr('অনুগ্রহ করে মোবাইল নম্বর লিখুন', 'Please enter mobile number');

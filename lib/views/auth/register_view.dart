@@ -19,15 +19,12 @@ class RegisterView extends StatefulWidget {
 }
 
 class _RegisterViewState extends State<RegisterView> {
-  static const brandGreen = Color(0xFF009688);
-  static const textDark = Color(0xFF0F172A);
-  static const textMuted = Color(0xFF64748B);
-
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _referCodeController = TextEditingController();
 
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
@@ -38,6 +35,7 @@ class _RegisterViewState extends State<RegisterView> {
     final phone = _phoneController.text.trim();
     final password = _passwordController.text;
     final confirmPassword = _confirmPasswordController.text;
+    final referCode = _referCodeController.text.trim();
 
     if (name.isEmpty || phone.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -65,6 +63,7 @@ class _RegisterViewState extends State<RegisterView> {
       district: 'Dhaka',
       upazila: 'Dhanmondi',
       union: 'Dhanmondi',
+      referId: referCode.isNotEmpty ? referCode : null,
     );
 
     if (mounted) {
@@ -104,6 +103,7 @@ class _RegisterViewState extends State<RegisterView> {
     _phoneController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _referCodeController.dispose();
     super.dispose();
   }
 
@@ -127,50 +127,38 @@ class _RegisterViewState extends State<RegisterView> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const SizedBox(height: 10),
-                      // Top Logo Image
+
+                      // Top Logo Image (Clean without duplicate slogan text)
                       Image.asset(
                         'assets/images/logo.png',
-                        height: isSmallScreen ? 50 : 60,
+                        height: 65,
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stackTrace) => Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(Icons.local_hospital_rounded, size: 36, color: brandGreen),
-                            const SizedBox(width: 8),
+                          children: const [
+                            Icon(Icons.local_hospital_rounded, size: 36, color: Color(0xFF0F9D58)),
+                            SizedBox(width: 8),
                             Text(
                               'মেডিসেবা',
                               style: TextStyle(
-                                fontSize: isSmallScreen ? 22 : 26,
+                                fontSize: 24,
                                 fontWeight: FontWeight.w900,
-                                color: const Color(0xFFED1C24),
+                                color: Color(0xFFED1C24),
                               ),
                             ),
                           ],
                         ),
                       ),
 
-                      const SizedBox(height: 8),
-
-                      // Tagline under logo
-                      Text(
-                        '“সেবা নিন ঘরে বসে, সুস্থ থাকুন নির্বিশেষে”',
-                        style: TextStyle(
-                          fontSize: isSmallScreen ? 11 : 12.5,
-                          fontWeight: FontWeight.w700,
-                          color: const Color(0xFFED1C24),
-                          letterSpacing: 0.1,
-                        ),
-                      ),
-
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 28),
 
                       // Heading Title
-                      Text(
-                        'নতুন রোগী রেজিস্ট্রেশন (Register Account)',
+                      const Text(
+                        'রেজিস্ট্রেশন করুন',
                         style: TextStyle(
-                          fontSize: isSmallScreen ? 17.5 : 21,
+                          fontSize: 24,
                           fontWeight: FontWeight.w900,
-                          color: textDark,
+                          color: Color(0xFF0F172A),
                           letterSpacing: -0.3,
                         ),
                         textAlign: TextAlign.center,
@@ -180,10 +168,10 @@ class _RegisterViewState extends State<RegisterView> {
 
                       // Subtitle
                       const Text(
-                        'আজই মেডিসেবা ডিজিটাল অ্যাকাউন্ট খুলুন ও পয়েন্ট রিডিম করুন',
+                        'সঠিক তথ্য প্রদান করে আপনার অ্যাকাউন্ট তৈরি করুন',
                         style: TextStyle(
-                          fontSize: 13,
-                          color: textMuted,
+                          fontSize: 13.5,
+                          color: Color(0xFF64748B),
                           height: 1.4,
                         ),
                         textAlign: TextAlign.center,
@@ -191,11 +179,11 @@ class _RegisterViewState extends State<RegisterView> {
 
                       const SizedBox(height: 28),
 
-                      // 1. Full Name Field (রোগীর পূর্ণ নাম *)
+                      // 1. Full Name Field (পূর্ণ নাম *)
                       _buildFormField(
                         controller: _nameController,
-                        label: 'রোগীর পূর্ণ নাম *',
-                        hintText: 'যেমন: Mohammad Samiul',
+                        label: 'পূর্ণ নাম *',
+                        hintText: 'আপনার পূর্ণ নাম',
                         prefixIcon: Icons.person_outline_rounded,
                       ),
 
@@ -205,14 +193,14 @@ class _RegisterViewState extends State<RegisterView> {
                         _buildFormField(
                           controller: _phoneController,
                           label: 'ফোন নম্বর *',
-                          hintText: '01700000000',
+                          hintText: '017XXXXXXXX',
                           prefixIcon: Icons.phone_iphone_rounded,
                           keyboardType: TextInputType.phone,
                         ),
                         const SizedBox(height: 16),
                         _buildFormField(
                           controller: _emailController,
-                          label: 'ইমেইল ঠিকানা',
+                          label: 'ইমেইল ঠিকানা (ঐচ্ছিক)',
                           hintText: 'patient@example.com',
                           prefixIcon: Icons.mail_outline_rounded,
                           keyboardType: TextInputType.emailAddress,
@@ -257,6 +245,13 @@ class _RegisterViewState extends State<RegisterView> {
                             },
                           ),
                         ),
+                        const SizedBox(height: 16),
+                        _buildFormField(
+                          controller: _referCodeController,
+                          label: 'রেফারেল কোড (ঐচ্ছিক)',
+                          hintText: 'যেমন: REF12345',
+                          prefixIcon: Icons.card_giftcard_rounded,
+                        ),
                       ] else ...[
                         // 2. Phone & Email in split row
                         Row(
@@ -266,7 +261,7 @@ class _RegisterViewState extends State<RegisterView> {
                               child: _buildFormField(
                                 controller: _phoneController,
                                 label: 'ফোন নম্বর *',
-                                hintText: '01700000000',
+                                hintText: '017XXXXXXXX',
                                 prefixIcon: Icons.phone_iphone_rounded,
                                 keyboardType: TextInputType.phone,
                               ),
@@ -275,7 +270,7 @@ class _RegisterViewState extends State<RegisterView> {
                             Expanded(
                               child: _buildFormField(
                                 controller: _emailController,
-                                label: 'ইমেইল ঠিকানা',
+                                label: 'ইমেইল ঠিকানা (ঐচ্ছিক)',
                                 hintText: 'patient@example.com',
                                 prefixIcon: Icons.mail_outline_rounded,
                                 keyboardType: TextInputType.emailAddress,
@@ -334,23 +329,30 @@ class _RegisterViewState extends State<RegisterView> {
                             ),
                           ],
                         ),
+                        const SizedBox(height: 18),
+                        _buildFormField(
+                          controller: _referCodeController,
+                          label: 'রেফারেল কোড (ঐচ্ছিক)',
+                          hintText: 'যেমন: REF12345',
+                          prefixIcon: Icons.card_giftcard_rounded,
+                        ),
                       ],
 
-                      const SizedBox(height: 30),
+                      const SizedBox(height: 28),
 
                       // Submit Button
                       SizedBox(
                         width: double.infinity,
-                        height: 54,
+                        height: 52,
                         child: ElevatedButton(
                           onPressed: _isRegistering ? null : _handleRegister,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF009688),
+                            backgroundColor: const Color(0xFF0F9D58),
                             foregroundColor: Colors.white,
-                            elevation: 4,
-                            shadowColor: const Color(0xFF009688).withValues(alpha: 0.3),
+                            elevation: 3,
+                            shadowColor: const Color(0xFF0F9D58).withValues(alpha: 0.3),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(28),
+                              borderRadius: BorderRadius.circular(16),
                             ),
                           ),
                           child: _isRegistering
@@ -365,7 +367,7 @@ class _RegisterViewState extends State<RegisterView> {
                                     Text(
                                       'রেজিস্ট্রেশন সম্পন্ন করুন',
                                       style: TextStyle(
-                                        fontSize: 15.5,
+                                        fontSize: 16,
                                         fontWeight: FontWeight.bold,
                                         letterSpacing: 0.2,
                                       ),
@@ -377,74 +379,43 @@ class _RegisterViewState extends State<RegisterView> {
                         ),
                       ),
 
-                      const SizedBox(height: 24),
-                      const Divider(color: Color(0xFFF1F5F9), thickness: 1.2),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 28),
 
-                      // Footer Wrap
-                      SizedBox(
-                        width: double.infinity,
-                        child: Wrap(
-                          alignment: WrapAlignment.spaceBetween,
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          spacing: 8,
-                          runSpacing: 12,
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => LoginView(
-                                      homeController: widget.homeController,
-                                      authController: widget.authController,
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: const Text.rich(
-                                TextSpan(
-                                  text: 'পূর্বেই অ্যাকাউন্ট তৈরি করা আছে? ',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color(0xFF334155),
-                                  ),
-                                  children: [
-                                    TextSpan(
-                                      text: 'লগইন করুন',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Color(0xFF009688),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                      // Sign in Link
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => LoginView(
+                                homeController: widget.homeController,
+                                authController: widget.authController,
                               ),
                             ),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: const [
-                                Icon(
-                                  Icons.gpp_good_outlined,
-                                  color: Color(0xFF009688),
-                                  size: 16,
-                                ),
-                                SizedBox(width: 4),
-                                Text(
-                                  '100% Data Encrypted',
-                                  style: TextStyle(
-                                    fontSize: 11.5,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF009688),
-                                  ),
-                                ),
-                              ],
+                          );
+                        },
+                        child: const Text.rich(
+                          TextSpan(
+                            text: 'ইতিমধ্যে অ্যাকাউন্ট আছে? ',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF475569),
                             ),
-                          ],
+                            children: [
+                              TextSpan(
+                                text: 'সাইন-ইন করুন',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF0F9D58),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 10),
+
+                      const SizedBox(height: 16),
                     ],
                   ),
                 );
@@ -468,15 +439,12 @@ class _RegisterViewState extends State<RegisterView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Text(
-            label,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: textDark,
-            ),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 13.5,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF1E293B),
           ),
         ),
         const SizedBox(height: 8),
@@ -487,7 +455,7 @@ class _RegisterViewState extends State<RegisterView> {
           style: const TextStyle(
             fontSize: 14.5,
             fontWeight: FontWeight.w500,
-            color: textDark,
+            color: Color(0xFF0F172A),
           ),
           decoration: InputDecoration(
             prefixIcon: Icon(prefixIcon, color: const Color(0xFF94A3B8), size: 20),
@@ -495,14 +463,14 @@ class _RegisterViewState extends State<RegisterView> {
             hintStyle: const TextStyle(fontSize: 13.5, color: Color(0xFF94A3B8)),
             filled: true,
             fillColor: const Color(0xFFF8FAFC),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(16),
               borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1.2),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(24),
-              borderSide: const BorderSide(color: Color(0xFF009688), width: 1.5),
+              borderRadius: BorderRadius.circular(16),
+              borderSide: const BorderSide(color: Color(0xFF0F9D58), width: 1.6),
             ),
             suffixIcon: suffixIcon,
           ),

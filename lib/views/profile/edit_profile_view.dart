@@ -26,6 +26,7 @@ class _EditProfileViewState extends State<EditProfileView> {
   late TextEditingController _referIdController;
 
   bool _isPhoneLocked = false;
+  bool _isReferIdLocked = false;
   bool _isGoogleUser = false;
 
   // Address state
@@ -70,10 +71,13 @@ class _EditProfileViewState extends State<EditProfileView> {
         (RegExp(r'^01[3-9]\d{8}$').hasMatch(phone.replaceAll(RegExp(r'\s+'), '')) || phone.length >= 10);
     _isPhoneLocked = hasValidPhone || !_isGoogleUser;
 
+    final String existingReferId = userData?.referId ?? '';
+    _isReferIdLocked = existingReferId.trim().isNotEmpty;
+
     _nameController = TextEditingController(text: userData?.name ?? user?.displayName ?? '');
     _phoneController = TextEditingController(text: hasValidPhone ? phone : '');
     _emailController = TextEditingController(text: _isGoogleUser ? email : '');
-    _referIdController = TextEditingController(text: userData?.referId ?? '');
+    _referIdController = TextEditingController(text: existingReferId);
 
     _fetchDivisions(initialDivisionName: userData?.division,
                     initialDistrictName: userData?.district,
@@ -253,7 +257,9 @@ class _EditProfileViewState extends State<EditProfileView> {
     final String district = _selectedDistrict?.name ?? widget.authController.currentUserData?.district ?? '';
     final String upazila = _selectedUpazila?.name ?? widget.authController.currentUserData?.upazila ?? '';
     final String union = _selectedUnion?.name ?? widget.authController.currentUserData?.union ?? '';
-    final String referId = _referIdController.text.trim();
+    final String referId = _isReferIdLocked
+        ? (widget.authController.currentUserData?.referId ?? '')
+        : _referIdController.text.trim();
 
     final success = await widget.authController.updateProfileDetails(
       name: name,
@@ -268,7 +274,7 @@ class _EditProfileViewState extends State<EditProfileView> {
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Profile updated successfully! 🎉'),
+          content: Text('প্রোফাইল তথ্য সফলভাবে আপডেট হয়েছে! 🎉'),
           backgroundColor: brandGreen,
         ),
       );
@@ -293,7 +299,7 @@ class _EditProfileViewState extends State<EditProfileView> {
         scrolledUnderElevation: 0,
         centerTitle: true,
         title: const Text(
-          'Edit Profile',
+          'প্রোফাইল সম্পাদনা',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -328,7 +334,7 @@ class _EditProfileViewState extends State<EditProfileView> {
               children: [
                 // Section Title: Basic Info
                 const Text(
-                  'BASIC INFORMATION',
+                  'মূল তথ্য',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
@@ -341,12 +347,12 @@ class _EditProfileViewState extends State<EditProfileView> {
                 // Name
                 _buildInputField(
                   controller: _nameController,
-                  label: 'Full Name',
-                  hintText: 'Enter your full name',
+                  label: 'পূর্ণ নাম *',
+                  hintText: 'আপনার পূর্ণ নাম লিখুন',
                   prefixIcon: Icons.person_outline_rounded,
                   validator: (val) {
                     if (val == null || val.trim().isEmpty) {
-                      return 'Please enter your name';
+                      return 'অনুগ্রহ করে আপনার নাম দিন';
                     }
                     return null;
                   },
@@ -357,12 +363,12 @@ class _EditProfileViewState extends State<EditProfileView> {
                 if (_isGoogleUser) ...[
                   _buildInputField(
                     controller: _emailController,
-                    label: 'Gmail Address',
-                    hintText: 'Your registered Gmail',
+                    label: 'জিিমেইল ঠিকানা',
+                    hintText: 'আপনার রেজিস্টার্ড জিমেইল',
                     prefixIcon: Icons.email_outlined,
                     isReadOnly: true,
                     suffixIcon: const Icon(Icons.lock_outline_rounded, color: textMuted, size: 20),
-                    helperText: 'Gmail address is linked to your Google Account and cannot be changed.',
+                    helperText: 'জিমেইল ঠিকানাটি পরিবর্তনযোগ্য নয়।',
                   ),
                   const SizedBox(height: 16),
                 ],
@@ -370,8 +376,8 @@ class _EditProfileViewState extends State<EditProfileView> {
                 // Mobile Number (Locked if phone registered, Editable if Google user without phone)
                 _buildInputField(
                   controller: _phoneController,
-                  label: 'Mobile Number',
-                  hintText: _isPhoneLocked ? 'Registered Phone' : 'Enter 11-digit phone number',
+                  label: 'মোবাইল নম্বর',
+                  hintText: _isPhoneLocked ? 'রেজিস্টার্ড ফোন নম্বর' : '১১ ডিজিটের ফোন নম্বর দিন',
                   prefixIcon: Icons.phone_android_outlined,
                   isReadOnly: _isPhoneLocked,
                   keyboardType: TextInputType.phone,
@@ -379,16 +385,16 @@ class _EditProfileViewState extends State<EditProfileView> {
                       ? const Icon(Icons.lock_outline_rounded, color: textMuted, size: 20)
                       : null,
                   helperText: _isPhoneLocked
-                      ? 'Mobile number cannot be changed once registered.'
-                      : 'Please add your phone number to complete 100% of your profile.',
+                      ? 'মোবাইল নম্বর পরিবর্তন করা সম্ভব নয়।'
+                      : 'প্রোফাইল ১০০% সম্পন্ন করতে ফোন নম্বর যোগ করুন।',
                   validator: (val) {
                     if (!_isPhoneLocked) {
                       if (val == null || val.trim().isEmpty) {
-                        return 'Please enter your phone number';
+                        return 'অনুগ্রহ করে ফোন নম্বরটি দিন';
                       }
                       final clean = val.trim().replaceAll(RegExp(r'\s+'), '');
                       if (!RegExp(r'^01[3-9]\d{8}$').hasMatch(clean)) {
-                        return 'Enter a valid 11-digit Bangladeshi mobile number';
+                        return 'সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন';
                       }
                     }
                     return null;
@@ -399,7 +405,7 @@ class _EditProfileViewState extends State<EditProfileView> {
 
                 // Section Title: Address
                 const Text(
-                  'ADDRESS DETAILS',
+                  'ঠিকানা সংক্রান্ত তথ্য',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
@@ -411,8 +417,8 @@ class _EditProfileViewState extends State<EditProfileView> {
 
                 // Division
                 SearchableDropdown<GeoDivision>(
-                  label: 'Select Division',
-                  hintText: 'Select your division',
+                  label: 'বিভাগ নির্বাচন করুন',
+                  hintText: 'আপনার বিভাগ নির্বাচন করুন',
                   prefixIcon: Icons.map_outlined,
                   items: _divisions,
                   selectedValue: _selectedDivision,
@@ -431,8 +437,8 @@ class _EditProfileViewState extends State<EditProfileView> {
 
                 // District
                 SearchableDropdown<GeoDistrict>(
-                  label: 'Select District',
-                  hintText: 'Select your district',
+                  label: 'জেলা নির্বাচন করুন',
+                  hintText: 'আপনার জেলা নির্বাচন করুন',
                   prefixIcon: Icons.location_city_outlined,
                   items: _districts,
                   selectedValue: _selectedDistrict,
@@ -454,8 +460,8 @@ class _EditProfileViewState extends State<EditProfileView> {
 
                 // Upazila
                 SearchableDropdown<GeoUpazila>(
-                  label: 'Select Upazila',
-                  hintText: 'Select your upazila',
+                  label: 'উপজেলা নির্বাচন করুন',
+                  hintText: 'আপনার উপজেলা নির্বাচন করুন',
                   prefixIcon: Icons.location_on_outlined,
                   items: _upazilas,
                   selectedValue: _selectedUpazila,
@@ -477,8 +483,8 @@ class _EditProfileViewState extends State<EditProfileView> {
 
                 // Union
                 SearchableDropdown<GeoUnion>(
-                  label: 'Select Union/Area',
-                  hintText: 'Select your union or area',
+                  label: 'ইউনিয়ন নির্বাচন করুন',
+                  hintText: 'আপনার ইউনিয়ন নির্বাচন করুন',
                   prefixIcon: Icons.home_outlined,
                   items: _unions,
                   selectedValue: _selectedUnion,
@@ -501,9 +507,16 @@ class _EditProfileViewState extends State<EditProfileView> {
                 // Refer ID
                 _buildInputField(
                   controller: _referIdController,
-                  label: 'Refer ID (Optional)',
-                  hintText: 'Enter referral code if any',
+                  label: 'রেফারেল আইডি (ঐচ্ছিক)',
+                  hintText: _isReferIdLocked ? 'রেজিস্টার্ড রেফারেল আইডি' : 'যেমন: REF12345',
                   prefixIcon: Icons.card_giftcard_outlined,
+                  isReadOnly: _isReferIdLocked,
+                  suffixIcon: _isReferIdLocked
+                      ? const Icon(Icons.lock_outline_rounded, color: textMuted, size: 20)
+                      : null,
+                  helperText: _isReferIdLocked
+                      ? 'রেফারেল আইডি একবার প্রদান করা হলে তা পরিবর্তনযোগ্য নয়।'
+                      : null,
                 ),
 
                 const SizedBox(height: 36),
@@ -532,7 +545,7 @@ class _EditProfileViewState extends State<EditProfileView> {
                                 child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3),
                               )
                             : const Text(
-                                'Save Changes',
+                                'সংরক্ষণ করুন',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,

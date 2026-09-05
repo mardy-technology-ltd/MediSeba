@@ -1341,7 +1341,7 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
                       keyboardType: TextInputType.phone,
                       style: const TextStyle(fontSize: 12.5),
                       decoration: InputDecoration(
-                        hintText: 'যেমন: 01700000000',
+                        hintText: 'যেমন: 017XXXXXXXX',
                         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                       ),

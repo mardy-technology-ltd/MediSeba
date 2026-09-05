@@ -419,7 +419,7 @@ class _ContactUsViewState extends State<ContactUsView> {
             const SizedBox(height: 12),
 
             _buildLabel(_langController.tr('মোবাইল নম্বর (১১ ডিজিট)', 'Mobile Number (11 digits)'), isRequired: true),
-            _buildInput(_phoneController, '01700000000', keyboardType: TextInputType.phone),
+            _buildInput(_phoneController, '017XXXXXXXX', keyboardType: TextInputType.phone),
             const SizedBox(height: 12),
 
             _buildLabel(_langController.tr('বিষয়', 'Subject'), isRequired: true),

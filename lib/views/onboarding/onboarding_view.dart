@@ -95,96 +95,111 @@ class _OnboardingViewState extends State<OnboardingView> {
       body: SafeArea(
         child: Column(
           children: [
-            // Top App Header: Logo + Skip Button
+            // Top App Header: Skip Button (Right Aligned)
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Image.asset(
-                    'assets/images/logo.png',
-                    height: 38,
-                    fit: BoxFit.contain,
-                  ),
-
-                  // Skip Button
-                  TextButton(
-                    onPressed: _finishOnboarding,
-                    style: TextButton.styleFrom(
-                      foregroundColor: const Color(0xFF64748B),
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: _finishOnboarding,
+                  style: TextButton.styleFrom(
+                    foregroundColor: const Color(0xFF64748B),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    backgroundColor: const Color(0xFFF1F5F9),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          isBangla ? 'এড়িয়ে যান' : 'Skip',
-                          style: const TextStyle(
-                            fontSize: 13.5,
-                            fontWeight: FontWeight.w700,
-                          ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        isBangla ? 'এড়িয়ে যান' : 'Skip',
+                        style: const TextStyle(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w700,
                         ),
-                        const SizedBox(width: 2),
-                        const Icon(Icons.arrow_forward_ios_rounded, size: 12),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(width: 3),
+                      const Icon(Icons.arrow_forward_ios_rounded, size: 12),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
 
             // PageView Slider Body
             Expanded(
-              child: PageView.builder(
-                controller: _pageController,
-                onPageChanged: (index) {
-                  setState(() {
-                    _currentPage = index;
-                  });
-                },
-                itemCount: onboardingData.length,
-                itemBuilder: (context, index) {
-                  final data = onboardingData[index];
-                  return Center(
-                    child: SingleChildScrollView(
-                      physics: const BouncingScrollPhysics(),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            // Premium Image Card Container
-                            Container(
-                              width: double.infinity,
-                              height: 220,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: (data['accentColor'] as Color).withValues(alpha: 0.15),
-                                    blurRadius: 25,
-                                    offset: const Offset(0, 8),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final screenWidth = constraints.maxWidth;
+                  final screenHeight = constraints.maxHeight;
+
+                  // Responsive Sizing Calculations
+                  final double responsiveLogoWidth = (screenWidth * 0.72).clamp(240.0, 420.0);
+                  final double responsiveLogoHeight = (screenHeight * 0.12).clamp(65.0, 105.0);
+                  final double responsiveImageHeight = (screenHeight * 0.35).clamp(180.0, 260.0);
+
+                  return PageView.builder(
+                    controller: _pageController,
+                    onPageChanged: (index) {
+                      setState(() {
+                        _currentPage = index;
+                      });
+                    },
+                    itemCount: onboardingData.length,
+                    itemBuilder: (context, index) {
+                      final data = onboardingData[index];
+                      return Center(
+                        child: SingleChildScrollView(
+                          physics: const BouncingScrollPhysics(),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                // Prominent Responsive MediSeba Logo directly above the image
+                                Image.asset(
+                                  'assets/images/logo.png',
+                                  width: responsiveLogoWidth,
+                                  height: responsiveLogoHeight,
+                                  fit: BoxFit.contain,
+                                ),
+
+                                const SizedBox(height: 16),
+
+                                // Premium Image Card Container
+                                Container(
+                                  width: double.infinity,
+                                  height: responsiveImageHeight,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: (data['accentColor'] as Color).withValues(alpha: 0.15),
+                                        blurRadius: 25,
+                                        offset: const Offset(0, 8),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
-                                child: Image.asset(
-                                  data['image'] as String,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) => Container(
-                                    color: data['bgColor'] as Color,
-                                    child: Center(
-                                      child: Icon(
-                                        data['icon'] as IconData,
-                                        size: 80,
-                                        color: data['accentColor'] as Color,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: Image.asset(
+                                      data['image'] as String,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) => Container(
+                                        color: data['bgColor'] as Color,
+                                        child: Center(
+                                          child: Icon(
+                                            data['icon'] as IconData,
+                                            size: 80,
+                                            color: data['accentColor'] as Color,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ),
 
                             const SizedBox(height: 36),
 
@@ -240,8 +255,10 @@ class _OnboardingViewState extends State<OnboardingView> {
                     ),
                   );
                 },
-              ),
-            ),
+              );
+            },
+          ),
+        ),
 
             // Bottom Controller Bar: Page Indicator Dots + Action Button
             Padding(
