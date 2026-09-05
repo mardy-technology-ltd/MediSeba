@@ -8,6 +8,8 @@ import '../../controllers/home_controller.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/language_controller.dart';
 
+import '../../services/cache_service.dart';
+
 enum LoginRole {
   patient,
   doctor,
@@ -44,22 +46,27 @@ class _LoginViewState extends State<LoginView> {
   bool _isPasswordVisible = false;
   bool _isLoggingIn = false;
 
-  LoginRole _detectRole(String input) {
+  LoginRole _detectRole(String input, {String? userRole}) {
     final cleanInput = input.trim().toLowerCase();
-    if (cleanInput.contains('hbp') ||
+    final cleanRole = (userRole ?? '').trim().toLowerCase();
+
+    if (cleanRole == 'hbp' ||
+        cleanRole == 'hbp-agent' ||
+        cleanRole.contains('hbp') ||
+        cleanInput.contains('hbp') ||
         cleanInput.contains('sojib') ||
         cleanInput.contains('rahim') ||
         cleanInput.contains('01710000010') ||
         cleanInput.contains('01798456879')) {
       return LoginRole.hbp;
     }
-    if (cleanInput.contains('doctor')) return LoginRole.doctor;
-    if (cleanInput.contains('admin')) return LoginRole.admin;
-    if (cleanInput.contains('tanvir')) return LoginRole.supervisor;
-    if (cleanInput.contains('areamanager')) return LoginRole.areaMgr;
-    if (cleanInput.contains('marketing')) return LoginRole.marketingMgr;
-    if (cleanInput.contains('headsales')) return LoginRole.headOfSales;
-    if (cleanInput.contains('director')) return LoginRole.salesDirector;
+    if (cleanRole == 'doctor' || cleanInput.contains('doctor')) return LoginRole.doctor;
+    if (cleanRole == 'admin' || cleanRole == 'super-admin' || cleanInput.contains('admin')) return LoginRole.admin;
+    if (cleanRole == 'supervisor' || cleanInput.contains('tanvir')) return LoginRole.supervisor;
+    if (cleanRole == 'area-manager' || cleanInput.contains('areamanager')) return LoginRole.areaMgr;
+    if (cleanRole == 'marketing-manager' || cleanInput.contains('marketing')) return LoginRole.marketingMgr;
+    if (cleanRole == 'head-of-sales' || cleanInput.contains('headsales')) return LoginRole.headOfSales;
+    if (cleanRole == 'sales-director' || cleanInput.contains('director')) return LoginRole.salesDirector;
     return LoginRole.patient;
   }
 
@@ -107,18 +114,24 @@ class _LoginViewState extends State<LoginView> {
 
       if (success) {
         final uData = widget.authController.currentUserData;
+        final uRole = (uData?.role ?? CacheService.get('auth_user_role')?.toString() ?? '').toLowerCase();
         final uName = (uData?.name ?? '').toLowerCase();
         final uPhone = (uData?.phone ?? '').toLowerCase();
         final id = _inputController.text.trim().toLowerCase();
 
-        final bool isHbpUser = _selectedRole == LoginRole.hbp ||
+        final bool isHbpUser = uRole == 'hbp' ||
+            uRole == 'hbp-agent' ||
+            uRole.contains('hbp') ||
+            _selectedRole == LoginRole.hbp ||
             id.contains('hbp') ||
             id.contains('sojib') ||
             id.contains('01798456879') ||
             uName.contains('sojib') ||
             uPhone.contains('01798456879');
 
-        final bool isAdminUser = _selectedRole == LoginRole.admin ||
+        final bool isAdminUser = uRole == 'admin' ||
+            uRole == 'super-admin' ||
+            _selectedRole == LoginRole.admin ||
             id.contains('admin') ||
             uName.contains('admin');
 

@@ -6,15 +6,44 @@ class CacheService {
   static const String boxName = 'mediseba_cache';
   static Box? _box;
 
+  /// Flag to enable/disable local cache DB connection (default: false / disconnected)
+  static bool isCacheEnabled = false;
+
+  /// In-memory cache for active session parameters during app lifecycle
+  static final Map<String, dynamic> _memoryCache = {};
+
+  /// Keys that are critical session/auth data which must always stay in memory
+  static const Set<String> _sessionKeys = {
+    'auth_token',
+    'auth_user',
+    'auth_user_role',
+    'auth_login_identifier',
+    'has_seen_onboarding',
+  };
+
   /// Initialize Hive and open the default cache box
   static Future<void> init() async {
     try {
       await Hive.initFlutter();
       _box = await Hive.openBox(boxName);
-      debugPrint('HiveCacheService initialized successfully.');
+      // Clear all existing local cached data
+      await clearAll();
+      debugPrint('HiveCacheService initialized & local database cleaned successfully. Local DB Cache Disconnected.');
     } catch (e) {
       debugPrint('Error initializing HiveCacheService: $e');
     }
+  }
+
+  /// Reconnect local database cache
+  static void enableCache() {
+    isCacheEnabled = true;
+    debugPrint('Local Cache Database Reconnected.');
+  }
+
+  /// Disconnect local database cache
+  static void disableCache() {
+    isCacheEnabled = false;
+    debugPrint('Local Cache Database Disconnected.');
   }
 
   static Box get _getBox {
@@ -26,6 +55,10 @@ class CacheService {
 
   /// Save JSON data or primitive value with timestamp
   static Future<void> put(String key, dynamic data) async {
+    // Always store in memory RAM for runtime availability
+    _memoryCache[key] = data;
+
+    if (!isCacheEnabled && !_sessionKeys.contains(key)) return;
     try {
       final payload = {
         'timestamp': DateTime.now().millisecondsSinceEpoch,
@@ -39,6 +72,10 @@ class CacheService {
 
   /// Read cached data
   static dynamic get(String key) {
+    if (_memoryCache.containsKey(key)) {
+      return _memoryCache[key];
+    }
+    if (!isCacheEnabled) return null;
     try {
       if (!_getBox.containsKey(key)) return null;
       final payload = _getBox.get(key);
@@ -62,8 +99,9 @@ class CacheService {
 
   /// Check if cached data for [key] has exceeded [ttl]
   static bool isExpired(String key, Duration ttl) {
+    if (!isCacheEnabled && !_sessionKeys.contains(key)) return true;
     try {
-      if (!_getBox.containsKey(key)) return true;
+      if (!_getBox.containsKey(key)) return !_memoryCache.containsKey(key);
       final payload = _getBox.get(key);
       if (payload != null && payload is Map) {
         final rawTimestamp = payload['timestamp'];
@@ -80,7 +118,7 @@ class CacheService {
           }
         }
       }
-      return true;
+      return !_memoryCache.containsKey(key);
     } catch (e) {
       debugPrint('CacheService.isExpired error for key $key: $e');
       return true;
@@ -89,17 +127,23 @@ class CacheService {
 
   /// Delete cached key
   static Future<void> delete(String key) async {
+    _memoryCache.remove(key);
     try {
-      await _getBox.delete(key);
+      if (_box != null && _box!.isOpen) {
+        await _getBox.delete(key);
+      }
     } catch (e) {
       debugPrint('CacheService.delete error: $e');
     }
   }
 
-  /// Clear all cache
+  /// Clear all local cache
   static Future<void> clearAll() async {
+    _memoryCache.clear();
     try {
-      await _getBox.clear();
+      if (_box != null && _box!.isOpen) {
+        await _getBox.clear();
+      }
     } catch (e) {
       debugPrint('CacheService.clearAll error: $e');
     }

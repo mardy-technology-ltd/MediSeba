@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../controllers/auth_controller.dart';
 import '../../../services/api_service.dart';
 import '../../../services/cache_service.dart';
 
@@ -158,7 +159,7 @@ class _HbpRegisterCustomerDialogState extends State<HbpRegisterCustomerDialog> {
     final password = _passwordController.text.trim();
     final email = _emailController.text.trim();
 
-    final token = CacheService.get('auth_token')?.toString() ?? '';
+    final token = AuthController.instance?.token ?? CacheService.get('auth_token')?.toString() ?? '';
 
     // Call official backend API: POST /hbp/register-patient
     final res = await ApiService.registerPatientByHbp(

@@ -8,6 +8,7 @@ class UserModel {
   final String union;
   final String? referId;
   final String? profileImageUrl;
+  final String role;
   final DateTime createdAt;
 
   UserModel({
@@ -20,6 +21,7 @@ class UserModel {
     required this.union,
     this.referId,
     this.profileImageUrl,
+    this.role = 'patient',
     required this.createdAt,
   });
 
@@ -34,6 +36,7 @@ class UserModel {
       union: data['union'] ?? '',
       referId: data['referId'],
       profileImageUrl: data['profileImageUrl'],
+      role: data['role']?.toString() ?? data['user_type']?.toString() ?? data['type']?.toString() ?? 'patient',
       createdAt: data['createdAt'] != null 
           ? DateTime.parse(data['createdAt'].toString()) 
           : DateTime.now(),
@@ -50,6 +53,7 @@ class UserModel {
       'union': union,
       'referId': referId,
       'profileImageUrl': profileImageUrl,
+      'role': role,
       'createdAt': createdAt.toIso8601String(),
     };
   }

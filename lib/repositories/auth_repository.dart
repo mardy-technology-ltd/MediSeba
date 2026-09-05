@@ -89,6 +89,11 @@ class AuthRepository {
           if (userJson != null) {
             final Map<String, dynamic> map = Map<String, dynamic>.from(userJson as Map);
             final String uid = map['id']?.toString() ?? map['uuid']?.toString() ?? 'user_id';
+            final String role = map['role']?.toString() ??
+                map['user_type']?.toString() ??
+                map['type']?.toString() ??
+                (emailOrPhone.toLowerCase().contains('hbp') ? 'hbp' : 'patient');
+
             _currentUserData = UserModel(
               uid: uid,
               name: map['name']?.toString() ?? 'User',
@@ -99,9 +104,12 @@ class AuthRepository {
               union: map['union']?.toString() ?? '',
               referId: map['referId']?.toString(),
               profileImageUrl: map['profileImageUrl']?.toString() ?? map['avatar']?.toString(),
+              role: role,
               createdAt: DateTime.now(),
             );
+            await CacheService.put('auth_user_role', role);
           } else {
+            final String inferredRole = emailOrPhone.toLowerCase().contains('hbp') ? 'hbp' : 'patient';
             _currentUserData = UserModel(
               uid: 'user_id',
               name: 'User',
@@ -110,8 +118,10 @@ class AuthRepository {
               district: '',
               upazila: '',
               union: '',
+              role: inferredRole,
               createdAt: DateTime.now(),
             );
+            await CacheService.put('auth_user_role', inferredRole);
           }
           await CacheService.put('auth_user', _currentUserData!.toMap());
           return true;

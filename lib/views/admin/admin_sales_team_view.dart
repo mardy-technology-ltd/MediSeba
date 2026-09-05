@@ -115,14 +115,26 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
     });
 
     try {
-      final token = CacheService.get('auth_token') as String? ?? '';
-      
+      final token = widget.authController?.token ?? AuthController.instance?.token ?? (CacheService.get('auth_token') as String? ?? '');
+      debugPrint('====================================================');
+      debugPrint('🔍 [ADMIN SALES TEAM DEBUG] _loadData() started');
+      debugPrint('🔍 [ADMIN SALES TEAM DEBUG] Auth Token: ${token.isNotEmpty ? "Available (${token.substring(0, token.length > 15 ? 15 : token.length)}...)" : "EMPTY"}');
+
       // 1. Fetch sales agents
       final agents = await ApiService.getSalesAgents(token: token);
-      
+      debugPrint('🔍 [ADMIN SALES TEAM DEBUG] ApiService.getSalesAgents() returned: ${agents?.length ?? "null"} items');
+      if (agents != null && agents.isNotEmpty) {
+        debugPrint('🔍 [ADMIN SALES TEAM DEBUG] Sample Agent #1: ${agents.first}');
+      }
+
       // 2. Fetch supervisors list
       final supervisors = await ApiService.getSupervisors(token);
-      
+      debugPrint('🔍 [ADMIN SALES TEAM DEBUG] ApiService.getSupervisors() returned: ${supervisors?.length ?? "null"} items');
+      if (supervisors != null && supervisors.isNotEmpty) {
+        debugPrint('🔍 [ADMIN SALES TEAM DEBUG] Sample Supervisor #1: ${supervisors.first}');
+      }
+      debugPrint('====================================================');
+
       if (agents != null) {
         setState(() {
           _usersList = agents.map((u) {
@@ -162,6 +174,7 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
         });
       }
     } catch (e) {
+      debugPrint('❌ [ADMIN SALES TEAM DEBUG] Exception in _loadData(): $e');
       setState(() {
         _error = 'ত্রুটি ঘটেছে: $e';
         _isLoading = false;
@@ -179,7 +192,7 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
     int? supervisorId,
   }) async {
     setState(() => _isLoading = true);
-    final token = CacheService.get('auth_token') as String? ?? '';
+    final token = widget.authController?.token ?? AuthController.instance?.token ?? (CacheService.get('auth_token') as String? ?? '');
     final apiRole = _mapRoleUiToApi(role);
     
     final success = await ApiService.createSalesAgent(
@@ -217,7 +230,7 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
     required int? newSupervisorId,
   }) async {
     setState(() => _isLoading = true);
-    final token = CacheService.get('auth_token') as String? ?? '';
+    final token = widget.authController?.token ?? AuthController.instance?.token ?? (CacheService.get('auth_token') as String? ?? '');
     bool roleSuccess = true;
     bool supervisorSuccess = true;
 
@@ -257,7 +270,7 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
   /// Delete User API Action
   Future<void> _deleteUser(int userId, String name) async {
     setState(() => _isLoading = true);
-    final token = CacheService.get('auth_token') as String? ?? '';
+    final token = widget.authController?.token ?? AuthController.instance?.token ?? (CacheService.get('auth_token') as String? ?? '');
     final success = await ApiService.deleteSalesAgent(userId: userId, token: token);
     
     if (success) {
@@ -302,8 +315,15 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
     return _getRoleColor(role).withValues(alpha: 0.08);
   }
 
-  /// Resolve supervisor UI role from users list or text parsing
+  /// Resolve supervisor UI role from API data, users list, or text parsing
   String _getSupervisorUiRole(Map<String, dynamic> s) {
+    final String rawRole = (s['role'] ?? s['user_type'] ?? s['type'] ?? '').toString();
+    if (rawRole.isNotEmpty) {
+      final mapped = _mapRoleApiToUi(rawRole);
+      if (mapped.isNotEmpty && mapped != rawRole) {
+        return mapped;
+      }
+    }
     final String sIdStr = (s['id'] ?? '').toString();
     for (final u in _usersList) {
       if (u['id'] == sIdStr) {
@@ -338,6 +358,11 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
 
   /// Get list of reporting bosses dynamically filtered from supervisors list
   List<Map<String, dynamic>> _getFilteredBossesList(String selectedRoleUi) {
+    debugPrint('====================================================');
+    debugPrint('🔍 [BOSS DROPDOWN DEBUG] _getFilteredBossesList for UI Role: "$selectedRoleUi"');
+    debugPrint('🔍 [BOSS DROPDOWN DEBUG] _supervisorsList count: ${_supervisorsList.length}');
+    debugPrint('🔍 [BOSS DROPDOWN DEBUG] _usersList count: ${_usersList.length}');
+
     final List<Map<String, dynamic>> list = [
       {'id': 0, 'name': '-- কোনো রিপোর্টিং বস নেই (Top Executive) --'},
     ];
@@ -356,15 +381,72 @@ class _AdminSalesTeamViewState extends State<AdminSalesTeamView> {
       targetRoleUi = 'Sales Director';
     }
 
+    debugPrint('🔍 [BOSS DROPDOWN DEBUG] Target Boss Role expected: "$targetRoleUi"');
+
+    int matchedCount = 0;
+
+    // 1. Filter from _supervisorsList
     for (var s in _supervisorsList) {
       final String roleUi = _getSupervisorUiRole(s);
-      if (targetRoleUi != null && roleUi == targetRoleUi) {
+      final int id = int.tryParse(s['id']?.toString() ?? '') ?? 0;
+      final String name = (s['name'] ?? '').toString();
+      final String email = (s['email'] ?? '').toString();
+      final String rawRole = (s['role'] ?? s['user_type'] ?? '').toString();
+
+      debugPrint('   👉 Checking Supervisor Item: id=$id, name="$name", rawRole="$rawRole", resolvedRoleUi="$roleUi"');
+
+      if (targetRoleUi == null ||
+          roleUi.toLowerCase() == targetRoleUi.toLowerCase() ||
+          rawRole.toLowerCase() == _mapRoleUiToApi(targetRoleUi).toLowerCase() ||
+          (targetRoleUi == 'Supervisor' && (rawRole.toLowerCase().contains('supervisor') || name.toLowerCase().contains('supervisor')))) {
+        if (id > 0 && !list.any((item) => item['id'] == id)) {
+          list.add({'id': id, 'name': '$name ($email)'});
+          matchedCount++;
+          debugPrint('   ✅ Matched & Added Boss from _supervisorsList: id=$id, name="$name"');
+        }
+      }
+    }
+
+    // 2. Filter from _usersList
+    for (var u in _usersList) {
+      final String uRole = (u['role'] ?? '').toString();
+      final int id = int.tryParse(u['id']?.toString() ?? '') ?? 0;
+      final String name = (u['name'] ?? '').toString();
+      final String email = (u['email'] ?? '').toString();
+
+      if (targetRoleUi != null && uRole.toLowerCase() == targetRoleUi.toLowerCase()) {
+        if (id > 0 && !list.any((item) => item['id'] == id)) {
+          list.add({'id': id, 'name': '$name ($email)'});
+          matchedCount++;
+          debugPrint('   ✅ Matched & Added Boss from _usersList: id=$id, name="$name", role="$uRole"');
+        }
+      }
+    }
+
+    // 3. Fallback: If no exact matching boss was found, list all available supervisors/managers so dropdown has options!
+    if (matchedCount == 0 && (_supervisorsList.isNotEmpty || _usersList.isNotEmpty)) {
+      debugPrint('⚠️ [BOSS DROPDOWN DEBUG] No exact boss match for "$targetRoleUi". Populating fallback supervisors/managers list.');
+      for (var s in _supervisorsList) {
         final int id = int.tryParse(s['id']?.toString() ?? '') ?? 0;
         final String name = (s['name'] ?? '').toString();
         final String email = (s['email'] ?? '').toString();
-        list.add({'id': id, 'name': '$name ($email)'});
+        if (id > 0 && !list.any((item) => item['id'] == id)) {
+          list.add({'id': id, 'name': '$name ($email)'});
+        }
+      }
+      for (var u in _usersList) {
+        final String uRole = (u['role'] ?? '').toString();
+        final int id = int.tryParse(u['id']?.toString() ?? '') ?? 0;
+        final String name = (u['name'] ?? '').toString();
+        final String email = (u['email'] ?? '').toString();
+        if (id > 0 && uRole != 'HBP Field Agent' && !list.any((item) => item['id'] == id)) {
+          list.add({'id': id, 'name': '$name ($email) - [$uRole]'});
+        }
       }
     }
+
+    debugPrint('🔍 [BOSS DROPDOWN DEBUG] Total Options in Dropdown: ${list.length}');
+    debugPrint('====================================================');
     return list;
   }
 

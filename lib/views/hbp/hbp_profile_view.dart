@@ -50,8 +50,9 @@ class _HbpProfileViewState extends State<HbpProfileView> {
 
   @override
   Widget build(BuildContext context) {
-    const userName = 'Sojib';
-    const userPhone = '01798456879';
+    final uData = widget.authController.currentUserData;
+    final userName = (uData?.name.isNotEmpty == true) ? uData!.name : (widget.authController.currentUser?.displayName ?? 'HBP User');
+    final userPhone = (uData?.phone.isNotEmpty == true) ? uData!.phone : (widget.authController.loginIdentifier ?? '017XXXXXXXX');
 
     return Scaffold(
       backgroundColor: const Color(0xFFF1F5F9),

@@ -62,7 +62,14 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
           final String userName = (widget.authController.currentUserData?.name ?? '').toLowerCase();
           final String userPhone = (widget.authController.currentUserData?.phone ?? '').toLowerCase();
 
-          final bool isHbp = loginIdentifier.contains('hbp') ||
+          final String uRole = (widget.authController.currentUserData?.role ??
+              CacheService.get('auth_user_role')?.toString() ??
+              '').toLowerCase();
+
+          final bool isHbp = uRole == 'hbp' ||
+              uRole == 'hbp-agent' ||
+              uRole.contains('hbp') ||
+              loginIdentifier.contains('hbp') ||
               loginIdentifier.contains('sojib') ||
               loginIdentifier.contains('rahim') ||
               loginIdentifier.contains('01710000010') ||
@@ -71,7 +78,14 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
               userPhone.contains('01798456879');
 
           // Dynamically detect if staff or admin login matching LoginRole pattern
-          final bool isAdminOrStaff = loginIdentifier.contains('admin') ||
+          final bool isAdminOrStaff = uRole == 'admin' ||
+              uRole == 'super-admin' ||
+              uRole == 'supervisor' ||
+              uRole == 'area-manager' ||
+              uRole == 'marketing-manager' ||
+              uRole == 'head-of-sales' ||
+              uRole == 'sales-director' ||
+              loginIdentifier.contains('admin') ||
               loginIdentifier.contains('doctor') ||
               loginIdentifier.contains('tanvir') || // Supervisor
               loginIdentifier.contains('areamanager') || // Area Manager

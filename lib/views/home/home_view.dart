@@ -23,6 +23,7 @@ import '../hbp/hbp_dashboard_view.dart';
 import '../medishop/medishop_view.dart';
 import '../ambulance/ambulance_seba_view.dart';
 import '../career/career_view.dart';
+import '../../services/cache_service.dart';
 import '../blog/blog_view.dart';
 import '../contact/contact_us_view.dart';
 import '../matriseba/matriseba_view.dart';
@@ -1607,7 +1608,12 @@ class _HomeViewState extends State<HomeView> {
     final loginIdentifier = (widget.authController.loginIdentifier ?? '').toLowerCase();
     final userPhone = (userData?.phone ?? '').toLowerCase();
     final userName = (userData?.name ?? '').toLowerCase();
-    final bool isHbpUser = loginIdentifier.contains('hbp') ||
+    final String uRole = (userData?.role ?? CacheService.get('auth_user_role')?.toString() ?? '').toLowerCase();
+
+    final bool isHbpUser = uRole == 'hbp' ||
+        uRole == 'hbp-agent' ||
+        uRole.contains('hbp') ||
+        loginIdentifier.contains('hbp') ||
         userPhone.contains('01798456879') ||
         userName.contains('sojib') ||
         userName.contains('hbp');
