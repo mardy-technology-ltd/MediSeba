@@ -359,9 +359,6 @@ class _DonateBloodViewState extends State<DonateBloodView> {
   }
 
   void _handleSubmit() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const BloodRequestSuccessView()),
-    );
+    showBloodRequestSuccessDialog(context);
   }
 }

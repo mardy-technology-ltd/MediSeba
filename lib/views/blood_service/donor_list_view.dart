@@ -12,6 +12,7 @@ class BloodDonor {
   final String gender;
   final String lastDonationDate;
   final String imageUrl;
+  final bool isVerified;
 
   const BloodDonor({
     required this.name,
@@ -24,6 +25,7 @@ class BloodDonor {
     this.gender = 'Female',
     this.lastDonationDate = '12/08/2024',
     required this.imageUrl,
+    this.isVerified = true,
   });
 }
 
