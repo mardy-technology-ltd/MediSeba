@@ -91,6 +91,7 @@ class _HomeViewState extends State<HomeView> {
     super.dispose();
   }
 
+  /*
   void _performHomeSearch() {
     final query = _homeSearchController.text.trim();
     FocusScope.of(context).unfocus();
@@ -105,6 +106,7 @@ class _HomeViewState extends State<HomeView> {
       ),
     );
   }
+  */
 
   @override
   Widget build(BuildContext context) {
@@ -536,9 +538,10 @@ class _HomeViewState extends State<HomeView> {
                 ],
               ),
 
-              const SizedBox(height: 18),
+              // const SizedBox(height: 18),
 
-              // Interactive Universal Search Bar Field
+              // Interactive Universal Search Bar Field (Commented Out per user request)
+              /*
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -623,6 +626,7 @@ class _HomeViewState extends State<HomeView> {
                   ),
                 ),
               ),
+              */
             ],
           ),
         ),
@@ -1870,6 +1874,7 @@ class _HomeViewState extends State<HomeView> {
                                 MaterialPageRoute(
                                   builder: (_) => PatientPortalView(
                                     languageController: _langController,
+                                    authController: widget.authController,
                                   ),
                                 ),
                               );

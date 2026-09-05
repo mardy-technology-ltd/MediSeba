@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../widgets/custom_app_bar.dart';
 import 'donor_list_view.dart';
-import 'donor_reviews_view.dart';
-import 'review_submitted_success_view.dart';
+// import 'donor_reviews_view.dart';
+// import 'review_submitted_success_view.dart';
 
 class DonorProfileView extends StatelessWidget {
   final BloodDonor donor;
@@ -11,210 +13,499 @@ class DonorProfileView extends StatelessWidget {
     required this.donor,
   });
 
+  static const Color brandRed = Color(0xFFE11D48);
+  static const Color brandRedDark = Color(0xFF991B1B);
+  static const Color brandGreen = Color(0xFF008744);
+  static const Color bgCanvas = Color(0xFFF8FAFC);
+  static const Color textDark = Color(0xFF0F172A);
+  static const Color textMuted = Color(0xFF64748B);
+
+  Future<void> _makePhoneCall(BuildContext context, String phoneNumber) async {
+    final Uri uri = Uri(scheme: 'tel', path: phoneNumber);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('কল করা সম্ভব হচ্ছে না: $phoneNumber')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        centerTitle: true,
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: const Icon(
-                Icons.chevron_left_rounded,
-                color: Color(0xFF64748B),
-                size: 28,
-              ),
-            ),
-          ),
-        ),
-        title: const Text(
-          'Doner Profile',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFF222222),
-          ),
-        ),
+      backgroundColor: bgCanvas,
+      appBar: const CustomAppBar(
+        title: 'রক্তদাতার প্রোফাইল',
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Top Profile Image Card
-              Center(
-                child: Container(
-                  width: 140,
-                  height: 140,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF1F5F9),
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Image.network(
-                      donor.imageUrl,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        color: const Color(0xFFE2E8F0),
-                        child: const Icon(
-                          Icons.person_rounded,
-                          size: 64,
-                          color: Color(0xFF008744),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 640),
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // ─── 1. HERO HEADER PROFILE CARD ───────────────────────────
+                  _buildProfileHeroCard(context),
 
-              const SizedBox(height: 24),
+                  const SizedBox(height: 20),
 
-              // Fields
-              _buildFieldGroup('Doner Name', donor.name),
-              _buildFieldGroup('Division', donor.division),
-              _buildFieldGroup('District', donor.district),
-              _buildFieldGroup('Thana', donor.thana),
-              _buildFieldGroup('Contact Number', donor.contactNumber),
-              _buildFieldGroup('Address', donor.address),
-              _buildFieldGroup('Blood Group', donor.bloodGroup),
-              _buildFieldGroup('Gender', donor.gender),
-              _buildFieldGroup('Last Blood Donation Date', donor.lastDonationDate),
+                  // ─── 2. QUICK CONTACT ACTION ROW ───────────────────────────
+                  _buildQuickContactRow(context),
 
-              const SizedBox(height: 16),
+                  const SizedBox(height: 20),
 
-              // See Reviews & Comments Button (Green Card)
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => DonorReviewsView(donorName: donor.name),
-                    ),
-                  );
-                },
-                child: Container(
-                  width: double.infinity,
-                  height: 54,
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF008744),
-                    borderRadius: BorderRadius.circular(14),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF008744).withValues(alpha: 0.2),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
+                  // ─── 3. DONOR INFORMATION SECTIONS ────────────────────────
+                  _buildInfoCard(
+                    title: 'ব্যক্তিগত ও জরুরি তথ্য',
+                    icon: Icons.person_rounded,
+                    children: [
+                      _buildInfoRow(Icons.badge_outlined, 'রক্তদাতার নাম', donor.name),
+                      _buildInfoRow(Icons.invert_colors_rounded, 'রক্তের গ্রুপ', donor.bloodGroup, isHighlight: true),
+                      _buildInfoRow(Icons.phone_iphone_rounded, 'ফোন নম্বর', donor.contactNumber),
+                      _buildInfoRow(Icons.wc_rounded, 'লিঙ্গ (Gender)', donor.gender),
+                      _buildInfoRow(Icons.history_rounded, 'সর্বশেষ রক্তদানের সময়', donor.lastDonationDate),
                     ],
                   ),
-                  alignment: Alignment.center,
-                  child: const Text(
-                    'See Reviews & Comments',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
 
-              const SizedBox(height: 12),
+                  const SizedBox(height: 16),
 
-              // Give Review & Comment Button (Green Card)
-              GestureDetector(
-                onTap: () {
-                  _showGiveReviewModal(context);
-                },
-                child: Container(
-                  width: double.infinity,
-                  height: 54,
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF008744),
-                    borderRadius: BorderRadius.circular(14),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF008744).withValues(alpha: 0.2),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
+                  _buildInfoCard(
+                    title: 'ঠিকানা ও অবস্থান',
+                    icon: Icons.location_on_rounded,
+                    children: [
+                      _buildInfoRow(Icons.map_outlined, 'বিভাগ', donor.division),
+                      _buildInfoRow(Icons.location_city_outlined, 'জেলা', donor.district),
+                      _buildInfoRow(Icons.holiday_village_outlined, 'উপজেলা / থানা', donor.thana),
+                      _buildInfoRow(Icons.place_outlined, 'বিস্তারিত ঠিকানা', donor.address),
                     ],
                   ),
-                  alignment: Alignment.center,
-                  child: const Text(
-                    'Give Review & Comment',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
 
-              const SizedBox(height: 32),
-            ],
+                  // const SizedBox(height: 20),
+
+                  // ─── 4. REVIEWS & RATING ACTION BUTTONS (COMMENTED OUT) ─────
+                  // _buildActionButtons(context),
+
+                  const SizedBox(height: 30),
+                ],
+              ),
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildFieldGroup(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
+  // ─── HERO HEADER PROFILE CARD ──────────────────────────────────────
+  Widget _buildProfileHeroCard(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF475569),
+          // Banner Top Background
+          Container(
+            height: 110,
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [brandRed, brandRedDark],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            child: Stack(
+              children: [
+                Positioned(
+                  right: -20,
+                  top: -20,
+                  child: Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withValues(alpha: 0.08),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  right: 14,
+                  top: 14,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.verified_user_rounded, color: Colors.white, size: 14),
+                        SizedBox(width: 4),
+                        Text(
+                          'ভেরিফাইড রক্তদাতা',
+                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 8),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF8FAFC),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFF1F5F9), width: 1.2),
-            ),
-            child: Text(
-              value.isNotEmpty ? value : label,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-                color: value.isNotEmpty ? const Color(0xFF64748B) : const Color(0xFFCBD5E1),
-              ),
+
+          // Overlapping Avatar & Main Details
+          Transform.translate(
+            offset: const Offset(0, -42),
+            child: Column(
+              children: [
+                Stack(
+                  alignment: Alignment.bottomRight,
+                  children: [
+                    Container(
+                      width: 104,
+                      height: 104,
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.12),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(52),
+                        child: Image.network(
+                          donor.imageUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Container(
+                            color: const Color(0xFFF1F5F9),
+                            child: const Icon(
+                              Icons.person_rounded,
+                              size: 50,
+                              color: brandRed,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(3),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.verified_rounded,
+                        color: brandGreen,
+                        size: 22,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 10),
+
+                // Name
+                Text(
+                  donor.name,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    color: textDark,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+
+                const SizedBox(height: 4),
+
+                // Address Subtitle
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.location_on_outlined, size: 15, color: textMuted),
+                    const SizedBox(width: 4),
+                    Text(
+                      donor.address,
+                      style: const TextStyle(fontSize: 13, color: textMuted, fontWeight: FontWeight.w500),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 14),
+
+                // Blood Group Badge Box
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 7),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFE4E6),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: const Color(0xFFFECDD3)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.water_drop_rounded, size: 16, color: brandRed),
+                      const SizedBox(width: 6),
+                      Text(
+                        'রক্তের গ্রুপ: ${donor.bloodGroup}',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w900,
+                          color: brandRed,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  // ─── QUICK CONTACT ACTION BUTTONS ──────────────────────────────────
+  Widget _buildQuickContactRow(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: ElevatedButton.icon(
+            onPressed: () => _makePhoneCall(context, donor.contactNumber),
+            icon: const Icon(Icons.phone_in_talk_rounded, size: 18, color: Colors.white),
+            label: const Text(
+              'সরাসরি কল দিন',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: brandGreen,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              elevation: 0,
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: OutlinedButton.icon(
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('ডোনারের তথ্য কপি হয়েছে')),
+              );
+            },
+            icon: const Icon(Icons.share_rounded, size: 18, color: textDark),
+            label: const Text(
+              'শেয়ার করুন',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: textDark),
+            ),
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              side: const BorderSide(color: Color(0xFFCBD5E1)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              backgroundColor: Colors.white,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ─── CARD WITH FIELD ROWS ──────────────────────────────────────────
+  Widget _buildInfoCard({
+    required String title,
+    required IconData icon,
+    required List<Widget> children,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFE4E6),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, color: brandRed, size: 18),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: textDark,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          const Divider(height: 1, color: Color(0xFFF1F5F9)),
+          const SizedBox(height: 10),
+          ...children,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(IconData icon, String label, String value, {bool isHighlight = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(icon, size: 18, color: isHighlight ? brandRed : textMuted),
+          const SizedBox(width: 10),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 13.5,
+              fontWeight: FontWeight.w600,
+              color: textMuted,
+            ),
+          ),
+          const Spacer(),
+          Text(
+            value.isNotEmpty ? value : 'N/A',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: isHighlight ? FontWeight.w900 : FontWeight.w700,
+              color: isHighlight ? brandRed : textDark,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /*
+  // ─── ACTION BUTTONS (COMMENTED OUT) ────────────────────────────────
+  Widget _buildActionButtons(BuildContext context) {
+    return Column(
+      children: [
+        // See Reviews
+        InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => DonorReviewsView(donorName: donor.name),
+              ),
+            );
+          },
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.02),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: const Row(
+              children: [
+                Icon(Icons.star_rounded, color: Color(0xFFFFB800), size: 22),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'রিভিউ ও মতামত দেখুন',
+                    style: TextStyle(
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.bold,
+                      color: textDark,
+                    ),
+                  ),
+                ),
+                Icon(Icons.chevron_right_rounded, color: textMuted, size: 22),
+              ],
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 12),
+
+        // Give Review Button
+        InkWell(
+          onTap: () => _showGiveReviewModal(context),
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+            decoration: BoxDecoration(
+              color: brandGreen,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: brandGreen.withValues(alpha: 0.25),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.rate_review_rounded, color: Colors.white, size: 20),
+                SizedBox(width: 10),
+                Text(
+                  'রিভিউ ও রেটিং দিন',
+                  style: TextStyle(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -247,16 +538,16 @@ class DonorProfileView extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Review ${donor.name}',
+                        '${donor.name}-কে রিভিউ দিন',
                         style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF1E293B),
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                          color: textDark,
                         ),
                       ),
                       GestureDetector(
                         onTap: () => Navigator.pop(context),
-                        child: const Icon(Icons.close_rounded, color: Color(0xFF64748B)),
+                        child: const Icon(Icons.close_rounded, color: textMuted),
                       ),
                     ],
                   ),
@@ -264,11 +555,11 @@ class DonorProfileView extends StatelessWidget {
 
                   // Rating stars
                   const Text(
-                    'Select Rating',
+                    'রেটিং নির্বাচন করুন',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 13.5,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF475569),
+                      color: textMuted,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -298,11 +589,11 @@ class DonorProfileView extends StatelessWidget {
 
                   // Comment Input
                   const Text(
-                    'Write your comment',
+                    'আপনার মতামত লিখুন',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 13.5,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF475569),
+                      color: textMuted,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -311,14 +602,14 @@ class DonorProfileView extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: const Color(0xFFF8FAFC),
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: const Color(0xFFF1F5F9), width: 1.2),
+                      border: Border.all(color: const Color(0xFFE2E8F0)),
                     ),
                     child: TextField(
                       controller: commentController,
                       maxLines: 3,
-                      style: const TextStyle(fontSize: 14, color: Color(0xFF1E293B)),
+                      style: const TextStyle(fontSize: 14, color: textDark),
                       decoration: const InputDecoration(
-                        hintText: 'আপনার অভিজ্ঞতা বা রিভিউ লিখুন...',
+                        hintText: 'ডোনার সম্পর্কে আপনার অভিজ্ঞতা বা মন্তব্য লিখুন...',
                         hintStyle: TextStyle(color: Color(0xFF94A3B8), fontSize: 13),
                         border: InputBorder.none,
                       ),
@@ -333,9 +624,9 @@ class DonorProfileView extends StatelessWidget {
                     height: 48,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF008744),
+                        backgroundColor: brandGreen,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(14),
                         ),
                         elevation: 0,
                       ),
@@ -349,10 +640,10 @@ class DonorProfileView extends StatelessWidget {
                         );
                       },
                       child: const Text(
-                        'Submit Review',
+                        'রিভিউ জমা দিন',
                         style: TextStyle(
                           fontSize: 15,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
@@ -366,4 +657,5 @@ class DonorProfileView extends StatelessWidget {
       },
     );
   }
+  */
 }

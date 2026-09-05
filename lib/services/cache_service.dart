@@ -6,13 +6,13 @@ class CacheService {
   static const String boxName = 'mediseba_cache';
   static Box? _box;
 
-  /// Flag to enable/disable local cache DB connection (default: false / disconnected)
-  static bool isCacheEnabled = false;
+  /// Flag to enable/disable local response cache DB connection (default: true)
+  static bool isCacheEnabled = true;
 
   /// In-memory cache for active session parameters during app lifecycle
   static final Map<String, dynamic> _memoryCache = {};
 
-  /// Keys that are critical session/auth data which must always stay in memory
+  /// Keys that are critical session/auth data which must always stay persistent on disk
   static const Set<String> _sessionKeys = {
     'auth_token',
     'auth_user',
@@ -26,9 +26,7 @@ class CacheService {
     try {
       await Hive.initFlutter();
       _box = await Hive.openBox(boxName);
-      // Clear all existing local cached data
-      await clearAll();
-      debugPrint('HiveCacheService initialized & local database cleaned successfully. Local DB Cache Disconnected.');
+      debugPrint('HiveCacheService initialized successfully.');
     } catch (e) {
       debugPrint('Error initializing HiveCacheService: $e');
     }
@@ -75,7 +73,7 @@ class CacheService {
     if (_memoryCache.containsKey(key)) {
       return _memoryCache[key];
     }
-    if (!isCacheEnabled) return null;
+    if (!isCacheEnabled && !_sessionKeys.contains(key)) return null;
     try {
       if (!_getBox.containsKey(key)) return null;
       final payload = _getBox.get(key);

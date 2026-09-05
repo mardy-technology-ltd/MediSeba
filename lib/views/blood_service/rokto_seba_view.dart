@@ -114,15 +114,74 @@ class _RoktoSebaViewState extends State<RoktoSebaView> {
     }
   }
 
+  bool _matchesBilingualQuery(BloodDonor donor, String rawQuery) {
+    final query = rawQuery.trim().toLowerCase();
+    if (query.isEmpty) return true;
+
+    final docName = donor.name.toLowerCase();
+    final docAddress = donor.address.toLowerCase();
+    final docBlood = donor.bloodGroup.toLowerCase();
+    final docPhone = donor.contactNumber.toLowerCase();
+
+    if (docName.contains(query) ||
+        docAddress.contains(query) ||
+        docBlood.contains(query) ||
+        docPhone.contains(query)) {
+      return true;
+    }
+
+    const translations = {
+      'rajshahi': ['রাজশাহী', 'তালাইমারী'],
+      'dhaka': ['ঢাকা', 'উত্তরা', 'ধানমন্ডি', 'মিরপুর', 'গুলশান', 'বনানী'],
+      'chittagong': ['চট্টগ্রাম', 'জিইসি'],
+      'chattogram': ['চট্টগ্রাম', 'জিইসি'],
+      'khulna': ['খুলনা'],
+      'barisal': ['বরিশাল'],
+      'barishal': ['বরিশাল'],
+      'sylhet': ['সিলেট'],
+      'rangpur': ['রংপুর'],
+      'mymensingh': ['ময়মনসিংহ'],
+      'bogra': ['বগুড়া'],
+      'bogura': ['বগুড়া'],
+      'comilla': ['কুমিল্লা'],
+      'cumilla': ['কুমিল্লা'],
+      'uttara': ['উত্তরা'],
+      'dhanmondi': ['ধানমন্ডি'],
+      'mirpur': ['মিরপুর'],
+      'gulshan': ['গুলশান'],
+      'banani': ['বনানী'],
+      'talaimari': ['তালাইমারী'],
+      'gec': ['জিইসি'],
+      'arif': ['আরিফ'],
+      'tanjila': ['তানজিলা'],
+      'rakibul': ['রাকিবুল'],
+      'sakib': ['সাকিব'],
+      'hasan': ['হাসান'],
+      'hossen': ['হোসেন'],
+      'hossain': ['হোসেন'],
+      'akter': ['আক্তার'],
+      'akther': ['আক্তার'],
+      'islam': ['ইসলাম'],
+    };
+
+    for (final entry in translations.entries) {
+      if (entry.key.contains(query) || query.contains(entry.key)) {
+        for (final banglaKeyword in entry.value) {
+          if (docAddress.contains(banglaKeyword) || docName.contains(banglaKeyword)) {
+            return true;
+          }
+        }
+      }
+    }
+
+    return false;
+  }
+
   List<BloodDonor> get _filteredDonors {
     final query = _searchController.text.trim().toLowerCase();
     return _allDonors.where((donor) {
       final matchesGroup = _selectedBloodGroup == 'All' || donor.bloodGroup == _selectedBloodGroup;
-      final matchesQuery = query.isEmpty ||
-          donor.name.toLowerCase().contains(query) ||
-          donor.address.toLowerCase().contains(query) ||
-          donor.bloodGroup.toLowerCase().contains(query) ||
-          donor.contactNumber.contains(query);
+      final matchesQuery = _matchesBilingualQuery(donor, query);
       return matchesGroup && matchesQuery;
     }).toList();
   }
@@ -199,9 +258,9 @@ class _RoktoSebaViewState extends State<RoktoSebaView> {
                       physics: const NeverScrollableScrollPhysics(),
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: isWide ? 2 : 1,
-                        crossAxisSpacing: 14,
-                        mainAxisSpacing: 14,
-                        mainAxisExtent: 154,
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                        mainAxisExtent: 122,
                       ),
                       itemCount: _filteredDonors.length,
                       itemBuilder: (context, index) {
@@ -366,36 +425,39 @@ class _RoktoSebaViewState extends State<RoktoSebaView> {
 
   // ─── QUICK ACTION TILES ROW ───────────────────────────────────────
   Widget _buildQuickActionRow(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: _buildActionTile(
-            title: 'রক্ত চাই',
-            subtitle: 'জরুরি রক্তের আবেদন করুন',
-            icon: Icons.water_drop_rounded,
-            iconColor: const Color(0xFFE11D48),
-            iconBg: const Color(0xFFFFE4E6),
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const RequestBloodView()),
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            child: _buildActionTile(
+              title: 'রক্ত চাই',
+              subtitle: 'জরুরি রক্তের\nআবেদন করুন',
+              icon: Icons.water_drop_rounded,
+              iconColor: const Color(0xFFE11D48),
+              iconBg: const Color(0xFFFFE4E6),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const RequestBloodView()),
+              ),
             ),
           ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _buildActionTile(
-            title: 'রক্ত দিতে চাই',
-            subtitle: 'রক্তদাতা হিসেবে যুক্ত হন',
-            icon: Icons.favorite_rounded,
-            iconColor: const Color(0xFF10B981),
-            iconBg: const Color(0xFFD1FAE5),
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const DonateBloodView()),
+          const SizedBox(width: 12),
+          Expanded(
+            child: _buildActionTile(
+              title: 'রক্ত দিতে চাই',
+              subtitle: 'রক্তদাতা হিসেবে\nযুক্ত হন',
+              icon: Icons.favorite_rounded,
+              iconColor: const Color(0xFF10B981),
+              iconBg: const Color(0xFFD1FAE5),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const DonateBloodView()),
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -411,7 +473,7 @@ class _RoktoSebaViewState extends State<RoktoSebaView> {
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
       child: Container(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -425,36 +487,43 @@ class _RoktoSebaViewState extends State<RoktoSebaView> {
           ],
         ),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(9),
               decoration: BoxDecoration(
                 color: iconBg,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(icon, color: iconColor, size: 22),
+              child: Icon(icon, color: iconColor, size: 21),
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: 8),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: textDark,
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.bold,
+                        color: textDark,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     subtitle,
                     style: const TextStyle(
-                      fontSize: 11,
+                      fontSize: 10.5,
                       color: textMuted,
+                      height: 1.2,
                     ),
-                    maxLines: 1,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
@@ -633,18 +702,18 @@ class _RoktoSebaViewState extends State<RoktoSebaView> {
           ),
         );
       },
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(16),
       child: Container(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(color: const Color(0xFFE2E8F0)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
-              blurRadius: 10,
-              offset: const Offset(0, 3),
+              color: Colors.black.withValues(alpha: 0.02),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
@@ -663,7 +732,7 @@ class _RoktoSebaViewState extends State<RoktoSebaView> {
                         child: Text(
                           donor.name,
                           style: const TextStyle(
-                            fontSize: 15,
+                            fontSize: 14,
                             fontWeight: FontWeight.w800,
                             color: textDark,
                           ),
@@ -675,25 +744,25 @@ class _RoktoSebaViewState extends State<RoktoSebaView> {
                       const Icon(
                         Icons.verified_rounded,
                         color: Color(0xFF10B981),
-                        size: 16,
+                        size: 15,
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 6),
 
                 // Blood Group Badge
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
                     color: const Color(0xFFFFE4E6),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: const Color(0xFFFECDD3)),
                   ),
                   child: Text(
                     donor.bloodGroup,
                     style: const TextStyle(
-                      fontSize: 13,
+                      fontSize: 12,
                       fontWeight: FontWeight.w900,
                       color: brandRed,
                     ),
@@ -707,15 +776,15 @@ class _RoktoSebaViewState extends State<RoktoSebaView> {
               children: [
                 const Icon(
                   Icons.location_on_outlined,
-                  size: 14,
+                  size: 13,
                   color: textMuted,
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: 3),
                 Expanded(
                   child: Text(
                     donor.address,
                     style: const TextStyle(
-                      fontSize: 12.5,
+                      fontSize: 12,
                       color: textMuted,
                       fontWeight: FontWeight.w500,
                     ),
@@ -726,8 +795,6 @@ class _RoktoSebaViewState extends State<RoktoSebaView> {
               ],
             ),
 
-            const Divider(height: 1, color: Color(0xFFF1F5F9)),
-
             // Bottom Row: Donation Time & Direct Call Pill Button
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -735,7 +802,7 @@ class _RoktoSebaViewState extends State<RoktoSebaView> {
                 Text(
                   'শেষ দান: ${donor.lastDonationDate}',
                   style: const TextStyle(
-                    fontSize: 11.5,
+                    fontSize: 11,
                     color: Color(0xFF64748B),
                     fontWeight: FontWeight.w500,
                   ),
@@ -744,16 +811,16 @@ class _RoktoSebaViewState extends State<RoktoSebaView> {
                 // Call Pill Button
                 InkWell(
                   onTap: () => _makePhoneCall(donor.contactNumber),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(16),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                     decoration: BoxDecoration(
                       color: brandRed,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
                           color: brandRed.withValues(alpha: 0.25),
-                          blurRadius: 6,
+                          blurRadius: 4,
                           offset: const Offset(0, 2),
                         ),
                       ],
@@ -761,12 +828,12 @@ class _RoktoSebaViewState extends State<RoktoSebaView> {
                     child: const Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.phone_rounded, color: Colors.white, size: 13),
+                        Icon(Icons.phone_rounded, color: Colors.white, size: 12),
                         SizedBox(width: 4),
                         Text(
                           'কল দিন',
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 11.5,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),

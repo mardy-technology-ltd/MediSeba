@@ -1359,4 +1359,62 @@ class ApiService {
     }
     return null;
   }
+
+  /// Fetch Patient Dashboard & Overview metrics from API: GET /patient/dashboard
+  static Future<Map<String, dynamic>?> fetchPatientDashboard(String token) async {
+    final stopwatch = Stopwatch()..start();
+    final String url = '$baseUrl/patient/dashboard';
+    final Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    final reqId = ApiLogger.logRequest(
+      screen: 'Patient Portal View',
+      trigger: 'initState() / Dynamic Fetch',
+      functionName: 'fetchPatientDashboard',
+      isUserAction: false,
+      method: 'GET',
+      url: url,
+      headers: headers,
+    );
+
+    try {
+      final response = await http.get(
+        Uri.parse(url),
+        headers: headers,
+      ).timeout(const Duration(seconds: 8));
+
+      stopwatch.stop();
+
+      ApiLogger.logResponse(
+        requestId: reqId,
+        statusCode: response.statusCode,
+        body: response.body,
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
+
+      if (response.statusCode == 200) {
+        final body = jsonDecode(response.body);
+        if (body['status'] == 'success' || body['data'] != null) {
+          return Map<String, dynamic>.from(body['data'] ?? body);
+        }
+      }
+    } catch (e) {
+      stopwatch.stop();
+      ApiLogger.logError(
+        requestId: reqId,
+        screen: 'Patient Portal View',
+        trigger: 'initState() / Dynamic Fetch',
+        functionName: 'fetchPatientDashboard',
+        method: 'GET',
+        url: url,
+        statusCode: 500,
+        errorDetails: e.toString(),
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
+    }
+    return null;
+  }
 }

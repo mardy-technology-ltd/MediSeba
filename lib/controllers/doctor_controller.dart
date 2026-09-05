@@ -49,6 +49,25 @@ class DoctorController extends ChangeNotifier {
   }
 
   void _applyFilters() {
+    final cleanQuery = _searchQuery.trim().toLowerCase();
+
+    // Generic keywords for doctor search that should match all doctors
+    const genericDoctorKeywords = {
+      'doctor',
+      'doctors',
+      'dr',
+      'dr.',
+      'doc',
+      'ডাক্তার',
+      'ডাক্তারগণ',
+      'ডাক্তাররা',
+      'দাক্তার',
+      'চিকিৎসক',
+      'বিশেষজ্ঞ',
+    };
+
+    final bool isGenericDoctorSearch = genericDoctorKeywords.contains(cleanQuery);
+
     _filteredDoctors = _allDoctors.where((doctor) {
       bool matchesSpecialty = _selectedSpecialty == 'সকল (All)';
       if (!matchesSpecialty) {
@@ -68,10 +87,34 @@ class DoctorController extends ChangeNotifier {
             (categoryEnglish.isNotEmpty && docSpecialty.contains(categoryEnglish));
       }
 
-      bool matchesSearch = _searchQuery.isEmpty ||
-          doctor.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          doctor.specialty.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          doctor.hospital.toLowerCase().contains(_searchQuery.toLowerCase());
+      if (cleanQuery.isEmpty || isGenericDoctorSearch) {
+        return matchesSpecialty;
+      }
+
+      final String docName = doctor.name.toLowerCase();
+      final String docSpecialty = doctor.specialty.toLowerCase();
+      final String docHospital = doctor.hospital.toLowerCase();
+      final String docDegree = doctor.degree.toLowerCase();
+
+      bool matchesSearch = docName.contains(cleanQuery) ||
+          docSpecialty.contains(cleanQuery) ||
+          docHospital.contains(cleanQuery) ||
+          docDegree.contains(cleanQuery);
+
+      // Transliteration and partial name match support
+      if (!matchesSearch) {
+        if ((cleanQuery.contains('arif') || cleanQuery.contains('আরিফ')) && docName.contains('আরিফ')) {
+          matchesSearch = true;
+        } else if ((cleanQuery.contains('farzana') || cleanQuery.contains('ফারজানা')) && docName.contains('ফারজানা')) {
+          matchesSearch = true;
+        } else if ((cleanQuery.contains('tamim') || cleanQuery.contains('তামিম')) && docName.contains('তামিম')) {
+          matchesSearch = true;
+        } else if ((cleanQuery.contains('saima') || cleanQuery.contains('সায়মা')) && docName.contains('সায়মা')) {
+          matchesSearch = true;
+        } else if ((cleanQuery.contains('tanvir') || cleanQuery.contains('তানভীর')) && docName.contains('তানভীর')) {
+          matchesSearch = true;
+        }
+      }
 
       return matchesSpecialty && matchesSearch;
     }).toList();
