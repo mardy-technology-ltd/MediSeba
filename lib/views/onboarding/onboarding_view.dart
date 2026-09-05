@@ -56,6 +56,7 @@ class _OnboardingViewState extends State<OnboardingView> {
 
     final List<Map<String, dynamic>> onboardingData = [
       {
+        'image': 'assets/images/onboarding_1.jpg',
         'icon': Icons.medical_services_rounded,
         'title': isBangla ? 'অনলাইনে অভিজ্ঞ ডাক্তার দেখান' : 'Consult Expert Doctors Online',
         'subtitle': isBangla
@@ -66,24 +67,26 @@ class _OnboardingViewState extends State<OnboardingView> {
         'badge': isBangla ? '২৪/৭ ডক্টর সেবা' : '24/7 Doctor Care',
       },
       {
-        'icon': Icons.local_pharmacy_rounded,
-        'title': isBangla ? 'জরুরি রক্তসেবা ও ওষুধ অর্ডার' : 'Emergency Blood & Medicine Order',
+        'image': 'assets/images/onboarding_2.jpg',
+        'icon': Icons.bloodtype_rounded,
+        'title': isBangla ? 'জরুরি রক্তসেবা ও স্বাস্থ্য ক্যাম্প' : 'Emergency Blood & Health Care',
         'subtitle': isBangla
-            ? '১০০% আসল ওষুধ মেডিশপ থেকে অর্ডার করুন এবং যেকোনো জরুরি প্রয়োজনে রক্তসেবা ও অ্যাম্বুলেন্স পান।'
-            : 'Order authentic medicines from MediShop and access emergency blood donors & ambulance service.',
-        'bgColor': const Color(0xFFE0F2FE),
-        'accentColor': const Color(0xFF0284C7),
-        'badge': isBangla ? 'জরুরি সেবা ও মেডিশপ' : 'Emergency & Pharmacy',
+            ? 'জরুরি প্রয়োজনে রক্তদাতা ও ব্লাড ব্যাংক খুঁজুন এবং বিনামূল্যে হেলথ ক্যাম্প সেবা গ্রহন করুন।'
+            : 'Find emergency blood donors & blood banks and attend free health care camps.',
+        'bgColor': const Color(0xFFFEF2F2),
+        'accentColor': const Color(0xFFDC2626),
+        'badge': isBangla ? 'রক্তদান ও ডক্টর সেবা' : 'Blood & Care',
       },
       {
-        'icon': Icons.monitor_heart_rounded,
-        'title': isBangla ? 'ডিজিটাল পেশেন্ট পোর্টাল ও রেকর্ডস' : 'Digital Patient Portal & Records',
+        'image': 'assets/images/onboarding_3.jpg',
+        'icon': Icons.airport_shuttle_rounded,
+        'title': isBangla ? 'জরুরি অ্যাম্বুলেন্স ও ইমার্জেন্সি' : 'Rapid Ambulance & Emergency',
         'subtitle': isBangla
-            ? 'আপনার ডিজিটাল প্রেসক্রিপশন, পেমেন্ট রিসিট ও হেলথ ভাইটাল হিস্ট্রি রাখুন সবসময় সুরক্ষিত।'
-            : 'Keep all your digital prescriptions, payment receipts & health vitals safely stored in one portal.',
-        'bgColor': const Color(0xFFF3E8FF),
-        'accentColor': const Color(0xFF7E22CE),
-        'badge': isBangla ? 'স্মার্ট হেলথ রেকর্ডস' : 'Smart Health Records',
+            ? 'যেকোনো স্থানে ২৪/৭ দ্রুত অ্যাম্বুলেন্স বুকিং এবং জরুরি চিকিৎসা সহায়তা পান নিমিষেই।'
+            : 'Book 24/7 rapid ambulance service and emergency medical assistance anywhere, instantly.',
+        'bgColor': const Color(0xFFE0F2FE),
+        'accentColor': const Color(0xFF0284C7),
+        'badge': isBangla ? 'জরুরি অ্যাম্বুলেন্স সেবা' : '24/7 Ambulance Service',
       },
     ];
 
@@ -150,26 +153,35 @@ class _OnboardingViewState extends State<OnboardingView> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            // Decorative Icon Card Container
+                            // Premium Image Card Container
                             Container(
-                              width: 170,
-                              height: 170,
+                              width: double.infinity,
+                              height: 220,
                               decoration: BoxDecoration(
-                                color: data['bgColor'] as Color,
-                                shape: BoxShape.circle,
+                                borderRadius: BorderRadius.circular(20),
                                 boxShadow: [
                                   BoxShadow(
                                     color: (data['accentColor'] as Color).withValues(alpha: 0.15),
-                                    blurRadius: 30,
-                                    offset: const Offset(0, 10),
+                                    blurRadius: 25,
+                                    offset: const Offset(0, 8),
                                   ),
                                 ],
                               ),
-                              child: Center(
-                                child: Icon(
-                                  data['icon'] as IconData,
-                                  size: 80,
-                                  color: data['accentColor'] as Color,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                child: Image.asset(
+                                  data['image'] as String,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) => Container(
+                                    color: data['bgColor'] as Color,
+                                    child: Center(
+                                      child: Icon(
+                                        data['icon'] as IconData,
+                                        size: 80,
+                                        color: data['accentColor'] as Color,
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
