@@ -17,12 +17,12 @@ class MedicineModel {
 
   factory MedicineModel.fromJson(Map<String, dynamic> json) {
     return MedicineModel(
-      id: json['id'] is int ? json['id'] : int.tryParse(json['id'].toString()) ?? 0,
-      brandName: (json['brand_name'] ?? '').toString().trim(),
-      genericName: (json['generic_name'] ?? '').toString().trim(),
-      dosageForm: (json['dosage_form'] ?? '').toString().trim(),
-      strength: (json['strength'] ?? '').toString().trim(),
-      manufacturer: (json['manufacturer'] ?? '').toString().trim(),
+      id: json['id'] is int ? json['id'] : (int.tryParse(json['id']?.toString() ?? '') ?? 0),
+      brandName: (json['brand_name'] ?? json['brandName'] ?? json['name'] ?? '').toString().trim(),
+      genericName: (json['generic_name'] ?? json['genericName'] ?? json['generic'] ?? '').toString().trim(),
+      dosageForm: (json['dosage_form'] ?? json['dosageForm'] ?? json['form'] ?? json['type'] ?? 'Tablet').toString().trim(),
+      strength: (json['strength'] ?? json['mg'] ?? '').toString().trim(),
+      manufacturer: (json['manufacturer'] ?? json['company'] ?? json['brand'] ?? '').toString().trim(),
     );
   }
 

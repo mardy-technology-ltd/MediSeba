@@ -56,7 +56,18 @@ class _MediShopViewState extends State<MediShopView> {
       final list = await ApiService.searchMedicines(query: query, forceRefresh: forceRefresh);
       if (mounted) {
         setState(() {
-          _allMedicines = list;
+          if (list.isNotEmpty) {
+            if (query.isEmpty) {
+              _allMedicines = list;
+            } else {
+              final existingNames = _allMedicines.map((m) => m.brandName.toLowerCase()).toSet();
+              for (final item in list) {
+                if (!existingNames.contains(item.brandName.toLowerCase())) {
+                  _allMedicines.add(item);
+                }
+              }
+            }
+          }
           _applyFilters();
           _isLoading = false;
         });
@@ -69,12 +80,12 @@ class _MediShopViewState extends State<MediShopView> {
   }
 
   void _onSearchChanged(String query) {
+    _applyFilters(); // Instant UI update on keystroke
+
     if (_debounceTimer?.isActive ?? false) _debounceTimer!.cancel();
-    _debounceTimer = Timer(const Duration(milliseconds: 400), () {
-      if (query.trim().length >= 2 || query.isEmpty) {
-        _fetchMedicines(query: query);
-      } else {
-        _applyFilters();
+    _debounceTimer = Timer(const Duration(milliseconds: 350), () {
+      if (query.trim().length >= 2 || query.trim().isEmpty) {
+        _fetchMedicines(query: query.trim());
       }
     });
   }
@@ -83,13 +94,30 @@ class _MediShopViewState extends State<MediShopView> {
     final query = _searchController.text.trim().toLowerCase();
     setState(() {
       _filteredMedicines = _allMedicines.where((med) {
-        final matchesQuery = query.isEmpty ||
-            med.brandName.toLowerCase().contains(query) ||
-            med.genericName.toLowerCase().contains(query) ||
-            med.manufacturer.toLowerCase().contains(query);
+        final brand = med.brandName.toLowerCase();
+        final generic = med.genericName.toLowerCase();
+        final company = med.manufacturer.toLowerCase();
+        final form = med.dosageForm.toLowerCase();
+        final strength = med.strength.toLowerCase();
 
-        final matchesCategory = _selectedCategory == 'সবকটি' ||
-            med.dosageForm.toLowerCase() == _selectedCategory.toLowerCase();
+        final matchesQuery = query.isEmpty ||
+            brand.contains(query) ||
+            generic.contains(query) ||
+            company.contains(query) ||
+            form.contains(query) ||
+            strength.contains(query);
+
+        bool matchesCategory = false;
+        if (_selectedCategory == 'সবকটি') {
+          matchesCategory = true;
+        } else {
+          final cat = _selectedCategory.toLowerCase();
+          matchesCategory = form.contains(cat) ||
+              (cat == 'capsule' && form.contains('cap')) ||
+              (cat == 'syrup' && (form.contains('syrup') || form.contains('liquid') || form.contains('suspension'))) ||
+              (cat == 'drops' && form.contains('drop')) ||
+              (cat == 'tablet' && (form.contains('tablet') || form.contains('tab')));
+        }
 
         return matchesQuery && matchesCategory;
       }).toList();

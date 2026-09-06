@@ -308,8 +308,9 @@ class ApiService {
     }
 
     final stopwatch = Stopwatch()..start();
-    final encodedQuery = Uri.encodeComponent(cleanQuery);
-    final url = '$medicinesEndpoint$encodedQuery';
+    final String url = cleanQuery.isEmpty
+        ? 'https://api.mediseba.org/api/v1/search-medicines'
+        : '$medicinesEndpoint${Uri.encodeComponent(cleanQuery)}';
     final headers = {
       'Accept': 'application/json',
       'User-Agent': 'MediSebaApp/1.0',
@@ -317,7 +318,7 @@ class ApiService {
 
     final reqId = ApiLogger.logRequest(
       screen: 'Medicine Inventory Search',
-      trigger: cleanQuery.isEmpty ? 'initState()' : 'Search Query Input',
+      trigger: cleanQuery.isEmpty ? 'initState() / All Medicines' : 'Search Query Input',
       functionName: 'searchMedicines',
       isUserAction: cleanQuery.isNotEmpty,
       method: 'GET',
@@ -328,7 +329,7 @@ class ApiService {
     try {
       final response = await http
           .get(Uri.parse(url), headers: headers)
-          .timeout(const Duration(seconds: 6));
+          .timeout(const Duration(seconds: 8));
 
       stopwatch.stop();
 
@@ -340,18 +341,27 @@ class ApiService {
       );
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> body = jsonDecode(response.body);
-        if (body['success'] == true && body['data'] is List) {
-          final List<dynamic> list = body['data'];
-          final items = list
-              .map(
-                (item) => MedicineModel.fromJson(item as Map<String, dynamic>),
-              )
-              .toList();
-          if (items.isNotEmpty) {
-            await CacheService.put(cacheKey, list);
-            return items;
+        final dynamic body = jsonDecode(response.body);
+        List<dynamic>? list;
+
+        if (body is Map<String, dynamic>) {
+          if (body['data'] is List) {
+            list = body['data'];
+          } else if (body['data'] is Map && body['data']['data'] is List) {
+            list = body['data']['data'];
+          } else if (body['medicines'] is List) {
+            list = body['medicines'];
           }
+        } else if (body is List) {
+          list = body;
+        }
+
+        if (list != null) {
+          final items = list
+              .map((item) => MedicineModel.fromJson(item as Map<String, dynamic>))
+              .toList();
+          await CacheService.put(cacheKey, list);
+          return items;
         }
       }
     } catch (e) {
