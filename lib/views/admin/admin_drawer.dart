@@ -13,7 +13,7 @@ import 'admin_settings_view.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/home_controller.dart';
 import '../../controllers/language_controller.dart';
-import '../auth/login_view.dart';
+import '../home/home_view.dart';
 
 class AdminDrawer extends StatelessWidget {
   final int selectedIndex;
@@ -206,7 +206,7 @@ class AdminDrawer extends StatelessWidget {
                   if (context.mounted) {
                     Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(
-                        builder: (context) => LoginView(
+                        builder: (context) => HomeView(
                           homeController: HomeController.instance ?? HomeController(),
                           authController: AuthController.instance ?? AuthController(),
                           languageController: LanguageController.instance ?? LanguageController(),

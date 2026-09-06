@@ -5,7 +5,7 @@ import '../../controllers/doctor_controller.dart';
 import '../../controllers/language_controller.dart';
 import '../../widgets/custom_app_bar.dart';
 import '../appointments/book_appointment_view.dart';
-import '../payment/payment_view.dart';
+import '../offers/widgets/eps_payment_gateway_dialog.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/home_controller.dart';
 import '../../widgets/auth_guard.dart';
@@ -309,11 +309,11 @@ class _DoctorListViewState extends State<DoctorListView> {
                                   message: 'ডাক্তারের কনসালটেশন বা চেম্বার অ্যাপয়েন্টমেন্ট সম্পন্ন করতে লগইন করুন।',
                                   onAuthenticated: () {
                                     if (doctor.isAvailableToday) {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => PaymentView(doctor: doctor),
-                                        ),
+                                      EpsPaymentGatewayDialog.show(
+                                        context: context,
+                                        packageName: doctor.name.isEmpty ? 'Instant Medicine Doctor Consultation' : doctor.name,
+                                        price: doctor.consultationFee.toInt() > 0 ? doctor.consultationFee.toInt() : 800,
+                                        points: 999,
                                       );
                                     } else {
                                       Navigator.push(

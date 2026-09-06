@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../controllers/auth_controller.dart';
 import '../../controllers/language_controller.dart';
+import '../../services/cache_service.dart';
 import '../../widgets/custom_app_bar.dart';
 
 class CustomerSupportView extends StatefulWidget {
+  final AuthController? authController;
   final LanguageController? languageController;
 
   const CustomerSupportView({
     super.key,
+    this.authController,
     this.languageController,
   });
 
@@ -32,6 +36,33 @@ class _CustomerSupportViewState extends State<CustomerSupportView> {
   void initState() {
     super.initState();
     _langController = widget.languageController ?? LanguageController();
+
+    final authCtrl = widget.authController ?? AuthController.instance;
+    final userModel = authCtrl?.currentUserData;
+    final authUser = authCtrl?.currentUser;
+
+    String initialName = '';
+    if (userModel != null && userModel.name.isNotEmpty) {
+      initialName = userModel.name;
+    } else if (authUser?.displayName != null && authUser!.displayName!.isNotEmpty) {
+      initialName = authUser.displayName!;
+    } else {
+      initialName = CacheService.get('user_name')?.toString() ?? '';
+    }
+
+    String initialPhone = '';
+    if (userModel != null && userModel.phone.isNotEmpty) {
+      initialPhone = userModel.phone;
+    } else {
+      initialPhone = CacheService.get('user_phone')?.toString() ?? authCtrl?.loginIdentifier ?? '';
+    }
+
+    if (initialName.isNotEmpty) {
+      _nameController.text = initialName;
+    }
+    if (initialPhone.isNotEmpty) {
+      _phoneController.text = initialPhone;
+    }
   }
 
   @override
@@ -64,8 +95,6 @@ class _CustomerSupportViewState extends State<CustomerSupportView> {
         if (!mounted) return;
         setState(() => _isSubmitting = false);
 
-        _nameController.clear();
-        _phoneController.clear();
         _messageController.clear();
 
         ScaffoldMessenger.of(context).showSnackBar(

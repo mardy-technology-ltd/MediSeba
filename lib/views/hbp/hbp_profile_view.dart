@@ -4,7 +4,7 @@ import '../../controllers/auth_controller.dart';
 import '../../controllers/home_controller.dart';
 import '../../controllers/language_controller.dart';
 import '../customer_support/customer_support_view.dart';
-import '../onboarding/onboarding_view.dart';
+import '../home/home_view.dart';
 
 class HbpProfileView extends StatefulWidget {
   final AuthController authController;
@@ -502,7 +502,7 @@ class _HbpProfileViewState extends State<HbpProfileView> {
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => OnboardingView(
+                    builder: (context) => HomeView(
                       homeController: homeCtrl,
                       authController: widget.authController,
                       languageController: widget.languageController ?? LanguageController(),

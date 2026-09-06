@@ -4,7 +4,7 @@ import '../../controllers/auth_controller.dart';
 import '../../controllers/home_controller.dart';
 import '../../controllers/language_controller.dart';
 import '../../models/user_model.dart';
-import '../auth/login_view.dart';
+import '../home/home_view.dart';
 import '../customer_support/customer_support_view.dart';
 import '../../widgets/custom_app_bar.dart';
 import 'edit_profile_view.dart';
@@ -217,9 +217,10 @@ class ProfileView extends StatelessWidget {
                         Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => LoginView(
+                            builder: (context) => HomeView(
                               authController: authController,
                               homeController: homeController,
+                              languageController: languageController,
                             ),
                           ),
                           (route) => false,

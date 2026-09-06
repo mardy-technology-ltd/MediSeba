@@ -1038,7 +1038,10 @@ class _HomeViewState extends State<HomeView> {
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => CustomerSupportView(languageController: _langController),
+            builder: (_) => CustomerSupportView(
+              authController: widget.authController,
+              languageController: _langController,
+            ),
           ),
         ),
       ),
@@ -1641,8 +1644,11 @@ class _HomeViewState extends State<HomeView> {
         userName.contains('sojib') ||
         userName.contains('hbp');
 
+    final screenSize = MediaQuery.of(context).size;
+    final responsiveLogoHeight = (screenSize.height * 0.062).clamp(48.0, 58.0);
+
     return Drawer(
-      width: MediaQuery.of(context).size.width * 0.82,
+      width: screenSize.width * 0.82,
       backgroundColor: Colors.white.withValues(alpha: 0.75),
       elevation: 0,
       shape: const RoundedRectangleBorder(
@@ -1669,13 +1675,14 @@ class _HomeViewState extends State<HomeView> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // MediSeba Logo Image
+                      // MediSeba Logo Image (Responsive Size)
                       Image.asset(
                         'assets/images/logo.png',
-                        height: 40,
+                        height: responsiveLogoHeight,
                         fit: BoxFit.contain,
                       ),
 
+                      /*
                       // Glassmorphic Segmented Language Toggle Button (Eng | বাং)
                       Container(
                         padding: const EdgeInsets.all(3),
@@ -1753,6 +1760,7 @@ class _HomeViewState extends State<HomeView> {
                           ],
                         ),
                       ),
+                      */
                     ],
                   ),
                 ),

@@ -1,15 +1,26 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import '../../constants/app_colors.dart';
-import '../../constants/app_text_styles.dart';
 import '../../models/doctor_model.dart';
-import '../shared_widgets/custom_button.dart';
-import '../shared_widgets/custom_textfield.dart';
 import 'payment_success_view.dart';
+
+import '../offers/widgets/eps_payment_gateway_dialog.dart';
 
 class PaymentView extends StatefulWidget {
   final DoctorModel doctor;
 
   const PaymentView({super.key, required this.doctor});
+
+  static Future<void> show({
+    required BuildContext context,
+    required DoctorModel doctor,
+  }) {
+    return EpsPaymentGatewayDialog.show(
+      context: context,
+      packageName: doctor.name.isEmpty ? 'Instant Medicine Doctor Consultation' : doctor.name,
+      price: doctor.consultationFee.toInt() > 0 ? doctor.consultationFee.toInt() : 800,
+      points: 999,
+    );
+  }
 
   @override
   State<PaymentView> createState() => _PaymentViewState();
@@ -17,23 +28,53 @@ class PaymentView extends StatefulWidget {
 
 class _PaymentViewState extends State<PaymentView> {
   final _formKey = GlobalKey<FormState>();
-  final _phoneController = TextEditingController(text: '01710000001');
-  final _trxIdController = TextEditingController(text: 'TRX9920184');
+  late TextEditingController _phoneController;
+  late TextEditingController _referralController;
+  late TextEditingController _txnController;
 
   String _selectedMethod = 'bKash';
   bool _isProcessing = false;
 
-  final List<Map<String, dynamic>> _paymentMethods = [
-    {'id': 'bKash', 'name': 'bKash', 'color': const Color(0xFFE2136E)},
-    {'id': 'Nagad', 'name': 'Nagad', 'color': const Color(0xFFF7931E)},
-    {'id': 'Rocket', 'name': 'Rocket', 'color': const Color(0xFF8C3494)},
-    {'id': 'Card', 'name': 'Card', 'color': AppColors.primary},
-  ];
+  late int _remainingSeconds;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _phoneController = TextEditingController(text: '01710000001');
+    _referralController = TextEditingController();
+    _txnController = TextEditingController(
+      text: 'EPS-PKG-${DateTime.now().millisecondsSinceEpoch}',
+    );
+
+    _remainingSeconds = 15 * 60 - 21;
+    _startTimer();
+  }
+
+  void _startTimer() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_remainingSeconds > 0) {
+        if (mounted) {
+          setState(() => _remainingSeconds--);
+        }
+      } else {
+        _timer?.cancel();
+      }
+    });
+  }
+
+  String get _formattedTime {
+    final minutes = _remainingSeconds ~/ 60;
+    final seconds = _remainingSeconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
 
   @override
   void dispose() {
+    _timer?.cancel();
     _phoneController.dispose();
-    _trxIdController.dispose();
+    _referralController.dispose();
+    _txnController.dispose();
     super.dispose();
   }
 
@@ -50,7 +91,8 @@ class _PaymentViewState extends State<PaymentView> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('পেমেন্ট সফলভাবে সম্পন্ন হয়েছে! অ্যাপয়েন্টমেন্ট নিশ্চিত করা হয়েছে।'),
-          backgroundColor: AppColors.success,
+          backgroundColor: Color(0xFF00E676),
+          behavior: SnackBarBehavior.floating,
         ),
       );
 
@@ -63,276 +105,342 @@ class _PaymentViewState extends State<PaymentView> {
     }
   }
 
+  Widget _buildPaymentMethodCard(String id, String label, IconData icon, Color color) {
+    final isSelected = _selectedMethod == id;
+    return InkWell(
+      onTap: () => setState(() => _selectedMethod = id),
+      borderRadius: BorderRadius.circular(16),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF2A1B30) : const Color(0xFF131D31),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? const Color(0xFFEC4899) : const Color(0xFF2A3B5C),
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: isSelected ? const Color(0xFFEC4899) : color, size: 20),
+            const SizedBox(height: 6),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? Colors.white : const Color(0xFF94A3B8),
+                fontSize: 13,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final fee = widget.doctor.consultationFee.toInt();
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: const Color(0xFF0A1120),
       appBar: AppBar(
-        backgroundColor: AppColors.surface,
+        backgroundColor: const Color(0xFF0A1120),
         elevation: 0,
         scrolledUnderElevation: 0,
-        title: Text('পেমেন্ট প্যানেল', style: AppTextStyles.heading2),
-        centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 20),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 18),
           onPressed: () => Navigator.pop(context),
         ),
-      ),
-      body: Column(
-        children: [
-          // Security Header Banner
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.06),
-              border: Border(
-                bottom: BorderSide(color: AppColors.primary.withValues(alpha: 0.12)),
+        title: Row(
+          children: [
+            Image.asset(
+              'assets/images/logo.png',
+              height: 28,
+              errorBuilder: (context, error, stackTrace) => const Text(
+                'মেডিসেবা',
+                style: TextStyle(color: Color(0xFF00E676), fontWeight: FontWeight.w900, fontSize: 18),
               ),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          ],
+        ),
+        actions: [
+          Container(
+            margin: const EdgeInsets.only(right: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: const Color(0xFF062D24),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: const Color(0xFF0F9D58), width: 1),
+            ),
+            child: const Row(
               children: [
-                const Row(
-                  children: [
-                    Icon(Icons.shield_rounded, color: AppColors.primary, size: 16),
-                    SizedBox(width: 6),
-                    Text(
-                      '256-Bit SSL Encrypted',
-                      style: TextStyle(
-                        color: AppColors.primary,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
+                Icon(Icons.shield_outlined, color: Color(0xFF00E676), size: 14),
+                SizedBox(width: 5),
+                Text(
+                  'Official EPS Gateway',
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF00E676)),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 1. Service Summary Card
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF131D31),
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(color: const Color(0xFF2A3B5C)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'ইনস্ট্যান্ট ডাক্তার কনসালটেশন সার্ভিস ফি',
+                              style: TextStyle(fontSize: 11.5, color: Color(0xFF38BDF8), fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              widget.doctor.name.isEmpty ? 'Instant Medicine Doctor Consultation' : widget.doctor.name,
+                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Colors.white),
+                            ),
+                            const SizedBox(height: 4),
+                            const Row(
+                              children: [
+                                Text('⚡ ', style: TextStyle(fontSize: 12)),
+                                Expanded(
+                                  child: Text(
+                                    'বিএমডিসি রেজিস্টার্ড ডাক্তারের সাথে সরাসরি ইনস্ট্যান্ট ভিডিও কল',
+                                    style: TextStyle(fontSize: 11, color: Color(0xFF38BDF8), fontWeight: FontWeight.w500),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
+                      const SizedBox(width: 8),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          const Text(
+                            'মোট প্রদেয়',
+                            style: TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '৳ $fee',
+                            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Color(0xFF00E676)),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // 2. Gateway Channel Title
+                const Text(
+                  'পেমেন্ট গেটওয়ে চ্যানেল নির্বাচন করুন:',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white),
+                ),
+
+                const SizedBox(height: 12),
+
+                // 4 Payment Methods Grid
+                Row(
+                  children: [
+                    Expanded(child: _buildPaymentMethodCard('bKash', 'bKash', Icons.account_balance_wallet_rounded, const Color(0xFFEC4899))),
+                    const SizedBox(width: 10),
+                    Expanded(child: _buildPaymentMethodCard('Nagad', 'Nagad', Icons.account_balance_wallet_outlined, const Color(0xFFF97316))),
+                    const SizedBox(width: 10),
+                    Expanded(child: _buildPaymentMethodCard('Rocket', 'Rocket', Icons.account_balance_rounded, const Color(0xFFA855F7))),
+                    const SizedBox(width: 10),
+                    Expanded(child: _buildPaymentMethodCard('Cards', 'Cards', Icons.credit_card_rounded, const Color(0xFF38BDF8))),
                   ],
                 ),
+
+                const SizedBox(height: 20),
+
+                // 3. Form Fields
+                _buildInputLabel('কাস্টমার মোবাইল নম্বর (Mobile Number) *'),
+                _buildInputField(
+                  controller: _phoneController,
+                  keyboardType: TextInputType.phone,
+                  suffixIcon: const Icon(Icons.phone_rounded, color: Color(0xFF64748B), size: 20),
+                ),
+
+                const SizedBox(height: 14),
+
+                _buildInputLabel('HBP রেফারেল কোড / এজেন্ট আইডি (ঐচ্ছিক / Optional)'),
+                _buildInputField(
+                  controller: _referralController,
+                  hintText: 'উদাহরণ: HBP-01700000010 (যদি থাকে)',
+                ),
+
+                const SizedBox(height: 14),
+
+                _buildInputLabel('EPS মার্চেন্ট ট্রানজেকশন আইডি (TxnID)'),
+                _buildInputField(
+                  controller: _txnController,
+                ),
+
+                const SizedBox(height: 18),
+
+                // 4. Security & Timer Bar
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(4),
+                    color: const Color(0xFF0F1B2E),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: const Color(0xFF1E2D4A)),
                   ),
-                  child: const Text(
-                    'PAYMENT',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Row(
+                        children: [
+                          Icon(Icons.lock_outline_rounded, color: Color(0xFF00E676), size: 16),
+                          SizedBox(width: 8),
+                          Text(
+                            '256-bit SSL Encrypted EPS Gateway',
+                            style: TextStyle(color: Color(0xFF00E676), fontSize: 12, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF3B1E08),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: const Color(0xFFEA580C), width: 1),
+                        ),
+                        child: Row(
+                          children: [
+                            const Text('⏰ ', style: TextStyle(fontSize: 10)),
+                            Text(
+                              _formattedTime,
+                              style: const TextStyle(color: Color(0xFFFB923C), fontSize: 11, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // 5. Submit Button
+                SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: ElevatedButton(
+                    onPressed: _isProcessing ? null : _handleConfirmPayment,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF00A884),
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                     ),
+                    child: _isProcessing
+                        ? const SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                          )
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'EPS গেটওয়ে দিয়ে পেমেন্ট করুন (৳ $fee)',
+                                style: const TextStyle(fontSize: 15.5, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(width: 8),
+                              const Icon(Icons.arrow_forward_rounded, size: 20),
+                            ],
+                          ),
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Footer Text
+                const Center(
+                  child: Column(
+                    children: [
+                      Text(
+                        'Verified & Powered by Easy Payment System (EPS) Limited',
+                        style: TextStyle(color: Color(0xFF64748B), fontSize: 11, fontWeight: FontWeight.w500),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        'পেমেন্ট সম্পন্ন হওয়ার সাথে সাথেই আপনার হেলথ ওয়ালেটে পয়েন্ট যুক্ত হবে',
+                        style: TextStyle(color: Color(0xFF475569), fontSize: 10.5),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
 
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Consultation Summary Card
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: AppColors.surface,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.04),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                        border: Border.all(color: AppColors.primary.withValues(alpha: 0.15)),
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: AppColors.primary.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Icon(
-                              Icons.videocam_rounded,
-                              color: AppColors.primary,
-                              size: 24,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'ইনস্ট্যান্ট ভিডিও কনসালটেশন',
-                                  style: TextStyle(
-                                    color: AppColors.primary,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  widget.doctor.name,
-                                  style: AppTextStyles.heading2.copyWith(fontSize: 17),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: AppColors.primary.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Column(
-                              children: [
-                                const Text(
-                                  'মোট প্রদেয়',
-                                  style: TextStyle(
-                                    color: AppColors.textSecondary,
-                                    fontSize: 10,
-                                  ),
-                                ),
-                                Text(
-                                  '৳ $fee',
-                                  style: AppTextStyles.heading2.copyWith(
-                                    color: AppColors.primary,
-                                    fontSize: 18,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+  Widget _buildInputLabel(String label) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6.0),
+      child: Text(
+        label,
+        style: const TextStyle(color: Color(0xFFCBD5E1), fontSize: 12.5, fontWeight: FontWeight.w600),
+      ),
+    );
+  }
 
-                    const SizedBox(height: 24),
-
-                    // Payment Method Selection
-                    Text('পেমেন্ট মেথড নির্বাচন করুন', style: AppTextStyles.heading3),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: _paymentMethods.map((method) {
-                        final isSelected = _selectedMethod == method['id'];
-                        final color = method['color'] as Color;
-
-                        return Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                            child: InkWell(
-                              onTap: () {
-                                setState(() => _selectedMethod = method['id'] as String);
-                              },
-                              borderRadius: BorderRadius.circular(12),
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 200),
-                                padding: const EdgeInsets.symmetric(vertical: 12),
-                                decoration: BoxDecoration(
-                                  color: isSelected ? color.withValues(alpha: 0.1) : AppColors.surface,
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: isSelected ? color : AppColors.cardBg,
-                                    width: isSelected ? 2 : 1,
-                                  ),
-                                  boxShadow: isSelected
-                                      ? [
-                                          BoxShadow(
-                                            color: color.withValues(alpha: 0.2),
-                                            blurRadius: 6,
-                                            offset: const Offset(0, 2),
-                                          )
-                                        ]
-                                      : null,
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    method['name'] as String,
-                                    style: TextStyle(
-                                      color: isSelected ? color : AppColors.textPrimary,
-                                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    // Form Fields Card Container
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: AppColors.surface,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.03),
-                            blurRadius: 10,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Account Mobile Number Field
-                          CustomTextField(
-                            label: '$_selectedMethod অ্যাকাউন্ট নম্বর',
-                            hint: '017XXXXXXXX',
-                            controller: _phoneController,
-                            keyboardType: TextInputType.phone,
-                            prefixIcon: Icons.phone_android_rounded,
-                            validator: (val) => val == null || val.isEmpty ? 'মোবাইল নম্বর প্রদান করুন' : null,
-                          ),
-
-                          const SizedBox(height: 16),
-
-                          // Transaction ID Field
-                          CustomTextField(
-                            label: 'ট্রানজেকশন আইডি (Transaction ID)',
-                            hint: 'TRX9920184',
-                            controller: _trxIdController,
-                            prefixIcon: Icons.receipt_long_rounded,
-                            validator: (val) => val == null || val.isEmpty ? 'ট্রানজেকশন আইডি প্রদান করুন' : null,
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 28),
-
-                    // Confirm Payment Button
-                    CustomButton(
-                      text: 'পেমেন্ট নিশ্চিত করুন (৳ $fee)',
-                      icon: Icons.arrow_forward_rounded,
-                      isLoading: _isProcessing,
-                      onPressed: _handleConfirmPayment,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
+  Widget _buildInputField({
+    required TextEditingController controller,
+    TextInputType keyboardType = TextInputType.text,
+    String? hintText,
+    Widget? suffixIcon,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF131D31),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFF2A3B5C)),
+      ),
+      child: TextField(
+        controller: controller,
+        keyboardType: keyboardType,
+        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 14),
+        decoration: InputDecoration(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          border: InputBorder.none,
+          hintText: hintText,
+          hintStyle: const TextStyle(color: Color(0xFF475569), fontSize: 13, fontWeight: FontWeight.w400),
+          suffixIcon: suffixIcon,
+        ),
       ),
     );
   }

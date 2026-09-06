@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../controllers/language_controller.dart';
 import '../../services/social_media_launcher.dart';
 import '../../widgets/helpline_bottom_sheet.dart';
+import 'widgets/social_brand_logo.dart';
 
 class SocialMediaView extends StatelessWidget {
   final LanguageController? languageController;
@@ -242,19 +243,9 @@ class SocialMediaView extends StatelessWidget {
         child: Row(
           children: [
             // Left Official Icon Container
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: item.brandColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: item.brandColor.withValues(alpha: 0.2), width: 1),
-              ),
-              child: Icon(
-                item.iconData,
-                color: item.brandColor,
-                size: 24,
-              ),
+            SocialBrandLogo(
+              brandId: item.id,
+              size: 44,
             ),
 
             const SizedBox(width: 12),
@@ -278,12 +269,12 @@ class SocialMediaView extends StatelessWidget {
                   Text(
                     subtitle,
                     style: const TextStyle(
-                      fontSize: 11,
+                      fontSize: 11.5,
                       color: Color(0xFF64748B),
                       fontWeight: FontWeight.w500,
+                      height: 1.25,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
                   ),
                 ],
               ),
