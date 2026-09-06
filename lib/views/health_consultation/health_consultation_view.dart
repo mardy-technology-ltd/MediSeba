@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../controllers/language_controller.dart';
+import '../../widgets/custom_app_bar.dart';
 import '../../widgets/helpline_bottom_sheet.dart';
 import 'health_consultation_success_view.dart';
 
@@ -84,24 +85,9 @@ class _HealthConsultationViewState extends State<HealthConsultationView> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0.5,
-        automaticallyImplyLeading: false,
-        leading: widget.showBackBtn
-            ? IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_rounded, color: textDark, size: 20),
-                onPressed: () => Navigator.pop(context),
-              )
-            : null,
-        title: Text(
-          _langController.tr('স্বাস্থ্য বিষয়ক পরামর্শ', 'Health Consultation'),
-          style: const TextStyle(
-            fontSize: 17,
-            fontWeight: FontWeight.bold,
-            color: textDark,
-          ),
-        ),
+      appBar: CustomAppBar(
+        title: _langController.tr('স্বাস্থ্য বিষয়ক পরামর্শ', 'Health Consultation'),
+        showBackButton: widget.showBackBtn,
         actions: [
           IconButton(
             icon: const Icon(Icons.phone_in_talk_rounded, color: brandGreen),

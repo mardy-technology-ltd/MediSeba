@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../controllers/language_controller.dart';
+import '../../widgets/custom_app_bar.dart';
 
 class HealthConsultationSuccessView extends StatelessWidget {
   final LanguageController? languageController;
@@ -27,18 +28,9 @@ class HealthConsultationSuccessView extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0.5,
-        automaticallyImplyLeading: false,
-        title: Text(
-          langController.tr('পরামর্শের অবস্থা', 'Consultation Status'),
-          style: const TextStyle(
-            fontSize: 17,
-            fontWeight: FontWeight.bold,
-            color: textDark,
-          ),
-        ),
+      appBar: CustomAppBar(
+        title: langController.tr('পরামর্শের অবস্থা', 'Consultation Status'),
+        showBackButton: true,
       ),
       body: SafeArea(
         child: Padding(
