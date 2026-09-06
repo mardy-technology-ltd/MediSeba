@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../controllers/language_controller.dart';
 import '../../widgets/custom_app_bar.dart';
 import '../../widgets/helpline_bottom_sheet.dart';
@@ -27,6 +28,17 @@ class _MatriSebaViewState extends State<MatriSebaView> {
   void initState() {
     super.initState();
     _langController = widget.languageController ?? LanguageController();
+  }
+
+  Future<void> _makePhoneCall(String phone) async {
+    final Uri uri = Uri.parse('tel:$phone');
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      }
+    } catch (e) {
+      debugPrint('Error making phone call: $e');
+    }
   }
 
   @override
@@ -289,7 +301,7 @@ class _MatriSebaViewState extends State<MatriSebaView> {
               width: double.infinity,
               height: 44,
               child: ElevatedButton.icon(
-                onPressed: () => showHelplineBottomSheet(context),
+                onPressed: () => _makePhoneCall('09647111666'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: brandPink,
                   elevation: 0,
@@ -299,7 +311,7 @@ class _MatriSebaViewState extends State<MatriSebaView> {
                 ),
                 icon: const Icon(Icons.phone_in_talk_rounded, color: Colors.white, size: 18),
                 label: Text(
-                  _langController.tr('প্যাকেজটি সাবস্ক্রাইব করুন (09647111666)', 'Subscribe Package (09647111666)'),
+                  _langController.tr('প্যাকেজ নিতে কল করুন (09647111666)', 'Call to Get Package (09647111666)'),
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 12.5,
@@ -391,7 +403,7 @@ class _MatriSebaViewState extends State<MatriSebaView> {
               width: double.infinity,
               height: 44,
               child: ElevatedButton.icon(
-                onPressed: () => showHelplineBottomSheet(context),
+                onPressed: () => _makePhoneCall('09647111666'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: brandPurple,
                   elevation: 0,
@@ -401,7 +413,7 @@ class _MatriSebaViewState extends State<MatriSebaView> {
                 ),
                 icon: const Icon(Icons.phone_in_talk_rounded, color: Colors.white, size: 18),
                 label: Text(
-                  _langController.tr('প্যাকেজটি সাবস্ক্রাইব করুন (09647111666)', 'Subscribe Package (09647111666)'),
+                  _langController.tr('প্যাকেজ নিতে কল করুন (09647111666)', 'Call to Get Package (09647111666)'),
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 12.5,

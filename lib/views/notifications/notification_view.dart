@@ -14,7 +14,7 @@ class NotificationView extends StatelessWidget {
   Widget build(BuildContext context) {
     final notifications = [
       {
-        'title': 'মেডি সেবা সার্ভিস আপডেট',
+        'title': 'মেডিসেবা সার্ভিস আপডেট',
         'subtitle':
             'এখন ঘরে বসেই ডাক্তার সিরিয়াল ও স্বাস্থ্য পরামর্শ নিন একদম সহজে!',
         'time': '১০ মিনিট আগে',
@@ -34,7 +34,7 @@ class NotificationView extends StatelessWidget {
       {
         'title': 'জরুরি অ্যাম্বুলেন্স সেবা',
         'subtitle':
-            'মেডি সেবা ২৪/৭ জরুরি অ্যাম্বুলেন্স সার্ভিস এখন চালু রয়েছে।',
+            'মেডিসেবা ২৪/৭ জরুরি অ্যাম্বুলেন্স সার্ভিস এখন চালু রয়েছে।',
         'time': '১ দিন আগে',
         'icon': Icons.airport_shuttle_rounded,
         'color': const Color(0xFFE53935),

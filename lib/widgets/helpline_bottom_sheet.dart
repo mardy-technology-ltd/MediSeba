@@ -13,8 +13,8 @@ void showHelplineBottomSheet(BuildContext context) {
 class HelplineBottomSheet extends StatelessWidget {
   const HelplineBottomSheet({super.key});
 
-  static const hotlinePhone = '+88009647111666';
-  static const hotlinePhoneDisplay = '+880 09647 111 666';
+  static const hotlinePhone = '09647111666';
+  static const hotlinePhoneDisplay = '09647111666';
   static const supportEmail = 'info@mediseba.org';
 
   Future<void> _makePhoneCall() async {

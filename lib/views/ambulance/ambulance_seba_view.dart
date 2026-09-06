@@ -15,7 +15,7 @@ class AmbulanceSebaView extends StatefulWidget {
 class _AmbulanceSebaViewState extends State<AmbulanceSebaView> {
   late final LanguageController _langController;
 
-  static const hotlinePhone = '+88009647111666';
+  static const hotlinePhone = '09647111666';
   static const hotlinePhoneDisplay = '09647111666';
 
   static const brandBlue = Color(0xFF2563EB);

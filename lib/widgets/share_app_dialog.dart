@@ -22,7 +22,7 @@ class _ShareAppDialogState extends State<ShareAppDialog> {
   static const String appLink =
       'https://play.google.com/store/apps/details?id=com.mediseba.mediseba';
   static const String shareMessage =
-      'মেডি সেবা - আপনার স্বাস্থ্যসেবা এখন এক ক্লিকে!\n'
+      'মেডিসেবা - আপনার স্বাস্থ্যসেবা এখন এক ক্লিকে!\n'
       'স্বাস্থ্য বিষয়ক জিজ্ঞাসা, ডাক্তার সিরিয়াল ও জরুরি সেবার জন্য ইনস্টল করুন MediSeba অ্যাপ:\n'
       '$appLink';
 
