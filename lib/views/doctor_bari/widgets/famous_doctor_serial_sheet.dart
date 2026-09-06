@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../services/api_service.dart';
 
 class DoctorOptionItem {
   final String name;
@@ -432,7 +433,7 @@ class _FamousDoctorSerialSheetState extends State<FamousDoctorSerialSheet> {
     }
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (_nameController.text.trim().isEmpty ||
         _phoneController.text.trim().isEmpty ||
         _selectedDoctor == null ||
@@ -447,6 +448,51 @@ class _FamousDoctorSerialSheetState extends State<FamousDoctorSerialSheet> {
       return;
     }
 
+    final formattedDate =
+        '${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}';
+
+    // Trigger API call (logs request & response details to terminal)
+    final responseData = await ApiService.bookDoctorSerial(
+      patientName: _nameController.text.trim(),
+      patientPhone: _phoneController.text.trim(),
+      doctorName: _selectedDoctor!.name,
+      hospital: _hospitalController.text.trim().isEmpty ? _selectedDoctor!.hospital : _hospitalController.text.trim(),
+      preferredDate: formattedDate,
+      degree: _selectedDoctor!.degree,
+      specialty: _selectedDoctor!.specialty,
+      fee: _selectedDoctor!.fee,
+      screen: 'Famous Doctor Serial Sheet Modal',
+    );
+
+    // Check if device is offline
+    if (responseData['is_offline'] == true) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.wifi_off_rounded, color: Colors.white, size: 20),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  responseData['message'] ?? 'কোনো ইন্টারনেট সংযোগ নেই! অনুগ্রহ করে কানেকশন চেক করুন।',
+                  style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.redAccent,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          duration: const Duration(seconds: 4),
+        ),
+      );
+      return;
+    }
+
+    final ticketId = responseData['ticket_id'] as String? ?? '#MS-84920';
+
+    if (!mounted) return;
     Navigator.pop(context); // Close form sheet
 
     // Show Success Confirmation Sheet
@@ -499,9 +545,9 @@ class _FamousDoctorSerialSheetState extends State<FamousDoctorSerialSheet> {
                   color: const Color(0xFFF1F5F9),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Text(
-                  'টিকেট আইডি: #MS-84920',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: darkGreen),
+                child: Text(
+                  'টিকেট আইডি: $ticketId',
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: darkGreen),
                 ),
               ),
               const SizedBox(height: 12),

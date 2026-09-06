@@ -910,12 +910,17 @@ class _HomeViewState extends State<HomeView> {
         iconBg: const Color(0xFFE8F5E9),
         borderColor: const Color(0xFFC8E6C9),
         imagePath: 'assets/images/dr_ghor.png',
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => DoctorBariView(languageController: _langController),
-          ),
-        ),
+        onTap: () {
+          debugPrint('\n==================================================');
+          debugPrint('🔘 [HOME BUTTON CLICKED] "ডাক্তার ঘর" (Doctor Bari)');
+          debugPrint('==================================================\n');
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => DoctorBariView(languageController: _langController),
+            ),
+          );
+        },
       ),
       _CategoryItem(
         title: lang.tr('ডাক্তার সিরিয়াল', 'Doctor Serial'),
@@ -929,12 +934,18 @@ class _HomeViewState extends State<HomeView> {
         iconBg: const Color(0xFFE1F5FE),
         borderColor: const Color(0xFF81D4FA),
         imagePath: 'assets/images/dr_serial.png',
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => DoctorListView(languageController: _langController),
-          ),
-        ),
+        onTap: () {
+          debugPrint('\n==================================================');
+          debugPrint('🔘 [HOME BUTTON CLICKED] "ডাক্তার সিরিয়াল" (Doctor Serial)');
+          debugPrint('Triggering API Call: GET https://api.mediseba.org/api/v1/doctors');
+          debugPrint('==================================================\n');
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => DoctorListView(languageController: _langController),
+            ),
+          );
+        },
       ),
       _CategoryItem(
         title: lang.tr('মেডিশপ', 'MediShop'),

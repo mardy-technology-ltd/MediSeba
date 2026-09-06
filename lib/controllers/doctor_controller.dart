@@ -29,7 +29,7 @@ class DoctorController extends ChangeNotifier {
       _allDoctors = await ApiService.getDoctors(forceRefresh: forceRefresh);
       _applyFilters();
     } catch (e) {
-      _errorMessage = 'নেটওয়ার্ক ত্রুটি: $e';
+      _errorMessage = 'ইন্টারনেট সংযোগ বিচ্ছিন্ন রয়েছে। অনুগ্রহ করে ওয়াইফাই বা মোবাইল ডাটা চালু করে আবার চেষ্টা করুন।';
       _allDoctors = [];
       _applyFilters();
     } finally {

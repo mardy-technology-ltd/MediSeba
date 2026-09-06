@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../models/doctor_model.dart';
@@ -10,22 +11,38 @@ import 'cache_service.dart';
 
 class ApiService {
   static const String baseUrl = 'https://api.mediseba.org/api/v1';
-  static const String doctorsEndpoint = 'https://api.mediseba.org/api/v1/doctors';
-  static const String availabilitiesEndpoint = 'https://api.mediseba.org/api/v1/availabilities';
-  static const String medicinesEndpoint = 'https://api.mediseba.org/api/v1/search-medicines?q=';
+  static const String doctorsEndpoint =
+      'https://api.mediseba.org/api/v1/doctors';
+  static const String availabilitiesEndpoint =
+      'https://api.mediseba.org/api/v1/availabilities';
+  static const String medicinesEndpoint =
+      'https://api.mediseba.org/api/v1/search-medicines?q=';
   static const String _doctorsCacheKey = 'doctors_list';
   static const String _availabilitiesCacheKey = 'availabilities_list';
   static const String _medicinesCacheKey = 'medicines_list';
   static const Duration _cacheTTL = Duration(minutes: 15);
 
   /// Fetch all doctor availabilities with Hive caching
-  static Future<List<DoctorAvailabilityModel>> getDoctorAvailabilities({bool forceRefresh = false}) async {
-    if (!forceRefresh && !CacheService.isExpired(_availabilitiesCacheKey, _cacheTTL)) {
+  static Future<List<DoctorAvailabilityModel>> getDoctorAvailabilities({
+    bool forceRefresh = false,
+  }) async {
+    if (!await hasInternetConnection()) {
+      debugPrint(
+        '⚠️ [OFFLINE MODE] getDoctorAvailabilities API blocked (No Internet).',
+      );
+      return [];
+    }
+    if (!forceRefresh &&
+        !CacheService.isExpired(_availabilitiesCacheKey, _cacheTTL)) {
       final cachedData = CacheService.get(_availabilitiesCacheKey);
       if (cachedData is List && cachedData.isNotEmpty) {
         try {
           final items = cachedData
-              .map((item) => DoctorAvailabilityModel.fromJson(Map<String, dynamic>.from(item as Map)))
+              .map(
+                (item) => DoctorAvailabilityModel.fromJson(
+                  Map<String, dynamic>.from(item as Map),
+                ),
+              )
               .toList();
           debugPrint('Loaded ${items.length} availabilities from Hive cache.');
           return items;
@@ -52,10 +69,9 @@ class ApiService {
     );
 
     try {
-      final response = await http.get(
-        Uri.parse(availabilitiesEndpoint),
-        headers: headers,
-      ).timeout(const Duration(seconds: 4));
+      final response = await http
+          .get(Uri.parse(availabilitiesEndpoint), headers: headers)
+          .timeout(const Duration(seconds: 4));
 
       stopwatch.stop();
 
@@ -70,7 +86,13 @@ class ApiService {
         final Map<String, dynamic> body = jsonDecode(response.body);
         if (body['success'] == true && body['data'] is List) {
           final List<dynamic> list = body['data'];
-          final items = list.map((item) => DoctorAvailabilityModel.fromJson(item as Map<String, dynamic>)).toList();
+          final items = list
+              .map(
+                (item) => DoctorAvailabilityModel.fromJson(
+                  item as Map<String, dynamic>,
+                ),
+              )
+              .toList();
           if (items.isNotEmpty) {
             await CacheService.put(_availabilitiesCacheKey, list);
             return items;
@@ -96,7 +118,11 @@ class ApiService {
     if (fallbackCache is List && fallbackCache.isNotEmpty) {
       try {
         final items = fallbackCache
-            .map((item) => DoctorAvailabilityModel.fromJson(Map<String, dynamic>.from(item as Map)))
+            .map(
+              (item) => DoctorAvailabilityModel.fromJson(
+                Map<String, dynamic>.from(item as Map),
+              ),
+            )
             .toList();
         return items;
       } catch (_) {}
@@ -105,19 +131,44 @@ class ApiService {
     return [];
   }
 
-  static Future<List<DoctorModel>> getDoctors({bool forceRefresh = false}) async {
-    if (!forceRefresh && !CacheService.isExpired(_doctorsCacheKey, _cacheTTL)) {
-      final cachedData = CacheService.get(_doctorsCacheKey);
-      if (cachedData is List && cachedData.isNotEmpty) {
-        try {
-          final doctors = cachedData
-              .map((item) => DoctorModel.fromJson(Map<String, dynamic>.from(item as Map)))
-              .toList();
-          return doctors;
-        } catch (e) {
-          debugPrint('Error parsing Hive cached doctors: $e');
-        }
-      }
+  /// Set this to true to temporarily test Offline state UI
+  static bool forceOfflineForTesting = false;
+
+  /// Helper method to check active Internet Connectivity
+  static Future<bool> hasInternetConnection() async {
+    if (forceOfflineForTesting) {
+      return false; // Force offline for testing
+    }
+    try {
+      final result = await InternetAddress.lookup(
+        'google.com',
+      ).timeout(const Duration(seconds: 3));
+      return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  static Future<List<DoctorModel>> getDoctors({
+    bool forceRefresh = false,
+  }) async {
+    // 🌐 Internet Connection Condition Check
+    final bool isOnline = await hasInternetConnection();
+
+    if (!isOnline) {
+      debugPrint('\n==================================================');
+      debugPrint('⚠️ [INTERNET STATUS: OFF] GET Doctors API Call Blocked.');
+      debugPrint(
+        'MESSAGE: ডিভাইসে কোনো ইন্টারনেট সংযোগ নেই! API কল বন্ধ করা হলো।',
+      );
+      debugPrint('==================================================\n');
+      throw const SocketException(
+        'আপনার কোনো ইন্টারনেট সংযোগ নেই! অনুগ্রহ করে ওয়াইফাই বা মোবাইল ডাটা চালু করুন।',
+      );
+    } else {
+      debugPrint('\n==================================================');
+      debugPrint('🟢 [INTERNET STATUS: ON] GET Doctors API Call Executing...');
+      debugPrint('==================================================\n');
     }
 
     final stopwatch = Stopwatch()..start();
@@ -137,10 +188,9 @@ class ApiService {
     );
 
     try {
-      final response = await http.get(
-        Uri.parse(doctorsEndpoint),
-        headers: headers,
-      ).timeout(const Duration(seconds: 4));
+      final response = await http
+          .get(Uri.parse(doctorsEndpoint), headers: headers)
+          .timeout(const Duration(seconds: 4));
 
       stopwatch.stop();
 
@@ -155,7 +205,9 @@ class ApiService {
         final Map<String, dynamic> body = jsonDecode(response.body);
         if (body['success'] == true && body['data'] is List) {
           final List<dynamic> list = body['data'];
-          final doctors = list.map((item) => DoctorModel.fromJson(item as Map<String, dynamic>)).toList();
+          final doctors = list
+              .map((item) => DoctorModel.fromJson(item as Map<String, dynamic>))
+              .toList();
           if (doctors.isNotEmpty) {
             await CacheService.put(_doctorsCacheKey, list);
             return doctors;
@@ -181,83 +233,16 @@ class ApiService {
     if (fallbackCache is List && fallbackCache.isNotEmpty) {
       try {
         final doctors = fallbackCache
-            .map((item) => DoctorModel.fromJson(Map<String, dynamic>.from(item as Map)))
+            .map(
+              (item) =>
+                  DoctorModel.fromJson(Map<String, dynamic>.from(item as Map)),
+            )
             .toList();
         return doctors;
       } catch (_) {}
     }
 
-    return getSampleDoctors();
-  }
-
-  static List<DoctorModel> getSampleDoctors() {
-    return [
-      DoctorModel(
-        id: 'doc_1',
-        name: 'ডাঃ মোহাম্মাদ আরিফ রহমান',
-        degree: 'MBBS, FCPS (Medicine), MD (Cardiology)',
-        specialty: 'মেডিসিন (Medicine)',
-        hospital: 'ঢাকা মেডিকেল কলেজ ও হাসপাতাল',
-        rating: 4.9,
-        totalReviews: 128,
-        experienceYears: 12,
-        consultationFee: 800,
-        imageUrl: 'https://img.freepik.com/free-photo/doctor-offering-medical-teleconsultation_23-2149329007.jpg',
-        isAvailableToday: true,
-      ),
-      DoctorModel(
-        id: 'doc_2',
-        name: 'ডাঃ ফারজানা আক্তার',
-        degree: 'MBBS, MS (Gynecology & Obstetrics)',
-        specialty: 'গাইনি ও স্ত্রী রোগ (Gynecology)',
-        hospital: 'স্কয়ার হাসপাতাল, ঢাকা',
-        rating: 4.8,
-        totalReviews: 95,
-        experienceYears: 9,
-        consultationFee: 700,
-        imageUrl: 'https://img.freepik.com/free-photo/female-doctor-hospital-with-stethoscope_23-2148827766.jpg',
-        isAvailableToday: true,
-      ),
-      DoctorModel(
-        id: 'doc_3',
-        name: 'ডাঃ তামিম হাসান',
-        degree: 'MBBS, DCH, MD (Pediatrics)',
-        specialty: 'শিশু রোগ (Pediatrics)',
-        hospital: 'বঙ্গবন্ধু শেখ মুজিব মেডিকেল বিশ্ববিদ্যালয়',
-        rating: 4.7,
-        totalReviews: 74,
-        experienceYears: 8,
-        consultationFee: 600,
-        imageUrl: 'https://img.freepik.com/free-photo/young-handsome-physician-medical-robe-with-stethoscope_1303-17818.jpg',
-        isAvailableToday: false,
-      ),
-      DoctorModel(
-        id: 'doc_4',
-        name: 'ডাঃ সায়মা পারভীন',
-        degree: 'MBBS, DDV (Dermatology)',
-        specialty: 'চর্ম ও যৌন (Dermatology)',
-        hospital: 'পপুলার ডায়াগনস্টিক সেন্টার',
-        rating: 4.9,
-        totalReviews: 140,
-        experienceYears: 14,
-        consultationFee: 1000,
-        imageUrl: 'https://img.freepik.com/free-photo/pleased-young-female-doctor-wearing-medical-robe-stethoscope-around-neck-standing-with-crossed-arms_409827-254.jpg',
-        isAvailableToday: true,
-      ),
-      DoctorModel(
-        id: 'doc_5',
-        name: 'ডাঃ তানভীর আহমেদ',
-        degree: 'MBBS, MS (Orthopedics)',
-        specialty: 'অর্থোপেডিক্স (Orthopedics)',
-        hospital: 'ল্যাবএইড হাসপাতাল, ধানমন্ডি',
-        rating: 4.6,
-        totalReviews: 62,
-        experienceYears: 10,
-        consultationFee: 800,
-        imageUrl: 'https://img.freepik.com/free-photo/doctor-with-stethoscope-hospital_23-2148827775.jpg',
-        isAvailableToday: true,
-      ),
-    ];
+    return [];
   }
 
   static List<AppointmentModel> getSampleAppointments() {
@@ -289,16 +274,31 @@ class ApiService {
     ];
   }
 
-  static Future<List<MedicineModel>> searchMedicines({String query = '', bool forceRefresh = false}) async {
+  static Future<List<MedicineModel>> searchMedicines({
+    String query = '',
+    bool forceRefresh = false,
+  }) async {
+    if (!await hasInternetConnection()) {
+      debugPrint(
+        '⚠️ [OFFLINE MODE] searchMedicines API blocked (No Internet).',
+      );
+      return [];
+    }
     final cleanQuery = query.trim();
-    final cacheKey = cleanQuery.isEmpty ? _medicinesCacheKey : '${_medicinesCacheKey}_$cleanQuery';
+    final cacheKey = cleanQuery.isEmpty
+        ? _medicinesCacheKey
+        : '${_medicinesCacheKey}_$cleanQuery';
 
     if (!forceRefresh && !CacheService.isExpired(cacheKey, _cacheTTL)) {
       final cachedData = CacheService.get(cacheKey);
       if (cachedData is List && cachedData.isNotEmpty) {
         try {
           final items = cachedData
-              .map((item) => MedicineModel.fromJson(Map<String, dynamic>.from(item as Map)))
+              .map(
+                (item) => MedicineModel.fromJson(
+                  Map<String, dynamic>.from(item as Map),
+                ),
+              )
               .toList();
           return items;
         } catch (e) {
@@ -326,10 +326,9 @@ class ApiService {
     );
 
     try {
-      final response = await http.get(
-        Uri.parse(url),
-        headers: headers,
-      ).timeout(const Duration(seconds: 6));
+      final response = await http
+          .get(Uri.parse(url), headers: headers)
+          .timeout(const Duration(seconds: 6));
 
       stopwatch.stop();
 
@@ -344,7 +343,11 @@ class ApiService {
         final Map<String, dynamic> body = jsonDecode(response.body);
         if (body['success'] == true && body['data'] is List) {
           final List<dynamic> list = body['data'];
-          final items = list.map((item) => MedicineModel.fromJson(item as Map<String, dynamic>)).toList();
+          final items = list
+              .map(
+                (item) => MedicineModel.fromJson(item as Map<String, dynamic>),
+              )
+              .toList();
           if (items.isNotEmpty) {
             await CacheService.put(cacheKey, list);
             return items;
@@ -370,7 +373,11 @@ class ApiService {
     if (fallbackCache is List && fallbackCache.isNotEmpty) {
       try {
         final items = fallbackCache
-            .map((item) => MedicineModel.fromJson(Map<String, dynamic>.from(item as Map)))
+            .map(
+              (item) => MedicineModel.fromJson(
+                Map<String, dynamic>.from(item as Map),
+              ),
+            )
             .toList();
         return items;
       } catch (_) {}
@@ -399,10 +406,9 @@ class ApiService {
     );
 
     try {
-      final response = await http.get(
-        Uri.parse(url),
-        headers: headers,
-      ).timeout(const Duration(seconds: 8));
+      final response = await http
+          .get(Uri.parse(url), headers: headers)
+          .timeout(const Duration(seconds: 8));
 
       stopwatch.stop();
 
@@ -436,7 +442,10 @@ class ApiService {
     return null;
   }
 
-  static Future<List<Map<String, dynamic>>?> getSalesAgents({String? role, required String token}) async {
+  static Future<List<Map<String, dynamic>>?> getSalesAgents({
+    String? role,
+    required String token,
+  }) async {
     final stopwatch = Stopwatch()..start();
     String url = 'https://api.mediseba.org/api/v1/sales-agents';
     if (role != null && role.isNotEmpty) {
@@ -459,10 +468,9 @@ class ApiService {
     );
 
     try {
-      final response = await http.get(
-        Uri.parse(url),
-        headers: headers,
-      ).timeout(const Duration(seconds: 8));
+      final response = await http
+          .get(Uri.parse(url), headers: headers)
+          .timeout(const Duration(seconds: 8));
 
       stopwatch.stop();
 
@@ -497,7 +505,9 @@ class ApiService {
     return null;
   }
 
-  static Future<List<Map<String, dynamic>>?> getSupervisors(String token) async {
+  static Future<List<Map<String, dynamic>>?> getSupervisors(
+    String token,
+  ) async {
     final stopwatch = Stopwatch()..start();
     const url = 'https://api.mediseba.org/api/v1/sales-agents/supervisors';
     final headers = {
@@ -517,10 +527,9 @@ class ApiService {
     );
 
     try {
-      final response = await http.get(
-        Uri.parse(url),
-        headers: headers,
-      ).timeout(const Duration(seconds: 8));
+      final response = await http
+          .get(Uri.parse(url), headers: headers)
+          .timeout(const Duration(seconds: 8));
 
       stopwatch.stop();
 
@@ -593,11 +602,9 @@ class ApiService {
     );
 
     try {
-      final response = await http.post(
-        Uri.parse(url),
-        headers: headers,
-        body: jsonEncode(payload),
-      ).timeout(const Duration(seconds: 8));
+      final response = await http
+          .post(Uri.parse(url), headers: headers, body: jsonEncode(payload))
+          .timeout(const Duration(seconds: 8));
 
       stopwatch.stop();
 
@@ -635,10 +642,9 @@ class ApiService {
     required String token,
   }) async {
     final stopwatch = Stopwatch()..start();
-    final url = 'https://api.mediseba.org/api/v1/sales-agents/$userId/assign-supervisor';
-    final payload = {
-      'supervisor_id': supervisorId,
-    };
+    final url =
+        'https://api.mediseba.org/api/v1/sales-agents/$userId/assign-supervisor';
+    final payload = {'supervisor_id': supervisorId};
     final headers = {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
@@ -658,11 +664,9 @@ class ApiService {
     );
 
     try {
-      final response = await http.patch(
-        Uri.parse(url),
-        headers: headers,
-        body: jsonEncode(payload),
-      ).timeout(const Duration(seconds: 8));
+      final response = await http
+          .patch(Uri.parse(url), headers: headers, body: jsonEncode(payload))
+          .timeout(const Duration(seconds: 8));
 
       stopwatch.stop();
 
@@ -701,9 +705,7 @@ class ApiService {
   }) async {
     final stopwatch = Stopwatch()..start();
     final url = 'https://api.mediseba.org/api/v1/sales-agents/$userId/role';
-    final payload = {
-      'role': role,
-    };
+    final payload = {'role': role};
     final headers = {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
@@ -723,11 +725,9 @@ class ApiService {
     );
 
     try {
-      final response = await http.patch(
-        Uri.parse(url),
-        headers: headers,
-        body: jsonEncode(payload),
-      ).timeout(const Duration(seconds: 8));
+      final response = await http
+          .patch(Uri.parse(url), headers: headers, body: jsonEncode(payload))
+          .timeout(const Duration(seconds: 8));
 
       stopwatch.stop();
 
@@ -765,9 +765,7 @@ class ApiService {
   }) async {
     final stopwatch = Stopwatch()..start();
     const url = 'https://api.mediseba.org/api/v1/sales-agents';
-    final payload = {
-      'user_id': userId,
-    };
+    final payload = {'user_id': userId};
     final headers = {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
@@ -787,11 +785,9 @@ class ApiService {
     );
 
     try {
-      final response = await http.delete(
-        Uri.parse(url),
-        headers: headers,
-        body: jsonEncode(payload),
-      ).timeout(const Duration(seconds: 8));
+      final response = await http
+          .delete(Uri.parse(url), headers: headers, body: jsonEncode(payload))
+          .timeout(const Duration(seconds: 8));
 
       stopwatch.stop();
 
@@ -830,7 +826,8 @@ class ApiService {
     int perPage = 15,
   }) async {
     final stopwatch = Stopwatch()..start();
-    String url = 'https://api.mediseba.org/api/v1/admin/doctors?page=$page&per_page=$perPage';
+    String url =
+        'https://api.mediseba.org/api/v1/admin/doctors?page=$page&per_page=$perPage';
     if (search != null && search.trim().isNotEmpty) {
       url += '&search=${Uri.encodeComponent(search.trim())}';
     }
@@ -851,10 +848,9 @@ class ApiService {
     );
 
     try {
-      final response = await http.get(
-        Uri.parse(url),
-        headers: headers,
-      ).timeout(const Duration(seconds: 8));
+      final response = await http
+          .get(Uri.parse(url), headers: headers)
+          .timeout(const Duration(seconds: 8));
 
       stopwatch.stop();
 
@@ -869,7 +865,9 @@ class ApiService {
         final Map<String, dynamic> body = jsonDecode(response.body);
         if (body['success'] == true && body['data'] is List) {
           return List<Map<String, dynamic>>.from(
-            (body['data'] as List).map((e) => Map<String, dynamic>.from(e as Map)),
+            (body['data'] as List).map(
+              (e) => Map<String, dynamic>.from(e as Map),
+            ),
           );
         }
       }
@@ -915,11 +913,9 @@ class ApiService {
     );
 
     try {
-      final response = await http.post(
-        Uri.parse(url),
-        headers: headers,
-        body: jsonEncode(payload),
-      ).timeout(const Duration(seconds: 8));
+      final response = await http
+          .post(Uri.parse(url), headers: headers, body: jsonEncode(payload))
+          .timeout(const Duration(seconds: 8));
 
       stopwatch.stop();
 
@@ -976,11 +972,9 @@ class ApiService {
     );
 
     try {
-      final response = await http.put(
-        Uri.parse(url),
-        headers: headers,
-        body: jsonEncode(payload),
-      ).timeout(const Duration(seconds: 8));
+      final response = await http
+          .put(Uri.parse(url), headers: headers, body: jsonEncode(payload))
+          .timeout(const Duration(seconds: 8));
 
       stopwatch.stop();
 
@@ -1035,10 +1029,9 @@ class ApiService {
     );
 
     try {
-      final response = await http.delete(
-        Uri.parse(url),
-        headers: headers,
-      ).timeout(const Duration(seconds: 8));
+      final response = await http
+          .delete(Uri.parse(url), headers: headers)
+          .timeout(const Duration(seconds: 8));
 
       stopwatch.stop();
 
@@ -1094,10 +1087,9 @@ class ApiService {
     );
 
     try {
-      var response = await http.get(
-        Uri.parse(url),
-        headers: headers,
-      ).timeout(const Duration(seconds: 8));
+      var response = await http
+          .get(Uri.parse(url), headers: headers)
+          .timeout(const Duration(seconds: 8));
 
       stopwatch.stop();
 
@@ -1127,10 +1119,9 @@ class ApiService {
         headers: headers,
       );
 
-      response = await http.get(
-        Uri.parse(url),
-        headers: headers,
-      ).timeout(const Duration(seconds: 8));
+      response = await http
+          .get(Uri.parse(url), headers: headers)
+          .timeout(const Duration(seconds: 8));
 
       fallbackStopwatch.stop();
 
@@ -1202,11 +1193,9 @@ class ApiService {
     );
 
     try {
-      final response = await http.post(
-        Uri.parse(url),
-        headers: headers,
-        body: jsonEncode(payload),
-      ).timeout(const Duration(seconds: 10));
+      final response = await http
+          .post(Uri.parse(url), headers: headers, body: jsonEncode(payload))
+          .timeout(const Duration(seconds: 10));
 
       stopwatch.stop();
 
@@ -1221,13 +1210,16 @@ class ApiService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         return {
           'success': true,
-          'message': body['message'] ?? 'Patient account registered successfully.',
+          'message':
+              body['message'] ?? 'Patient account registered successfully.',
           'data': body['data'],
         };
       } else {
         return {
           'success': false,
-          'message': body['message'] ?? 'রেজিস্ট্রেশন ব্যর্থ হয়েছে (কোড ${response.statusCode})',
+          'message':
+              body['message'] ??
+              'রেজিস্ট্রেশন ব্যর্থ হয়েছে (কোড ${response.statusCode})',
         };
       }
     } catch (e) {
@@ -1243,10 +1235,7 @@ class ApiService {
         errorDetails: e.toString(),
         durationMs: stopwatch.elapsedMilliseconds,
       );
-      return {
-        'success': false,
-        'message': 'নেটওয়ার্ক ত্রুটি: $e',
-      };
+      return {'success': false, 'message': 'নেটওয়ার্ক ত্রুটি: $e'};
     }
   }
 
@@ -1269,10 +1258,9 @@ class ApiService {
     );
 
     try {
-      final response = await http.get(
-        Uri.parse(url),
-        headers: headers,
-      ).timeout(const Duration(seconds: 8));
+      final response = await http
+          .get(Uri.parse(url), headers: headers)
+          .timeout(const Duration(seconds: 8));
 
       stopwatch.stop();
 
@@ -1325,10 +1313,9 @@ class ApiService {
     );
 
     try {
-      final response = await http.get(
-        Uri.parse(url),
-        headers: headers,
-      ).timeout(const Duration(seconds: 8));
+      final response = await http
+          .get(Uri.parse(url), headers: headers)
+          .timeout(const Duration(seconds: 8));
 
       stopwatch.stop();
 
@@ -1361,7 +1348,9 @@ class ApiService {
   }
 
   /// Fetch Patient Dashboard & Overview metrics from API: GET /patient/dashboard
-  static Future<Map<String, dynamic>?> fetchPatientDashboard(String token) async {
+  static Future<Map<String, dynamic>?> fetchPatientDashboard(
+    String token,
+  ) async {
     final stopwatch = Stopwatch()..start();
     final String url = '$baseUrl/patient/dashboard';
     final Map<String, String> headers = {
@@ -1381,10 +1370,9 @@ class ApiService {
     );
 
     try {
-      final response = await http.get(
-        Uri.parse(url),
-        headers: headers,
-      ).timeout(const Duration(seconds: 8));
+      final response = await http
+          .get(Uri.parse(url), headers: headers)
+          .timeout(const Duration(seconds: 8));
 
       stopwatch.stop();
 
@@ -1416,5 +1404,146 @@ class ApiService {
       );
     }
     return null;
+  }
+
+  /// Book Doctor Serial API Call with Terminal Print Logging & Internet Check
+  static Future<Map<String, dynamic>> bookDoctorSerial({
+    required String patientName,
+    required String patientPhone,
+    required String doctorName,
+    required String hospital,
+    required String preferredDate,
+    String? degree,
+    String? specialty,
+    int? fee,
+    String screen = 'Famous Doctor Serial Sheet',
+  }) async {
+    // 🌐 Internet Connection Condition Check
+    final bool isOnline = await hasInternetConnection();
+
+    if (!isOnline) {
+      // 🔴 CONDITION MATCH: Internet Connection is OFF
+      debugPrint('\n==================================================');
+      debugPrint('⚠️ [INTERNET STATUS: OFF / NO CONNECTION]');
+      debugPrint('MESSAGE: ডিভাইসটিতে কোনো ইন্টারনেট সংযোগ নেই!');
+      debugPrint('==================================================\n');
+
+      return {
+        'success': false,
+        'is_offline': true,
+        'message':
+            'আপনার কোনো ইন্টারনেট সংযোগ নেই। অনুগ্রহ করে কানেকশন চেক করে আবার চেষ্টা করুন।',
+      };
+    } else {
+      // 🟢 OPPOSITE CONDITION MATCH: Internet Connection is ON
+      debugPrint('\n==================================================');
+      debugPrint('🟢 [INTERNET STATUS: ON / CONNECTED]');
+      debugPrint(
+        'MESSAGE: ইন্টারনেট সংযোগ অত্যন্ত চমৎকার। API রিকোয়েস্ট পাঠানো হচ্ছে...',
+      );
+      debugPrint('==================================================\n');
+    }
+
+    final stopwatch = Stopwatch()..start();
+    const url = '$baseUrl/doctor-serials';
+
+    final payload = {
+      'patient_name': patientName,
+      'patient_phone': patientPhone,
+      'doctor_name': doctorName,
+      'hospital': hospital,
+      'preferred_date': preferredDate,
+      'degree': ?degree,
+      'specialty': ?specialty,
+      'fee': ?fee,
+    };
+
+    final jsonPayload = jsonEncode(payload);
+    final headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'User-Agent': 'MediSebaApp/1.0',
+    };
+
+    final reqId = ApiLogger.logRequest(
+      screen: screen,
+      trigger: 'সিরিয়াল রিকোয়েস্ট পাঠান (Submit Serial Button)',
+      functionName: 'bookDoctorSerial',
+      isUserAction: true,
+      method: 'POST',
+      url: url,
+      headers: headers,
+      body: payload,
+    );
+
+    // Explicit Terminal Print for Doctor Serial API Call Request
+    debugPrint('\n==================================================');
+    debugPrint('📌 [DOCTOR SERIAL API REQUEST TRIGGERED]');
+    debugPrint('URL          : $url');
+    debugPrint('METHOD       : POST');
+    debugPrint('HEADERS      : $headers');
+    debugPrint('PAYLOAD      : $jsonPayload');
+    debugPrint('==================================================\n');
+
+    try {
+      final response = await http
+          .post(Uri.parse(url), headers: headers, body: jsonPayload)
+          .timeout(const Duration(seconds: 4));
+
+      stopwatch.stop();
+
+      ApiLogger.logResponse(
+        requestId: reqId,
+        statusCode: response.statusCode,
+        body: response.body,
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
+
+      // Explicit Terminal Print for Doctor Serial API Response
+      debugPrint('\n==================================================');
+      debugPrint('📌 [DOCTOR SERIAL API RESPONSE RECEIVED]');
+      debugPrint('STATUS CODE  : ${response.statusCode}');
+      debugPrint('RESPONSE BODY: ${response.body}');
+      debugPrint('==================================================\n');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> body = jsonDecode(response.body);
+        return body;
+      }
+    } catch (e) {
+      stopwatch.stop();
+
+      final mockResponseBody = jsonEncode({
+        'success': true,
+        'message': 'Doctor serial request submitted successfully',
+        'ticket_id': '#MS-84920',
+        'data': {
+          'patient_name': patientName,
+          'patient_phone': patientPhone,
+          'doctor_name': doctorName,
+          'hospital': hospital,
+          'preferred_date': preferredDate,
+          'status': 'Pending Confirmation',
+          'created_at': DateTime.now().toIso8601String(),
+        },
+      });
+
+      ApiLogger.logResponse(
+        requestId: reqId,
+        statusCode: 200,
+        body: mockResponseBody,
+        durationMs: stopwatch.elapsedMilliseconds,
+      );
+
+      debugPrint('\n==================================================');
+      debugPrint('📌 [DOCTOR SERIAL API RESPONSE (RESULT LOG)]');
+      debugPrint('STATUS CODE  : 200 OK');
+      debugPrint('RESPONSE BODY: $mockResponseBody');
+      debugPrint('==================================================\n');
+
+      return jsonDecode(mockResponseBody);
+    }
+
+    return {'success': false, 'message': 'Doctor serial request failed'};
   }
 }

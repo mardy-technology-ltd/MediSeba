@@ -224,32 +224,70 @@ class _DoctorListViewState extends State<DoctorListView> {
                       if (_doctorController.errorMessage != null && _doctorController.doctors.isEmpty) {
                         return Center(
                           child: Padding(
-                            padding: const EdgeInsets.all(24.0),
+                            padding: const EdgeInsets.all(28.0),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Icon(Icons.wifi_off_rounded, size: 50, color: Color(0xFF008536)),
-                                const SizedBox(height: 12),
-                                Text(
-                                  _doctorController.errorMessage!,
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontSize: 13,
-                                    color: Color(0xFF64748B),
-                                    fontWeight: FontWeight.w600,
+                                Container(
+                                  padding: const EdgeInsets.all(20),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFEF2F2),
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: const Color(0xFFFCA5A5), width: 1.2),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.red.withValues(alpha: 0.1),
+                                        blurRadius: 16,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: const Icon(
+                                    Icons.wifi_off_rounded,
+                                    size: 44,
+                                    color: Color(0xFFDC2626),
                                   ),
                                 ),
-                                const SizedBox(height: 16),
-                                ElevatedButton.icon(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF008536),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
+                                const SizedBox(height: 20),
+                                const Text(
+                                  'ইন্টারনেট সংযোগ নেই!',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w900,
+                                    color: Color(0xFF0F172A),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                const Text(
+                                  'আপনার ইন্টারনেট কানেকশনটি বিচ্ছিন্ন রয়েছে। অনুগ্রহ করে ওয়াইফাই বা মোবাইল ডাটা চালু করে আবার চেষ্টা করুন।',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Color(0xFF64748B),
+                                    fontWeight: FontWeight.w500,
+                                    height: 1.45,
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+                                SizedBox(
+                                  height: 44,
+                                  child: ElevatedButton.icon(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF008536),
+                                      elevation: 3,
+                                      shadowColor: const Color(0xFF008536).withValues(alpha: 0.35),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(24),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                                    ),
+                                    onPressed: () => _doctorController.fetchDoctors(forceRefresh: true),
+                                    icon: const Icon(Icons.refresh_rounded, color: Colors.white, size: 18),
+                                    label: const Text(
+                                      'পুনরায় চেষ্টা করুন',
+                                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13.5),
                                     ),
                                   ),
-                                  onPressed: () => _doctorController.fetchDoctors(),
-                                  icon: const Icon(Icons.refresh_rounded, color: Colors.white),
-                                  label: const Text('পুনরায় চেষ্টা করুন', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                                 ),
                               ],
                             ),
