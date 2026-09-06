@@ -233,7 +233,12 @@ class _FamousDoctorSerialSheetState extends State<FamousDoctorSerialSheet> {
 
                               return InkWell(
                                 onTap: () {
-                                  setState(() => _selectedDoctor = item);
+                                  setState(() {
+                                    _selectedDoctor = item;
+                                    if (item.hospital.isNotEmpty) {
+                                      _hospitalController.text = item.hospital;
+                                    }
+                                  });
                                   Navigator.pop(context);
                                 },
                                 borderRadius: BorderRadius.circular(14),
@@ -666,26 +671,9 @@ class _FamousDoctorSerialSheetState extends State<FamousDoctorSerialSheet> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: _selectedDoctor != null
-                            ? Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    _selectedDoctor!.name,
-                                    style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.bold, color: textDark),
-                                  ),
-                                  const SizedBox(height: 1),
-                                  Text(
-                                    '${_selectedDoctor!.degree} • ${_selectedDoctor!.specialty}',
-                                    style: const TextStyle(fontSize: 11, color: Color(0xFF15803D), fontWeight: FontWeight.w600),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    '🏥 ${_selectedDoctor!.hospital}',
-                                    style: const TextStyle(fontSize: 10.5, color: Color(0xFF64748B)),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
+                            ? Text(
+                                _selectedDoctor!.name,
+                                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: textDark),
                               )
                             : const Text(
                                 'ডাক্তার বা স্পেশালিস্ট নির্বাচন করুন...',
