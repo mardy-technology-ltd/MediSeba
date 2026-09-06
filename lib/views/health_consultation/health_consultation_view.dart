@@ -376,14 +376,14 @@ class _HealthConsultationViewState extends State<HealthConsultationView> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.psychology_rounded, color: Colors.white, size: 15),
-                const SizedBox(width: 6),
+                const Icon(Icons.location_on_outlined, color: Colors.white, size: 14),
+                const SizedBox(width: 5),
                 Text(
                   _langController.tr('ফ্রি হেলথ কনসালটেশন সার্ভিস', 'Free Health Consultation'),
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 11,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
