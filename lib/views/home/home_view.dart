@@ -906,7 +906,7 @@ class _HomeViewState extends State<HomeView> {
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => DoctorListView(languageController: _langController),
+            builder: (_) => DoctorBariView(languageController: _langController),
           ),
         ),
       ),
@@ -925,7 +925,7 @@ class _HomeViewState extends State<HomeView> {
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => DoctorBariView(languageController: _langController),
+            builder: (_) => DoctorListView(languageController: _langController),
           ),
         ),
       ),
