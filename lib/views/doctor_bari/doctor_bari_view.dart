@@ -5,6 +5,7 @@ import '../../services/api_service.dart';
 import '../../widgets/custom_app_bar.dart';
 import '../appointments/book_appointment_view.dart';
 import '../offers/widgets/eps_payment_gateway_dialog.dart';
+import '../doctors/doctor_details_view.dart';
 import '../doctors/widgets/doctor_card.dart';
 import 'widgets/famous_doctor_serial_sheet.dart';
 
@@ -977,6 +978,17 @@ class _DoctorBariViewState extends State<DoctorBariView> {
                   return DoctorCard(
                     doctor: doctor,
                     onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DoctorDetailsView(
+                            doctor: doctor,
+                            languageController: widget.languageController,
+                          ),
+                        ),
+                      );
+                    },
+                    onBookTap: () {
                       if (doctor.isAvailableToday) {
                         EpsPaymentGatewayDialog.show(
                           context: context,

@@ -9,6 +9,7 @@ import '../offers/widgets/eps_payment_gateway_dialog.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/home_controller.dart';
 import '../../widgets/auth_guard.dart';
+import 'doctor_details_view.dart';
 import 'widgets/doctor_card.dart';
 
 class DoctorListView extends StatefulWidget {
@@ -336,6 +337,19 @@ class _DoctorListViewState extends State<DoctorListView> {
                             return DoctorCard(
                               doctor: doctor,
                               onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => DoctorDetailsView(
+                                      doctor: doctor,
+                                      languageController: _langController,
+                                      authController: widget.authController,
+                                      homeController: widget.homeController,
+                                    ),
+                                  ),
+                                );
+                              },
+                              onBookTap: () {
                                 final authCtrl = widget.authController ?? AuthController();
                                 final homeCtrl = widget.homeController ?? HomeController();
                                 AuthGuard.check(

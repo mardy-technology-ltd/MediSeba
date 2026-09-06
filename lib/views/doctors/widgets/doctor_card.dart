@@ -5,11 +5,13 @@ import '../../../models/doctor_model.dart';
 class DoctorCard extends StatelessWidget {
   final DoctorModel doctor;
   final VoidCallback onTap;
+  final VoidCallback? onBookTap;
 
   const DoctorCard({
     super.key,
     required this.doctor,
     required this.onTap,
+    this.onBookTap,
   });
 
   @override
@@ -342,46 +344,50 @@ class DoctorCard extends StatelessWidget {
                           ),
 
                           // Action Button
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            decoration: BoxDecoration(
-                              gradient: doctor.isAvailableToday
-                                  ? const LinearGradient(
-                                      colors: [brandGreen, Color(0xFF0F9D58)],
-                                    )
-                                  : null,
-                              color: doctor.isAvailableToday ? null : Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                              border: doctor.isAvailableToday
-                                  ? null
-                                  : Border.all(color: const Color(0xFF2563EB), width: 1.5),
-                              boxShadow: [
-                                if (doctor.isAvailableToday)
-                                  BoxShadow(
-                                    color: brandGreen.withValues(alpha: 0.25),
-                                    blurRadius: 6,
-                                    offset: const Offset(0, 2),
-                                  ),
-                              ],
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  doctor.isAvailableToday ? Icons.videocam_rounded : Icons.calendar_today_rounded,
-                                  size: 15,
-                                  color: doctor.isAvailableToday ? Colors.white : const Color(0xFF2563EB),
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  doctor.isAvailableToday ? 'ডাক্তার দেখান' : 'অ্যাপয়েন্টমেন্ট বুক করুন',
-                                  style: TextStyle(
-                                    fontSize: 12.5,
-                                    fontWeight: FontWeight.bold,
+                          GestureDetector(
+                            onTap: onBookTap ?? onTap,
+                            behavior: HitTestBehavior.opaque,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              decoration: BoxDecoration(
+                                gradient: doctor.isAvailableToday
+                                    ? const LinearGradient(
+                                        colors: [brandGreen, Color(0xFF0F9D58)],
+                                      )
+                                    : null,
+                                color: doctor.isAvailableToday ? null : Colors.white,
+                                borderRadius: BorderRadius.circular(20),
+                                border: doctor.isAvailableToday
+                                    ? null
+                                    : Border.all(color: const Color(0xFF2563EB), width: 1.5),
+                                boxShadow: [
+                                  if (doctor.isAvailableToday)
+                                    BoxShadow(
+                                      color: brandGreen.withValues(alpha: 0.25),
+                                      blurRadius: 6,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    doctor.isAvailableToday ? Icons.videocam_rounded : Icons.calendar_today_rounded,
+                                    size: 15,
                                     color: doctor.isAvailableToday ? Colors.white : const Color(0xFF2563EB),
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    doctor.isAvailableToday ? 'ডাক্তার দেখান' : 'অ্যাপয়েন্টমেন্ট বুক করুন',
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                      fontWeight: FontWeight.bold,
+                                      color: doctor.isAvailableToday ? Colors.white : const Color(0xFF2563EB),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],
