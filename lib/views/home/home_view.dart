@@ -510,29 +510,48 @@ class _HomeViewState extends State<HomeView> {
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _langController.tr('👋 শুভ দিন, সুস্থ থাকুন', '👋 Good Day, Stay Healthy'),
-                          style: const TextStyle(
-                            fontSize: 15.5,
-                            fontWeight: FontWeight.w900,
-                            color: textDark,
-                          ),
-                        ),
-                        Text(
-                          _langController.tr(
-                            'আজ আপনার কী ধরনের স্বাস্থ্যসেবা প্রয়োজন?',
-                            'What healthcare service do you need today?',
-                          ),
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: Color(0xFF64748B),
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
+                    child: ListenableBuilder(
+                      listenable: widget.authController,
+                      builder: (context, _) {
+                        final uData = widget.authController.currentUserData;
+                        final rawName = uData?.name.trim() ?? '';
+                        final nameDisplay = rawName.isNotEmpty ? rawName : '';
+
+                        final greetingTitle = nameDisplay.isNotEmpty
+                            ? _langController.tr('👋 স্বাগতম, $nameDisplay!', '👋 Welcome, $nameDisplay!')
+                            : _langController.tr('👋 মেডিসেবা-তে আপনাকে স্বাগতম!', '👋 Welcome to MediSeba!');
+
+                        final greetingSub = _langController.tr(
+                          'আপনার ও আপনার পরিবারের উন্নত স্বাস্থ্য সুরক্ষায় আমরা সবসময় পাশে আছি।',
+                          'We are always here to ensure healthcare for you and your family.',
+                        );
+
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              greetingTitle,
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w900,
+                                color: textDark,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              greetingSub,
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: Color(0xFF64748B),
+                                fontWeight: FontWeight.w600,
+                                height: 1.3,
+                              ),
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ),
                 ],
