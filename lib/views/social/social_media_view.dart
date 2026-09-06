@@ -37,7 +37,7 @@ class SocialMediaView extends StatelessWidget {
         'btnEn': 'Subscribe ➔',
       },
       'instagram': {
-        'handle': '@mediseba00',
+        'handle': '@mediseba000',
         'bnSub': 'দৈনন্দিন লাইফস্টাইল টিপস ও ইনফোগ্রাফিক্স',
         'enSub': 'Daily lifestyle tips & infographics',
         'btnBn': 'ফলো করুন ➔',

@@ -146,26 +146,34 @@ class _PatientPortalViewState extends State<PatientPortalView> with SingleTicker
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 14.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 1. Patient Profile Header Card (Web Portal Aligned)
-            _buildPatientHeaderCard(isBangla),
+      body: RefreshIndicator(
+        color: const Color(0xFF0F9D58),
+        onRefresh: () async {
+          _loadPatientData();
+          await Future.delayed(const Duration(milliseconds: 800));
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+          padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 14.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 1. Patient Profile Header Card (Web Portal Aligned)
+              _buildPatientHeaderCard(isBangla),
 
-            const SizedBox(height: 14),
+              const SizedBox(height: 14),
 
-            // 2. Live Health Vitals Tracker Card
-            _buildHealthVitalsCard(isBangla),
+              // 2. Live Health Vitals Tracker Card
+              _buildHealthVitalsCard(isBangla),
 
-            const SizedBox(height: 16),
+              const SizedBox(height: 16),
 
-            // 3. 2x3 Grid Overview Section Cards (Clicking opens dedicated sub-screen)
-            _build2x3GridOverviewSection(isBangla),
+              // 3. 2x3 Grid Overview Section Cards (Clicking opens dedicated sub-screen)
+              _build2x3GridOverviewSection(isBangla),
 
-            const SizedBox(height: 24),
-          ],
+              const SizedBox(height: 24),
+            ],
+          ),
         ),
       ),
     );

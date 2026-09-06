@@ -269,10 +269,16 @@ class _DonateBloodViewState extends State<DonateBloodView> {
           alignment: Alignment.topCenter,
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 640),
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
-              child: Column(
+            child: RefreshIndicator(
+              color: const Color(0xFFDC2626),
+              onRefresh: () async {
+                await Future.delayed(const Duration(milliseconds: 800));
+                if (mounted) setState(() {});
+              },
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+                child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // 1. Hero Header Banner Card
@@ -457,7 +463,8 @@ class _DonateBloodViewState extends State<DonateBloodView> {
           ),
         ),
       ),
-    );
+    ),
+  );
   }
 
   // Hero Banner Header Card

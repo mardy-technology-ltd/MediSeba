@@ -194,10 +194,16 @@ class _RoktoSebaViewState extends State<RoktoSebaView> {
         title: 'রক্তসেবা (Blood Bank)',
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
+        child: RefreshIndicator(
+          color: brandRed,
+          onRefresh: () async {
+            await Future.delayed(const Duration(milliseconds: 800));
+            if (mounted) setState(() {});
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ─── 1. HERO EMERGENCY BANNER CARD ────────────────────────────
@@ -276,7 +282,8 @@ class _RoktoSebaViewState extends State<RoktoSebaView> {
           ),
         ),
       ),
-    );
+    ),
+  );
   }
 
   // ─── HERO BANNER CARD WIDGET ───────────────────────────────────────

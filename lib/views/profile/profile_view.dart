@@ -91,10 +91,15 @@ class ProfileView extends StatelessWidget {
             backgroundColor: bgCanvas,
           ),
           body: SafeArea(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
+            child: RefreshIndicator(
+              color: primaryGreen,
+              onRefresh: () async {
+                await Future.delayed(const Duration(milliseconds: 800));
+              },
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // ─── Header Profile Card ──────────────────────────────
@@ -295,9 +300,10 @@ class ProfileView extends StatelessWidget {
               ),
             ),
           ),
-        );
-      },
-    );
+        ),
+      );
+    },
+  );
   }
 
   // ─── Header Card ───────────────────────────────────────────────────

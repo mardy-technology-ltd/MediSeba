@@ -290,10 +290,16 @@ class _HomeViewState extends State<HomeView> {
         ),
 
         // Main Content Scroll view
-        SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-          child: Column(
+        RefreshIndicator(
+          color: brandGreen,
+          onRefresh: () async {
+            await Future.delayed(const Duration(milliseconds: 800));
+            if (mounted) setState(() {});
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+            child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // 1. Personalized Greeting & Universal Search Header Card
@@ -400,8 +406,9 @@ class _HomeViewState extends State<HomeView> {
             ],
           ),
         ),
-      ],
-    );
+      ),
+    ],
+  );
   }
 
   // 1. User Greeting & Universal Search Bar Header Card

@@ -86,11 +86,17 @@ class NotificationView extends StatelessWidget {
 
             // Notification List
             Expanded(
-              child: ListView.separated(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
+              child: RefreshIndicator(
+                color: brandGreen,
+                onRefresh: () async {
+                  await Future.delayed(const Duration(milliseconds: 800));
+                },
+                child: ListView.separated(
+                  physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                 itemCount: notifications.length,
                 separatorBuilder: (_, _) => const SizedBox(height: 10),
                 itemBuilder: (context, index) {
@@ -173,7 +179,8 @@ class NotificationView extends StatelessWidget {
                 },
               ),
             ),
-          ],
+          ),
+        ],
         ),
       ),
     );

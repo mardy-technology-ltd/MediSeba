@@ -27,10 +27,10 @@ class SocialMediaLauncher {
     SocialMediaItem(
       id: 'facebook',
       title: 'Facebook',
-      webUrl: 'https://www.facebook.com/mediseba.org/',
+      webUrl: 'https://www.facebook.com/mediseba.org',
       nativeSchemes: [
-        'fb://page/mediseba.org/',
-        'fb://facewebmodal/f?href=https://www.facebook.com/mediseba.org/',
+        'fb://page/mediseba.org',
+        'fb://facewebmodal/f?href=https://www.facebook.com/mediseba.org',
       ],
       androidPackageName: 'com.facebook.katana',
       iconData: Icons.facebook,
@@ -51,9 +51,9 @@ class SocialMediaLauncher {
     SocialMediaItem(
       id: 'instagram',
       title: 'Instagram',
-      webUrl: 'https://www.instagram.com/mediseba00/',
+      webUrl: 'https://www.instagram.com/mediseba000/',
       nativeSchemes: [
-        'instagram://user?username=mediseba00',
+        'instagram://user?username=mediseba000',
       ],
       androidPackageName: 'com.instagram.android',
       iconData: Icons.camera_alt_rounded,

@@ -56,9 +56,16 @@ class _MatriSebaViewState extends State<MatriSebaView> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
+      body: RefreshIndicator(
+        color: brandPink,
+        onRefresh: () async {
+          await Future.delayed(const Duration(milliseconds: 800));
+          if (mounted) setState(() {});
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 1. Hero Pink Gradient Banner Card
@@ -104,7 +111,8 @@ class _MatriSebaViewState extends State<MatriSebaView> {
           ],
         ),
       ),
-    );
+    ),
+  );
   }
 
   // 1. Hero Pink Gradient Banner Card

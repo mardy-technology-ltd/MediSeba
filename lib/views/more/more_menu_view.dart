@@ -62,10 +62,15 @@ class MoreMenuView extends StatelessWidget {
               ),
             ),
 
-            SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
+            RefreshIndicator(
+              color: brandGreen,
+              onRefresh: () async {
+                await Future.delayed(const Duration(milliseconds: 800));
+              },
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Header Title
@@ -357,7 +362,8 @@ class MoreMenuView extends StatelessWidget {
                 ],
               ),
             ),
-          ],
+          ),
+        ],
         ),
       ),
     );

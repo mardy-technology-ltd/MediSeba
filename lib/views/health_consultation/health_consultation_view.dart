@@ -96,9 +96,16 @@ class _HealthConsultationViewState extends State<HealthConsultationView> {
         ],
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
+        child: RefreshIndicator(
+          color: brandGreen,
+          onRefresh: () async {
+            await Future.delayed(const Duration(milliseconds: 800));
+            if (mounted) setState(() {});
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // 1. Hero Medical Header Card
@@ -326,7 +333,8 @@ class _HealthConsultationViewState extends State<HealthConsultationView> {
           ),
         ),
       ),
-    );
+    ),
+  );
   }
 
   // 1. Hero Medical Header Card

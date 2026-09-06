@@ -178,21 +178,33 @@ class _HospitalListViewState extends State<HospitalListView> {
 
                 // List View for Hospitals
                 Expanded(
-                  child: list.isEmpty
-                      ? Center(
-                          child: Text(
-                            _langController.tr('কোনো হাসপাতাল পাওয়া যায়নি', 'No hospitals found'),
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: textMuted,
-                            ),
-                          ),
-                        )
-                      : ListView.builder(
-                          physics: const BouncingScrollPhysics(),
-                          padding: const EdgeInsets.fromLTRB(16, 6, 16, 100),
-                          itemCount: list.length,
+                  child: RefreshIndicator(
+                    color: brandGreen,
+                    onRefresh: () async {
+                      await Future.delayed(const Duration(milliseconds: 800));
+                      if (mounted) setState(() {});
+                    },
+                    child: list.isEmpty
+                        ? ListView(
+                            physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                            children: [
+                              const SizedBox(height: 120),
+                              Center(
+                                child: Text(
+                                  _langController.tr('কোনো হাসপাতাল পাওয়া যায়নি', 'No hospitals found'),
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: textMuted,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )
+                        : ListView.builder(
+                            physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                            padding: const EdgeInsets.fromLTRB(16, 6, 16, 100),
+                            itemCount: list.length,
                           itemBuilder: (context, index) {
                             final item = list[index];
                             return Container(
@@ -344,6 +356,7 @@ class _HospitalListViewState extends State<HospitalListView> {
                             );
                           },
                         ),
+                  ),
                 ),
               ],
             ),
