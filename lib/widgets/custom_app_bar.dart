@@ -25,7 +25,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.titleColor = const Color(0xFF0F172A),
     this.backButtonColor = Colors.white,
     this.backButtonBorderColor = const Color(0xFFE2E8F0),
-    this.centerTitle = false,
+    this.centerTitle = true,
   });
 
   @override
@@ -75,13 +75,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             )
           : null,
       title: Row(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: centerTitle ? MainAxisSize.min : MainAxisSize.max,
+        mainAxisAlignment: centerTitle ? MainAxisAlignment.center : MainAxisAlignment.start,
         children: [
           if (titleIcon != null) ...[
             titleIcon!,
             const SizedBox(width: 8),
           ],
-          Expanded(
+          Flexible(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: centerTitle ? CrossAxisAlignment.center : CrossAxisAlignment.start,
@@ -96,6 +97,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
+                  textAlign: centerTitle ? TextAlign.center : TextAlign.start,
                 ),
                 if (subtitle != null && subtitle!.isNotEmpty) ...[
                   const SizedBox(height: 1.5),
@@ -108,6 +110,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
+                    textAlign: centerTitle ? TextAlign.center : TextAlign.start,
                   ),
                 ],
               ],
