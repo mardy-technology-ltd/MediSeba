@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../controllers/language_controller.dart';
+import '../../widgets/custom_app_bar.dart';
 import '../doctors/doctor_list_view.dart';
 
 class BlogArticleModel {
@@ -64,48 +65,15 @@ class _BlogDetailViewState extends State<BlogDetailView> {
       builder: (context, _) {
         return Scaffold(
           backgroundColor: const Color(0xFFF8FAFC),
-          appBar: AppBar(
-            backgroundColor: Colors.white,
-            elevation: 0,
-            scrolledUnderElevation: 0,
-            centerTitle: true,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new_rounded, color: textDark, size: 20),
-              onPressed: () => Navigator.pop(context),
-            ),
-            title: Text(
-              _langController.tr('ব্লগ বিস্তারিত', 'Article Detail'),
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: textDark,
-              ),
-            ),
+          appBar: CustomAppBar(
+            title: _langController.tr('ব্লগ বিস্তারিত', 'Article Detail'),
           ),
           body: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 1. TOP BACK TO BLOGS BUTTON
-                OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    side: const BorderSide(color: Color(0xFFCBD5E1), width: 1),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  ),
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.arrow_back_rounded, size: 16, color: Color(0xFF334155)),
-                  label: Text(
-                    _langController.tr('ব্লগে ফিরে যান', 'Back to Blogs'),
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF334155)),
-                  ),
-                ),
-
-                const SizedBox(height: 14),
-
-                // 2. MAIN ARTICLE CARD CONTAINER
+                // 1. MAIN ARTICLE CARD CONTAINER
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(20),

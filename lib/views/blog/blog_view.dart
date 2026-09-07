@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../controllers/language_controller.dart';
+import '../../widgets/custom_app_bar.dart';
 import 'blog_detail_view.dart';
 
 class BlogView extends StatefulWidget {
@@ -222,23 +223,8 @@ class _BlogViewState extends State<BlogView> {
 
         return Scaffold(
           backgroundColor: const Color(0xFFF8FAFC),
-          appBar: AppBar(
-            backgroundColor: Colors.white,
-            elevation: 0,
-            scrolledUnderElevation: 0,
-            centerTitle: true,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new_rounded, color: textDark, size: 20),
-              onPressed: () => Navigator.pop(context),
-            ),
-            title: Text(
-              _langController.tr('হেলথ ব্লগ ও আর্টিকেল', 'Health Blog & Articles'),
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: textDark,
-              ),
-            ),
+          appBar: CustomAppBar(
+            title: _langController.tr('হেলথ ব্লগ ও আর্টিকেল', 'Health Blog & Articles'),
           ),
           body: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
