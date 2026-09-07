@@ -318,7 +318,9 @@ class ApiService {
 
     final reqId = ApiLogger.logRequest(
       screen: 'Medicine Inventory Search',
-      trigger: cleanQuery.isEmpty ? 'initState() / All Medicines' : 'Search Query Input',
+      trigger: cleanQuery.isEmpty
+          ? 'initState() / All Medicines'
+          : 'Search Query Input',
       functionName: 'searchMedicines',
       isUserAction: cleanQuery.isNotEmpty,
       method: 'GET',
@@ -358,7 +360,9 @@ class ApiService {
 
         if (list != null) {
           final items = list
-              .map((item) => MedicineModel.fromJson(item as Map<String, dynamic>))
+              .map(
+                (item) => MedicineModel.fromJson(item as Map<String, dynamic>),
+              )
               .toList();
           await CacheService.put(cacheKey, list);
           return items;

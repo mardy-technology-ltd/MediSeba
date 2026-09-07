@@ -11,6 +11,8 @@ import '../../widgets/share_app_dialog.dart';
 import '../../widgets/helpline_bottom_sheet.dart';
 import '../profile/profile_view.dart';
 import '../home/home_view.dart';
+import '../ambulance/ambulance_seba_view.dart';
+import '../matriseba/matriseba_view.dart';
 
 class MoreMenuView extends StatelessWidget {
   final AuthController authController;
@@ -242,7 +244,12 @@ class MoreMenuView extends StatelessWidget {
                         icon: Icons.airport_shuttle_rounded,
                         color: const Color(0xFFE53935),
                         bg: const Color(0xFFFFEBEE),
-                        onTap: () {},
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => AmbulanceSebaView(languageController: languageController),
+                          ),
+                        ),
                       ),
                       _buildQuickTile(
                         context,
@@ -250,7 +257,12 @@ class MoreMenuView extends StatelessWidget {
                         icon: Icons.pregnant_woman_rounded,
                         color: const Color(0xFFAD1457),
                         bg: const Color(0xFFFCE4EC),
-                        onTap: () {},
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => MatriSebaView(languageController: languageController),
+                          ),
+                        ),
                       ),
                     ],
                   ),

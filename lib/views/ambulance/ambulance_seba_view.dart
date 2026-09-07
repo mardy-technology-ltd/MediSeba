@@ -156,7 +156,7 @@ class _AmbulanceSebaViewState extends State<AmbulanceSebaView> {
                     'Freezer technology ambulance for safe long distance deceased transport.',
                   ),
                   features: [
-                    _langController.tr('মাইナス সেলসিয়াস কুলিং', 'Minus Degree Celsius Cooling'),
+                    _langController.tr('মাইনাস ২০° সেলসিয়াস কুলিং', 'Minus 20° Celsius Cooling'),
                     _langController.tr('দীর্ঘ দূরত্বের জন্য উপযুক্ত', 'Suitable for Long Distance'),
                     _langController.tr('সুরক্ষিত পরিবহন ব্যবস্থা', 'Secure Transportation'),
                     _langController.tr('২৪/৭ সাপোর্ট', '24/7 Support'),
