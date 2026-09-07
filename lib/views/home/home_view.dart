@@ -116,6 +116,7 @@ class _HomeViewState extends State<HomeView> {
         return Scaffold(
           key: _scaffoldKey,
           drawer: _buildSidebarDrawer(context),
+          drawerScrimColor: Colors.black.withValues(alpha: 0.35),
           backgroundColor: Colors.white,
           appBar: AppBar(
             backgroundColor: Colors.white,
@@ -1667,141 +1668,62 @@ class _HomeViewState extends State<HomeView> {
 
     return Drawer(
       width: screenSize.width * 0.82,
-      backgroundColor: Colors.white.withValues(alpha: 0.75),
-      elevation: 0,
+      backgroundColor: Colors.white,
+      elevation: 16,
+      shadowColor: Colors.black.withValues(alpha: 0.15),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
-          topRight: Radius.circular(30),
-          bottomRight: Radius.circular(30),
+          topRight: Radius.circular(28),
+          bottomRight: Radius.circular(28),
         ),
       ),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border(
-              right: BorderSide(color: Colors.white.withValues(alpha: 0.4), width: 1.5),
-            ),
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topRight: Radius.circular(28),
+            bottomRight: Radius.circular(28),
           ),
-          child: SafeArea(
-            child: Column(
-              children: [
-                // Top Header Bar: Title + Segmented Language Toggle Switch (Eng | বাং)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // MediSeba Logo Image (Responsive Size)
-                      Image.asset(
-                        'assets/images/logo.png',
-                        height: responsiveLogoHeight,
-                        fit: BoxFit.contain,
-                      ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Top Header Bar: Title + Segmented Language Toggle Switch (Eng | বাং)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // MediSeba Logo Image (Responsive Size)
+                    Image.asset(
+                      'assets/images/logo.png',
+                      height: responsiveLogoHeight,
+                      fit: BoxFit.contain,
+                    ),
+                  ],
+                ),
+              ),
 
-                      /*
-                      // Glassmorphic Segmented Language Toggle Button (Eng | বাং)
-                      Container(
-                        padding: const EdgeInsets.all(3),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.white.withValues(alpha: 0.6), width: 1),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            // Eng Segment
-                            GestureDetector(
-                              onTap: () {
-                                _langController.setLanguage(AppLanguage.english);
-                              },
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 200),
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                                decoration: BoxDecoration(
-                                  color: !isBangla ? brandGreen : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(7),
-                                  boxShadow: !isBangla
-                                      ? [
-                                          BoxShadow(
-                                            color: brandGreen.withValues(alpha: 0.25),
-                                            blurRadius: 4,
-                                            offset: const Offset(0, 1),
-                                          ),
-                                        ]
-                                      : null,
-                                ),
-                                child: Text(
-                                  'Eng',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w700,
-                                    color: !isBangla ? Colors.white : const Color(0xFF64748B),
-                                  ),
-                                ),
-                              ),
-                            ),
+              const SizedBox(height: 8),
 
-                            // বাং Segment
-                            GestureDetector(
-                              onTap: () {
-                                _langController.setLanguage(AppLanguage.bangla);
-                              },
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 200),
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                                decoration: BoxDecoration(
-                                  color: isBangla ? brandGreen : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(7),
-                                  boxShadow: isBangla
-                                      ? [
-                                          BoxShadow(
-                                            color: brandGreen.withValues(alpha: 0.25),
-                                            blurRadius: 4,
-                                            offset: const Offset(0, 1),
-                                          ),
-                                        ]
-                                      : null,
-                                ),
-                                child: Text(
-                                  'বাং',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w700,
-                                    color: isBangla ? Colors.white : const Color(0xFF64748B),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+              // Assistant Banner Card (Clean High-Contrast Bright Card)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: brandGreen.withValues(alpha: 0.18), width: 1.2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.03),
+                        blurRadius: 10,
+                        offset: const Offset(0, 3),
                       ),
-                      */
                     ],
                   ),
-                ),
-
-                const SizedBox(height: 8),
-
-                // Assistant Banner Card (Glassmorphic High-Tech Card)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.45),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.7), width: 1.2),
-                      boxShadow: [
-                        BoxShadow(
-                          color: brandGreen.withValues(alpha: 0.02),
-                          blurRadius: 8,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                    ),
                     child: Row(
                       children: [
                         Container(
@@ -1901,32 +1823,23 @@ class _HomeViewState extends State<HomeView> {
                             );
                           },
                         ),
-                      _buildBkashMenuItem(
-                        icon: Icons.assignment_ind_outlined,
-                        title: isBangla ? 'পেশেন্ট পোর্টাল' : 'Patient Portal',
-                        onTap: () {
-                          Navigator.pop(context);
-                          AuthGuard.check(
-                            context: context,
-                            authController: widget.authController,
-                            homeController: widget.homeController,
-                            languageController: _langController,
-                            title: 'পেশেন্ট পোর্টালে প্রবেশ করতে লগইন করুন',
-                            message: 'আপনার ডিজিটাল প্রেসক্রিপশন ও হেলথ রেকর্ডস সুরক্ষিত রাখতে লগইন করুন।',
-                            onAuthenticated: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => PatientPortalView(
-                                    languageController: _langController,
-                                    authController: widget.authController,
-                                  ),
+                      if (widget.authController.isLoggedIn)
+                        _buildBkashMenuItem(
+                          icon: Icons.assignment_ind_outlined,
+                          title: isBangla ? 'পেশেন্ট পোর্টাল' : 'Patient Portal',
+                          onTap: () {
+                            Navigator.pop(context);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => PatientPortalView(
+                                  languageController: _langController,
+                                  authController: widget.authController,
                                 ),
-                              );
-                            },
-                          );
-                        },
-                      ),
+                              ),
+                            );
+                          },
+                        ),
                       _buildBkashMenuItem(
                         icon: Icons.handshake_outlined,
                         title: isBangla ? 'পার্টনার' : 'Partner',
@@ -2026,9 +1939,8 @@ class _HomeViewState extends State<HomeView> {
             ),
           ),
         ),
-      ),
-    );
-  }
+      );
+    }
 
   Widget _buildBkashMenuItem({
     required IconData icon,
