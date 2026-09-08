@@ -116,7 +116,7 @@ class ApiLogger {
 
     debugPrint('');
     debugPrint('════════════════════════════════════════════════════════════');
-    debugPrint('$actionHeader');
+    debugPrint(actionHeader);
     debugPrint('════════════════════════════════════════════════════════════');
     debugPrint('Screen       : $screenName');
     debugPrint('${userActionFlag ? 'Button      ' : 'Trigger     '} : $buttonName');

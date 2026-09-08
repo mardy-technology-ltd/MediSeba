@@ -68,7 +68,8 @@ class _HomeViewState extends State<HomeView> {
     _bannerTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
       if (!mounted) return;
       if (_bannerPageController.hasClients) {
-        int currentPage = _bannerPageController.page?.round() ?? _currentBannerIndex;
+        int currentPage =
+            _bannerPageController.page?.round() ?? _currentBannerIndex;
         int nextPage = (currentPage + 1) % 3;
         _bannerPageController.animateToPage(
           nextPage,
@@ -125,7 +126,11 @@ class _HomeViewState extends State<HomeView> {
             centerTitle: true,
             leading: Builder(
               builder: (context) => IconButton(
-                icon: const Icon(Icons.menu_rounded, color: brandGreen, size: 28),
+                icon: const Icon(
+                  Icons.menu_rounded,
+                  color: brandGreen,
+                  size: 28,
+                ),
                 onPressed: () {
                   Scaffold.of(context).openDrawer();
                 },
@@ -142,7 +147,9 @@ class _HomeViewState extends State<HomeView> {
                 listenable: widget.authController,
                 builder: (context, _) {
                   final uData = widget.authController.currentUserData;
-                  final hasImage = uData?.profileImageUrl != null && uData!.profileImageUrl!.isNotEmpty;
+                  final hasImage =
+                      uData?.profileImageUrl != null &&
+                      uData!.profileImageUrl!.isNotEmpty;
 
                   return GestureDetector(
                     onTap: () {
@@ -152,7 +159,8 @@ class _HomeViewState extends State<HomeView> {
                         homeController: widget.homeController,
                         languageController: _langController,
                         title: 'প্রোফাইলে প্রবেশ করতে লগইন করুন',
-                        message: 'আপনার প্রোফাইল তথ্য, রসিদ ও হেলথ রেকর্ডস দেখতে অনুগ্রহ করে লগইন করুন।',
+                        message:
+                            'আপনার প্রোফাইল তথ্য, রসিদ ও হেলথ রেকর্ডস দেখতে অনুগ্রহ করে লগইন করুন।',
                         onAuthenticated: () {
                           Navigator.push(
                             context,
@@ -206,7 +214,10 @@ class _HomeViewState extends State<HomeView> {
               // Tab 2: Hospital List View
               HospitalListView(languageController: _langController),
               // Tab 3: Doctor List View
-              DoctorListView(showAppBar: false, languageController: _langController),
+              DoctorListView(
+                showAppBar: false,
+                languageController: _langController,
+              ),
               // Tab 4: More Menu View
               MoreMenuView(
                 authController: widget.authController,
@@ -273,7 +284,9 @@ class _HomeViewState extends State<HomeView> {
             height: 320,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: const Color(0xFF38BDF8).withValues(alpha: 0.08), // Sky Blue Accent
+              color: const Color(
+                0xFF38BDF8,
+              ).withValues(alpha: 0.08), // Sky Blue Accent
             ),
           ),
         ),
@@ -298,118 +311,132 @@ class _HomeViewState extends State<HomeView> {
             if (mounted) setState(() {});
           },
           child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 12.0,
+            ),
             child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 1. Personalized Greeting & Universal Search Header Card
-              _buildUserGreetingAndSearchBar(),
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 1. Personalized Greeting & Universal Search Header Card
+                _buildUserGreetingAndSearchBar(),
 
-              const SizedBox(height: 20),
+                const SizedBox(height: 20),
 
-              // 2. Category Service Grid Section
-              _buildSectionHeader(
-                title: _langController.tr('আমাদের সেবাসমূহ', 'Our Healthcare Services'),
-                onSeeAllTap: null,
-              ),
-              const SizedBox(height: 12),
-              _buildCategoryGrid(),
+                // 2. Category Service Grid Section
+                _buildSectionHeader(
+                  title: _langController.tr(
+                    'আমাদের সেবাসমূহ',
+                    'Our Healthcare Services',
+                  ),
+                  onSeeAllTap: null,
+                ),
+                const SizedBox(height: 12),
+                _buildCategoryGrid(),
 
-              const SizedBox(height: 22),
+                const SizedBox(height: 22),
 
-              // 4. Banner Slider Carousel
-              _buildHeroBanner(),
+                // 4. Banner Slider Carousel
+                _buildHeroBanner(),
 
-              const SizedBox(height: 18),
+                const SizedBox(height: 18),
 
-              // 5. Health Query Banner
-              _buildQueryBanner(),
+                // 5. Health Query Banner
+                _buildQueryBanner(),
 
-              const SizedBox(height: 22),
+                const SizedBox(height: 22),
 
-              // 5. Top Doctors Section (Horizontal Scroll Carousel)
-              _buildSectionHeader(
-                title: _langController.tr('বিশেষজ্ঞ ডাক্তারগণ', 'Top Doctors In Your Area'),
-                onSeeAllTap: () {
-                  setState(() => _currentBottomNavIndex = 3);
-                },
-              ),
-              const SizedBox(height: 12),
-              _buildHorizontalDoctorsList(),
+                // 5. Top Doctors Section (Horizontal Scroll Carousel)
+                _buildSectionHeader(
+                  title: _langController.tr(
+                    'বিশেষজ্ঞ ডাক্তারগণ',
+                    'Top Doctors In Your Area',
+                  ),
+                  onSeeAllTap: () {
+                    setState(() => _currentBottomNavIndex = 3);
+                  },
+                ),
+                const SizedBox(height: 12),
+                _buildHorizontalDoctorsList(),
 
-              const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-              // 6. Nearby Hospitals Section
-              _buildSectionHeader(
-                title: _langController.tr('নিকটস্থ হাসপাতাল ও ডায়াগনস্টিক', 'Nearby Hospitals & Diagnostics'),
-                onSeeAllTap: () {
-                  setState(() => _currentBottomNavIndex = 2);
-                },
-              ),
-              const SizedBox(height: 12),
+                // 6. Nearby Hospitals Section
+                _buildSectionHeader(
+                  title: _langController.tr(
+                    'নিকটস্থ হাসপাতাল ও ডায়াগনস্টিক',
+                    'Nearby Hospitals & Diagnostics',
+                  ),
+                  onSeeAllTap: () {
+                    setState(() => _currentBottomNavIndex = 2);
+                  },
+                ),
+                const SizedBox(height: 12),
 
-              // Hospitals Grid (Responsive Compact Grid)
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final screenWidth = constraints.maxWidth;
-                  final crossAxisCount = screenWidth > 600 ? 4 : 2;
-                  final aspectRatio = screenWidth > 600
-                      ? 1.15
-                      : (screenWidth < 360 ? 0.88 : 0.96);
+                // Hospitals Grid (Responsive Compact Grid)
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final screenWidth = constraints.maxWidth;
+                    final crossAxisCount = screenWidth > 600 ? 4 : 2;
+                    final aspectRatio = screenWidth > 600
+                        ? 1.15
+                        : (screenWidth < 360 ? 0.88 : 0.96);
 
-                  return GridView.count(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    crossAxisCount: crossAxisCount,
-                    mainAxisSpacing: 10,
-                    crossAxisSpacing: 10,
-                    childAspectRatio: aspectRatio,
-                    children: [
-                      _buildHospitalCard(
-                        name: 'পপুলার ডায়াগনস্টিক',
-                        address: 'উত্তরা ব্রাঞ্চ, ঢাকা',
-                        time: '07:00 am - 11:30 pm',
-                        rating: '4.9',
-                        imageUrl:
-                            'https://img.freepik.com/free-photo/empty-emergency-room-with-medical-equipment_23-2149138092.jpg',
-                      ),
-                      _buildHospitalCard(
-                        name: 'ইবনে সিনা হাসপাতাল',
-                        address: 'ধানমন্ডি, ঢাকা',
-                        time: '২৪ ঘণ্টা খোলা',
-                        rating: '4.8',
-                        imageUrl:
-                            'https://img.freepik.com/free-photo/modern-operating-room-hospital_23-2148942918.jpg',
-                      ),
-                      _buildHospitalCard(
-                        name: 'ল্যাবএইড হাসপাতাল',
-                        address: 'গুলশান, ঢাকা',
-                        time: '২৪ ঘণ্টা খোলা',
-                        rating: '4.9',
-                        imageUrl:
-                            'https://img.freepik.com/free-photo/interior-view-operating-room_1170-2254.jpg',
-                      ),
-                      _buildHospitalCard(
-                        name: 'স্কয়ার হাসপাতাল',
-                        address: 'পান্থপথ, ঢাকা',
-                        time: '২৪ ঘণ্টা খোলা',
-                        rating: '5.0',
-                        imageUrl:
-                            'https://img.freepik.com/free-photo/medical-clinic-reception-counter-registration_482257-26804.jpg',
-                      ),
-                    ],
-                  );
-                },
-              ),
+                    return GridView.count(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      crossAxisCount: crossAxisCount,
+                      mainAxisSpacing: 10,
+                      crossAxisSpacing: 10,
+                      childAspectRatio: aspectRatio,
+                      children: [
+                        _buildHospitalCard(
+                          name: 'পপুলার ডায়াগনস্টিক',
+                          address: 'উত্তরা ব্রাঞ্চ, ঢাকা',
+                          time: '07:00 am - 11:30 pm',
+                          rating: '4.9',
+                          imageUrl:
+                              'https://img.freepik.com/free-photo/empty-emergency-room-with-medical-equipment_23-2149138092.jpg',
+                        ),
+                        _buildHospitalCard(
+                          name: 'ইবনে সিনা হাসপাতাল',
+                          address: 'ধানমন্ডি, ঢাকা',
+                          time: '২৪ ঘণ্টা খোলা',
+                          rating: '4.8',
+                          imageUrl:
+                              'https://img.freepik.com/free-photo/modern-operating-room-hospital_23-2148942918.jpg',
+                        ),
+                        _buildHospitalCard(
+                          name: 'ল্যাবএইড হাসপাতাল',
+                          address: 'গুলশান, ঢাকা',
+                          time: '২৪ ঘণ্টা খোলা',
+                          rating: '4.9',
+                          imageUrl:
+                              'https://img.freepik.com/free-photo/interior-view-operating-room_1170-2254.jpg',
+                        ),
+                        _buildHospitalCard(
+                          name: 'স্কয়ার হাসপাতাল',
+                          address: 'পান্থপথ, ঢাকা',
+                          time: '২৪ ঘণ্টা খোলা',
+                          rating: '5.0',
+                          imageUrl:
+                              'https://img.freepik.com/free-photo/medical-clinic-reception-counter-registration_482257-26804.jpg',
+                        ),
+                      ],
+                    );
+                  },
+                ),
 
-              const SizedBox(height: 24),
-            ],
+                const SizedBox(height: 24),
+              ],
+            ),
           ),
         ),
-      ),
-    ],
-  );
+      ],
+    );
   }
 
   // 1. User Greeting & Universal Search Bar Header Card
@@ -424,7 +451,10 @@ class _HomeViewState extends State<HomeView> {
           decoration: BoxDecoration(
             color: Colors.white.withValues(alpha: 0.65),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.55), width: 1.5),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.55),
+              width: 1.5,
+            ),
             boxShadow: [
               BoxShadow(
                 color: brandGreen.withValues(alpha: 0.04),
@@ -448,11 +478,18 @@ class _HomeViewState extends State<HomeView> {
                           color: brandGreen.withValues(alpha: 0.12),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.shield_rounded, color: brandGreen, size: 13),
+                        child: const Icon(
+                          Icons.shield_rounded,
+                          color: brandGreen,
+                          size: 13,
+                        ),
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        _langController.tr('হেলথ কোর: সুরক্ষিত', 'Health Core: Secured'),
+                        _langController.tr(
+                          'হেলথ কোর: সুরক্ষিত',
+                          'Health Core: Secured',
+                        ),
                         style: const TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w800,
@@ -463,11 +500,17 @@ class _HomeViewState extends State<HomeView> {
                     ],
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFF38BDF8).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xFF38BDF8).withValues(alpha: 0.2), width: 0.8),
+                      border: Border.all(
+                        color: const Color(0xFF38BDF8).withValues(alpha: 0.2),
+                        width: 0.8,
+                      ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -514,7 +557,11 @@ class _HomeViewState extends State<HomeView> {
                         ),
                       ],
                     ),
-                    child: const Icon(Icons.waving_hand_rounded, color: Color(0xFFFBBF24), size: 18),
+                    child: const Icon(
+                      Icons.waving_hand_rounded,
+                      color: Color(0xFFFBBF24),
+                      size: 18,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -526,8 +573,14 @@ class _HomeViewState extends State<HomeView> {
                         final nameDisplay = rawName.isNotEmpty ? rawName : '';
 
                         final greetingTitle = nameDisplay.isNotEmpty
-                            ? _langController.tr('👋 স্বাগতম, $nameDisplay!', '👋 Welcome, $nameDisplay!')
-                            : _langController.tr('👋 মেডিসেবা-তে আপনাকে স্বাগতম!', '👋 Welcome to MediSeba!');
+                            ? _langController.tr(
+                                '👋 স্বাগতম, $nameDisplay!',
+                                '👋 Welcome, $nameDisplay!',
+                              )
+                            : _langController.tr(
+                                '👋 মেডিসেবা-তে আপনাকে স্বাগতম!',
+                                '👋 Welcome to MediSeba!',
+                              );
 
                         final greetingSub = _langController.tr(
                           'আপনার ও আপনার পরিবারের উন্নত স্বাস্থ্য সুরক্ষায় আমরা সবসময় পাশে আছি।',
@@ -671,7 +724,8 @@ class _HomeViewState extends State<HomeView> {
         'rating': '4.9',
         'reviews': '142',
         'time': '07:00 pm - 09:30 pm',
-        'image': 'https://img.freepik.com/free-photo/female-doctor-hospital-with-stethoscope_23-2148827766.jpg',
+        'image':
+            'https://img.freepik.com/free-photo/female-doctor-hospital-with-stethoscope_23-2148827766.jpg',
       },
       {
         'name': 'Dr. Billy Edwards',
@@ -680,7 +734,8 @@ class _HomeViewState extends State<HomeView> {
         'rating': '4.8',
         'reviews': '98',
         'time': '05:00 pm - 09:00 pm',
-        'image': 'https://img.freepik.com/free-photo/doctor-offering-medical-teleconsultation_23-2149329007.jpg',
+        'image':
+            'https://img.freepik.com/free-photo/doctor-offering-medical-teleconsultation_23-2149329007.jpg',
       },
       {
         'name': 'Dr. Mahbub Hasan',
@@ -689,7 +744,8 @@ class _HomeViewState extends State<HomeView> {
         'rating': '5.0',
         'reviews': '210',
         'time': '06:00 pm - 10:00 pm',
-        'image': 'https://img.freepik.com/free-photo/woman-doctor-wearing-stethoscope_23-2148827768.jpg',
+        'image':
+            'https://img.freepik.com/free-photo/woman-doctor-wearing-stethoscope_23-2148827768.jpg',
       },
     ];
 
@@ -712,7 +768,10 @@ class _HomeViewState extends State<HomeView> {
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.8),
                 borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.55), width: 1.5),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.55),
+                  width: 1.5,
+                ),
                 boxShadow: [
                   BoxShadow(
                     color: brandGreen.withValues(alpha: 0.04),
@@ -732,7 +791,10 @@ class _HomeViewState extends State<HomeView> {
                             padding: const EdgeInsets.all(2),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              border: Border.all(color: brandGreen.withValues(alpha: 0.25), width: 1.2),
+                              border: Border.all(
+                                color: brandGreen.withValues(alpha: 0.25),
+                                width: 1.2,
+                              ),
                             ),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(16),
@@ -741,12 +803,16 @@ class _HomeViewState extends State<HomeView> {
                                 width: 52,
                                 height: 52,
                                 fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) => Container(
-                                  width: 52,
-                                  height: 52,
-                                  color: const Color(0xFFE2E8F0),
-                                  child: const Icon(Icons.person, color: textMuted),
-                                ),
+                                errorBuilder: (context, error, stackTrace) =>
+                                    Container(
+                                      width: 52,
+                                      height: 52,
+                                      color: const Color(0xFFE2E8F0),
+                                      child: const Icon(
+                                        Icons.person,
+                                        color: textMuted,
+                                      ),
+                                    ),
                               ),
                             ),
                           ),
@@ -759,10 +825,15 @@ class _HomeViewState extends State<HomeView> {
                               decoration: BoxDecoration(
                                 color: const Color(0xFF10B981),
                                 shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white, width: 2),
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 2,
+                                ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(0xFF10B981).withValues(alpha: 0.35),
+                                    color: const Color(
+                                      0xFF10B981,
+                                    ).withValues(alpha: 0.35),
                                     blurRadius: 5,
                                     spreadRadius: 1,
                                   ),
@@ -779,7 +850,11 @@ class _HomeViewState extends State<HomeView> {
                           children: [
                             Row(
                               children: [
-                                const Icon(Icons.star_rounded, color: Color(0xFFF59E0B), size: 14),
+                                const Icon(
+                                  Icons.star_rounded,
+                                  color: Color(0xFFF59E0B),
+                                  size: 14,
+                                ),
                                 const SizedBox(width: 3),
                                 Text(
                                   '${doc['rating']} (${doc['reviews']})',
@@ -819,15 +894,25 @@ class _HomeViewState extends State<HomeView> {
                   ),
 
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFF1F5F9).withValues(alpha: 0.6),
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.grey.shade100, width: 0.8),
+                      border: Border.all(
+                        color: Colors.grey.shade100,
+                        width: 0.8,
+                      ),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.access_time_rounded, color: Color(0xFF64748B), size: 13),
+                        const Icon(
+                          Icons.access_time_rounded,
+                          color: Color(0xFF64748B),
+                          size: 13,
+                        ),
                         const SizedBox(width: 6),
                         Expanded(
                           child: Text(
@@ -918,7 +1003,8 @@ class _HomeViewState extends State<HomeView> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => DoctorBariView(languageController: _langController),
+              builder: (_) =>
+                  DoctorBariView(languageController: _langController),
             ),
           );
         },
@@ -937,13 +1023,18 @@ class _HomeViewState extends State<HomeView> {
         imagePath: 'assets/images/dr_serial.png',
         onTap: () {
           debugPrint('\n==================================================');
-          debugPrint('🔘 [HOME BUTTON CLICKED] "ডাক্তার সিরিয়াল" (Doctor Serial)');
-          debugPrint('Triggering API Call: GET https://api.mediseba.org/api/v1/doctors');
+          debugPrint(
+            '🔘 [HOME BUTTON CLICKED] "ডাক্তার সিরিয়াল" (Doctor Serial)',
+          );
+          debugPrint(
+            'Triggering API Call: GET https://api.mediseba.org/api/v1/doctors',
+          );
           debugPrint('==================================================\n');
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => DoctorListView(languageController: _langController),
+              builder: (_) =>
+                  DoctorListView(languageController: _langController),
             ),
           );
         },
@@ -1001,7 +1092,8 @@ class _HomeViewState extends State<HomeView> {
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => AmbulanceSebaView(languageController: _langController),
+            builder: (_) =>
+                AmbulanceSebaView(languageController: _langController),
           ),
         ),
       ),
@@ -1107,7 +1199,10 @@ class _HomeViewState extends State<HomeView> {
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: item.borderColor.withValues(alpha: 0.65), width: 1.3),
+          border: Border.all(
+            color: item.borderColor.withValues(alpha: 0.65),
+            width: 1.3,
+          ),
           boxShadow: [
             BoxShadow(
               color: item.iconColor.withValues(alpha: 0.04),
@@ -1141,19 +1236,20 @@ class _HomeViewState extends State<HomeView> {
                         child: Image.asset(
                           item.imagePath!,
                           fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) => Container(
-                            width: 52,
-                            height: 52,
-                            decoration: BoxDecoration(
-                              color: item.iconColor,
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Icon(
-                              item.icon,
-                              color: Colors.white,
-                              size: 24,
-                            ),
-                          ),
+                          errorBuilder: (context, error, stackTrace) =>
+                              Container(
+                                width: 52,
+                                height: 52,
+                                decoration: BoxDecoration(
+                                  color: item.iconColor,
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: Icon(
+                                  item.icon,
+                                  color: Colors.white,
+                                  size: 24,
+                                ),
+                              ),
                         ),
                       )
                     : Container(
@@ -1170,11 +1266,7 @@ class _HomeViewState extends State<HomeView> {
                             ),
                           ],
                         ),
-                        child: Icon(
-                          item.icon,
-                          color: Colors.white,
-                          size: 24,
-                        ),
+                        child: Icon(item.icon, color: Colors.white, size: 24),
                       ),
                 const SizedBox(height: 8),
 
@@ -1247,8 +1339,14 @@ class _HomeViewState extends State<HomeView> {
   Widget _buildHeroBanner() {
     final List<Map<String, dynamic>> banners = [
       {
-        'title': _langController.tr('আপনার স্বাস্থ্যের সুরক্ষাই আমাদের প্রথম অগ্রাধিকার', 'Your Health Is Our Top Priority'),
-        'subtitle': _langController.tr('২৪/৭ অভিজ্ঞ প্রফেশনাল ডাক্তারের সেবা বুকিং করুন', 'Book 24/7 experienced doctor consultation'),
+        'title': _langController.tr(
+          'আপনার স্বাস্থ্যের সুরক্ষাই আমাদের প্রথম অগ্রাধিকার',
+          'Your Health Is Our Top Priority',
+        ),
+        'subtitle': _langController.tr(
+          '২৪/৭ অভিজ্ঞ প্রফেশনাল ডাক্তারের সেবা বুকিং করুন',
+          'Book 24/7 experienced doctor consultation',
+        ),
         'badge': 'OPEN 24/7',
         'assetImage': null,
         'color1': const Color(0xFF008536),
@@ -1256,8 +1354,14 @@ class _HomeViewState extends State<HomeView> {
         'icon': Icons.medical_services_rounded,
       },
       {
-        'title': _langController.tr('মেডিশপ: ৮২,০০০+ অরিজিনাল ওষুধ ডিসকাউন্টে অর্ডার করুন', 'MediShop: Order 82,000+ Original Medicines'),
-        'subtitle': _langController.tr('ঘরে বসেই জেনুইন ওষুধ ও হেলথ প্রোডাক্টের হোম ডেলিভারি', 'Fast home delivery of genuine medicines & health care'),
+        'title': _langController.tr(
+          'মেডিশপ: ৮২,০০০+ অরিজিনাল ওষুধ ডিসকাউন্টে অর্ডার করুন',
+          'MediShop: Order 82,000+ Original Medicines',
+        ),
+        'subtitle': _langController.tr(
+          'ঘরে বসেই জেনুইন ওষুধ ও হেলথ প্রোডাক্টের হোম ডেলিভারি',
+          'Fast home delivery of genuine medicines & health care',
+        ),
         'badge': '20% OFF',
         'assetImage': null,
         'color1': const Color(0xFF0288D1),
@@ -1265,8 +1369,14 @@ class _HomeViewState extends State<HomeView> {
         'icon': Icons.medication_rounded,
       },
       {
-        'title': _langController.tr('২৪/৭ ইমার্জেন্সি আইসিইউ ও এসি অ্যাম্বুলেন্স সেবা', '24/7 Emergency ICU & AC Ambulance Service'),
-        'subtitle': _langController.tr('এক কলেই দ্রুত জরুরি স্থানান্তরের জন্য কল করুন', 'Call now for quick emergency medical transport'),
+        'title': _langController.tr(
+          '২৪/৭ ইমার্জেন্সি আইসিইউ ও এসি অ্যাম্বুলেন্স সেবা',
+          '24/7 Emergency ICU & AC Ambulance Service',
+        ),
+        'subtitle': _langController.tr(
+          'এক কলেই দ্রুত জরুরি স্থানান্তরের জন্য কল করুন',
+          'Call now for quick emergency medical transport',
+        ),
         'badge': 'HOTLINE',
         'assetImage': null,
         'color1': const Color(0xFFED1B24),
@@ -1310,14 +1420,19 @@ class _HomeViewState extends State<HomeView> {
                   child: Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [banner['color1'] as Color, banner['color2'] as Color],
+                        colors: [
+                          banner['color1'] as Color,
+                          banner['color2'] as Color,
+                        ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
                       borderRadius: BorderRadius.circular(22),
                       boxShadow: [
                         BoxShadow(
-                          color: (banner['color1'] as Color).withValues(alpha: 0.2),
+                          color: (banner['color1'] as Color).withValues(
+                            alpha: 0.2,
+                          ),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -1345,9 +1460,14 @@ class _HomeViewState extends State<HomeView> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 9,
+                                        vertical: 4,
+                                      ),
                                       decoration: BoxDecoration(
-                                        color: Colors.white.withValues(alpha: 0.2),
+                                        color: Colors.white.withValues(
+                                          alpha: 0.2,
+                                        ),
                                         borderRadius: BorderRadius.circular(20),
                                       ),
                                       child: Text(
@@ -1376,7 +1496,9 @@ class _HomeViewState extends State<HomeView> {
                                     Text(
                                       banner['subtitle'],
                                       style: TextStyle(
-                                        color: Colors.white.withValues(alpha: 0.85),
+                                        color: Colors.white.withValues(
+                                          alpha: 0.85,
+                                        ),
                                         fontSize: 10.5,
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -1392,10 +1514,15 @@ class _HomeViewState extends State<HomeView> {
                                 decoration: BoxDecoration(
                                   color: Colors.white.withValues(alpha: 0.18),
                                   shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.white.withValues(alpha: 0.25), width: 1.5),
+                                  border: Border.all(
+                                    color: Colors.white.withValues(alpha: 0.25),
+                                    width: 1.5,
+                                  ),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withValues(alpha: 0.05),
+                                      color: Colors.black.withValues(
+                                        alpha: 0.05,
+                                      ),
                                       blurRadius: 10,
                                       offset: const Offset(0, 4),
                                     ),
@@ -1494,7 +1621,10 @@ class _HomeViewState extends State<HomeView> {
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.85),
           borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.6), width: 1.5),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.6),
+            width: 1.5,
+          ),
           boxShadow: [
             BoxShadow(
               color: brandGreen.withValues(alpha: 0.03),
@@ -1521,7 +1651,11 @@ class _HomeViewState extends State<HomeView> {
                     errorBuilder: (context, error, stackTrace) => Container(
                       height: 84,
                       color: const Color(0xFFE2E8F0),
-                      child: const Icon(Icons.local_hospital_rounded, color: textMuted, size: 28),
+                      child: const Icon(
+                        Icons.local_hospital_rounded,
+                        color: textMuted,
+                        size: 28,
+                      ),
                     ),
                   ),
                 ),
@@ -1529,7 +1663,10 @@ class _HomeViewState extends State<HomeView> {
                   top: 6,
                   left: 6,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 7,
+                      vertical: 3,
+                    ),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
                         colors: [brandGreen, Color(0xFF0F9D58)],
@@ -1561,12 +1698,19 @@ class _HomeViewState extends State<HomeView> {
                     child: BackdropFilter(
                       filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2.5,
+                        ),
                         color: Colors.black.withValues(alpha: 0.55),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.star_rounded, color: Color(0xFFFBBF24), size: 10),
+                            const Icon(
+                              Icons.star_rounded,
+                              color: Color(0xFFFBBF24),
+                              size: 10,
+                            ),
                             const SizedBox(width: 2),
                             Text(
                               rating,
@@ -1650,12 +1794,16 @@ class _HomeViewState extends State<HomeView> {
   Widget _buildSidebarDrawer(BuildContext context) {
     final isBangla = _langController.isBangla;
     final userData = widget.authController.currentUserData;
-    final loginIdentifier = (widget.authController.loginIdentifier ?? '').toLowerCase();
+    final loginIdentifier = (widget.authController.loginIdentifier ?? '')
+        .toLowerCase();
     final userPhone = (userData?.phone ?? '').toLowerCase();
     final userName = (userData?.name ?? '').toLowerCase();
-    final String uRole = (userData?.role ?? CacheService.get('auth_user_role')?.toString() ?? '').toLowerCase();
+    final String uRole =
+        (userData?.role ?? CacheService.get('auth_user_role')?.toString() ?? '')
+            .toLowerCase();
 
-    final bool isHbpUser = uRole == 'hbp' ||
+    final bool isHbpUser =
+        uRole == 'hbp' ||
         uRole == 'hbp-agent' ||
         uRole.contains('hbp') ||
         loginIdentifier.contains('hbp') ||
@@ -1715,7 +1863,10 @@ class _HomeViewState extends State<HomeView> {
                   decoration: BoxDecoration(
                     color: const Color(0xFFF8FAFC),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: brandGreen.withValues(alpha: 0.18), width: 1.2),
+                    border: Border.all(
+                      color: brandGreen.withValues(alpha: 0.18),
+                      width: 1.2,
+                    ),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withValues(alpha: 0.03),
@@ -1724,223 +1875,250 @@ class _HomeViewState extends State<HomeView> {
                       ),
                     ],
                   ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 42,
-                          height: 42,
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [brandGreen, Color(0xFF0F9D58)],
-                            ),
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                  color: brandGreen.withValues(alpha: 0.25),
-                                  blurRadius: 6,
-                                  offset: const Offset(0, 2)),
-                            ],
-                          ),
-                          child: const Icon(
-                            Icons.medical_services_rounded,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    isBangla ? 'মেডিসেবা' : 'MediSeba',
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w900,
-                                      color: Color(0xFF1E293B),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFED1C24),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: const Text(
-                                      '২৪/৭',
-                                      style: TextStyle(
-                                        fontSize: 9,
-                                        fontWeight: FontWeight.w800,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                isBangla ? 'ডিজিটাল হেলথ ও জরুরি সেবা' : 'Digital Health & Emergency Services',
-                                style: const TextStyle(
-                                  fontSize: 11.5,
-                                  color: Color(0xFF64748B),
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                // Menu List (Glow Sidebar List Items)
-                Expanded(
-                  child: ListView(
-                    physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                  child: Row(
                     children: [
-                      if (isHbpUser)
-                        _buildBkashMenuItem(
-                          icon: Icons.shield_outlined,
-                          title: isBangla ? 'এইচবিপি ফিল্ড পোর্টাল' : 'HBP Field Portal',
-                          onTap: () {
-                            Navigator.pop(context);
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => HbpDashboardView(
-                                  homeController: widget.homeController,
-                                  authController: widget.authController,
-                                  languageController: _langController,
-                                ),
-                              ),
-                            );
-                          },
+                      Container(
+                        width: 42,
+                        height: 42,
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [brandGreen, Color(0xFF0F9D58)],
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: brandGreen.withValues(alpha: 0.25),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
-                      if (widget.authController.isLoggedIn)
-                        _buildBkashMenuItem(
-                          icon: Icons.assignment_ind_outlined,
-                          title: isBangla ? 'পেশেন্ট পোর্টাল' : 'Patient Portal',
-                          onTap: () {
-                            Navigator.pop(context);
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => PatientPortalView(
-                                  languageController: _langController,
-                                  authController: widget.authController,
-                                ),
-                              ),
-                            );
-                          },
+                        child: const Icon(
+                          Icons.medical_services_rounded,
+                          color: Colors.white,
+                          size: 20,
                         ),
-                      _buildBkashMenuItem(
-                        icon: Icons.handshake_outlined,
-                        title: isBangla ? 'পার্টনার' : 'Partner',
-                        onTap: () {
-                          Navigator.pop(context);
-                          showPartnerBottomSheet(context, languageController: _langController);
-                        },
                       ),
-                      _buildBkashMenuItem(
-                        icon: Icons.work_outline_rounded,
-                        title: isBangla ? 'ক্যারিয়ার' : 'Career',
-                        onTap: () {
-                          Navigator.pop(context);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => CareerView(languageController: _langController)),
-                          );
-                        },
-                      ),
-                      _buildBkashMenuItem(
-                        icon: Icons.article_outlined,
-                        title: isBangla ? 'ব্লগ' : 'Blog',
-                        onTap: () {
-                          Navigator.pop(context);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => BlogView(languageController: _langController)),
-                          );
-                        },
-                      ),
-                      _buildBkashMenuItem(
-                        icon: Icons.call_outlined,
-                        title: isBangla ? 'যোগাযোগ' : 'Contact Us',
-                        onTap: () {
-                          Navigator.pop(context);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => ContactUsView(languageController: _langController)),
-                          );
-                        },
-                      ),
-                      _buildBkashMenuItem(
-                        icon: Icons.headset_mic_outlined,
-                        title: isBangla ? 'গ্রাহক সেবা' : 'Customer Helpline',
-                        onTap: () {
-                          Navigator.pop(context);
-                          showHelplineBottomSheet(context);
-                        },
-                      ),
-                      _buildBkashMenuItem(
-                        icon: Icons.public_outlined,
-                        title: isBangla ? 'সোশ্যাল মিডিয়া' : 'Social Media',
-                        onTap: () {
-                          Navigator.pop(context);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const SocialMediaView()),
-                          );
-                        },
-                      ),
-                      _buildBkashMenuItem(
-                        icon: Icons.info_outline_rounded,
-                        title: isBangla ? 'আমাদের সম্পর্কে' : 'About Us',
-                        onTap: () {
-                          Navigator.pop(context);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => AboutUsView(languageController: _langController)),
-                          );
-                        },
-                      ),
-                      _buildBkashMenuItem(
-                        icon: Icons.share_outlined,
-                        title: isBangla ? 'রেফার ও শেয়ার' : 'Share App',
-                        onTap: () {
-                          Navigator.pop(context);
-                          showShareAppDialog(context);
-                        },
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  isBangla ? 'মেডিসেবা' : 'MediSeba',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w900,
+                                    color: Color(0xFF1E293B),
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFED1C24),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: const Text(
+                                    '২৪/৭',
+                                    style: TextStyle(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              isBangla
+                                  ? 'ডিজিটাল হেলথ ও জরুরি সেবা'
+                                  : 'Digital Health & Emergency Services',
+                              style: const TextStyle(
+                                fontSize: 11.5,
+                                color: Color(0xFF64748B),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ),
+              ),
 
-                // Footer Version
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 12.0, top: 8.0),
-                  child: Text(
-                    isBangla ? 'ভার্সন: ১.০.০' : 'Version: 1.0.0',
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF94A3B8),
+              const SizedBox(height: 16),
+
+              // Menu List (Glow Sidebar List Items)
+              Expanded(
+                child: ListView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                  children: [
+                    if (isHbpUser)
+                      _buildBkashMenuItem(
+                        icon: Icons.shield_outlined,
+                        title: isBangla
+                            ? 'এইচবিপি ফিল্ড পোর্টাল'
+                            : 'HBP Field Portal',
+                        onTap: () {
+                          Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => HbpDashboardView(
+                                homeController: widget.homeController,
+                                authController: widget.authController,
+                                languageController: _langController,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    if (widget.authController.isLoggedIn)
+                      _buildBkashMenuItem(
+                        icon: Icons.assignment_ind_outlined,
+                        title: isBangla ? 'পেশেন্ট পোর্টাল' : 'Patient Portal',
+                        onTap: () {
+                          Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => PatientPortalView(
+                                languageController: _langController,
+                                authController: widget.authController,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    _buildBkashMenuItem(
+                      icon: Icons.handshake_outlined,
+                      title: isBangla ? 'পার্টনার' : 'Partner',
+                      onTap: () {
+                        Navigator.pop(context);
+                        showPartnerBottomSheet(
+                          context,
+                          languageController: _langController,
+                        );
+                      },
                     ),
+                    _buildBkashMenuItem(
+                      icon: Icons.work_outline_rounded,
+                      title: isBangla ? 'ক্যারিয়ার' : 'Career',
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                CareerView(languageController: _langController),
+                          ),
+                        );
+                      },
+                    ),
+                    _buildBkashMenuItem(
+                      icon: Icons.article_outlined,
+                      title: isBangla ? 'ব্লগ' : 'Blog',
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                BlogView(languageController: _langController),
+                          ),
+                        );
+                      },
+                    ),
+                    _buildBkashMenuItem(
+                      icon: Icons.call_outlined,
+                      title: isBangla ? 'যোগাযোগ' : 'Contact Us',
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => ContactUsView(
+                              languageController: _langController,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    _buildBkashMenuItem(
+                      icon: Icons.headset_mic_outlined,
+                      title: isBangla ? 'গ্রাহক সেবা' : 'Customer Helpline',
+                      onTap: () {
+                        Navigator.pop(context);
+                        showHelplineBottomSheet(context);
+                      },
+                    ),
+                    _buildBkashMenuItem(
+                      icon: Icons.public_outlined,
+                      title: isBangla ? 'সোশ্যাল মিডিয়া' : 'Social Media',
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const SocialMediaView(),
+                          ),
+                        );
+                      },
+                    ),
+                    _buildBkashMenuItem(
+                      icon: Icons.info_outline_rounded,
+                      title: isBangla ? 'আমাদের সম্পর্কে' : 'About Us',
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => AboutUsView(
+                              languageController: _langController,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    _buildBkashMenuItem(
+                      icon: Icons.share_outlined,
+                      title: isBangla ? 'রেফার ও শেয়ার' : 'Share App',
+                      onTap: () {
+                        Navigator.pop(context);
+                        showShareAppDialog(context);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+
+              // Footer Version
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12.0, top: 8.0),
+                child: Text(
+                  isBangla ? 'ভার্সন: ১.০.০' : 'Version: 1.0.0',
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF94A3B8),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
-      );
-    }
+      ),
+    );
+  }
 
   Widget _buildBkashMenuItem({
     required IconData icon,
@@ -1955,13 +2133,12 @@ class _HomeViewState extends State<HomeView> {
         decoration: BoxDecoration(
           color: brandGreen.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: brandGreen.withValues(alpha: 0.15), width: 0.8),
+          border: Border.all(
+            color: brandGreen.withValues(alpha: 0.15),
+            width: 0.8,
+          ),
         ),
-        child: Icon(
-          icon,
-          color: brandGreen,
-          size: 20,
-        ),
+        child: Icon(icon, color: brandGreen, size: 20),
       ),
       title: Text(
         title,
@@ -1977,7 +2154,10 @@ class _HomeViewState extends State<HomeView> {
               decoration: BoxDecoration(
                 color: const Color(0xFFFFEBEE),
                 borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: const Color(0xFFEF4444).withValues(alpha: 0.2), width: 0.8),
+                border: Border.all(
+                  color: const Color(0xFFEF4444).withValues(alpha: 0.2),
+                  width: 0.8,
+                ),
               ),
               child: Text(
                 badgeText,
@@ -2045,9 +2225,7 @@ class _QueryBannerCardState extends State<_QueryBannerCard> {
   void _navigateToHealthConsultation() {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const HealthConsultationView(),
-      ),
+      MaterialPageRoute(builder: (context) => const HealthConsultationView()),
     );
   }
 
@@ -2106,7 +2284,10 @@ class _QueryBannerCardState extends State<_QueryBannerCard> {
                       Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2.5),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2.5,
+                            ),
                             decoration: BoxDecoration(
                               color: const Color(0xFF10B981),
                               borderRadius: BorderRadius.circular(20),
@@ -2160,7 +2341,10 @@ class _QueryBannerCardState extends State<_QueryBannerCard> {
                     scale: _scale,
                     duration: const Duration(milliseconds: 100),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 10,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(12),
@@ -2221,13 +2405,16 @@ class TechGridPainter extends CustomPainter {
     for (double j = 0; j < size.height; j += step) {
       canvas.drawLine(Offset(0, j), Offset(size.width, j), paint);
     }
-    
+
     // Draw some tech diagnostic circles
     canvas.drawCircle(Offset(size.width * 0.8, size.height * 0.5), 45, paint);
-    canvas.drawCircle(Offset(size.width * 0.8, size.height * 0.5), 55, paint..strokeWidth = 0.4);
+    canvas.drawCircle(
+      Offset(size.width * 0.8, size.height * 0.5),
+      55,
+      paint..strokeWidth = 0.4,
+    );
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
-
